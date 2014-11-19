@@ -49,7 +49,20 @@ def test_version():
 
 def test_line_rate():
     cobertura = make_cobertura()
-    assert cobertura.line_rate == 0.9
+    assert cobertura.line_rate() == 0.9
+
+
+def test_line_rate_by_class():
+    cobertura = make_cobertura()
+    expected_line_rates = {
+        'Main': 1.0,
+        'search.BinarySearch': 0.9166666666666666,
+        'search.LinearSearch': 0.7142857142857143,
+    }
+
+    for class_name in cobertura.classes():
+        assert cobertura.line_rate(class_name) == \
+            expected_line_rates[class_name]
 
 
 def test_branch_rate():
@@ -109,7 +122,7 @@ def test_line_misses():
     expected_lines = {
         'Main': [],
         'search.BinarySearch': [24],
-        'search.LinearSearch': [19, 24],
+        'search.LinearSearch': [19, 20, 24],
     }
 
     assert cobertura.line_misses('Main') == expected_lines['Main']
@@ -125,7 +138,7 @@ def test_line_misses__by_iterating_over_classes():
     expected_lines = {
         'Main': [],
         'search.BinarySearch': [24],
-        'search.LinearSearch': [19, 24],
+        'search.LinearSearch': [19, 20, 24],
     }
 
     for class_name in cobertura.classes():
@@ -138,12 +151,48 @@ def test_line_misses_ranges():
     expected_ranges = {
         'Main': [],
         'search.BinarySearch': [(24, 24)],
-        'search.LinearSearch': [(19, 19), (24, 24)],
+        'search.LinearSearch': [(19, 20), (24, 24)],
     }
 
     for class_name in cobertura.classes():
         assert cobertura.line_misses_ranges(class_name) == \
             expected_ranges[class_name]
+
+
+def test_total_lines():
+    cobertura = make_cobertura()
+    expected_total_lines = {
+        'Main': 11,
+        'search.BinarySearch': 12,
+        'search.LinearSearch': 8,
+    }
+    for class_name in cobertura.classes():
+        assert cobertura.total_lines(class_name) == \
+            expected_total_lines[class_name]
+
+
+def test_total_misses():
+    cobertura = make_cobertura()
+    expected_total_misses = {
+        'Main': 0,
+        'search.BinarySearch': 1,
+        'search.LinearSearch': 3,
+    }
+    for class_name in cobertura.classes():
+        assert cobertura.total_misses(class_name) == \
+            expected_total_misses[class_name]
+
+
+def test_total_hits():
+    cobertura = make_cobertura()
+    expected_total_misses = {
+        'Main': 11,
+        'search.BinarySearch': 11,
+        'search.LinearSearch': 5,
+    }
+    for class_name in cobertura.classes():
+        assert cobertura.total_hits(class_name) == \
+            expected_total_misses[class_name]
 
 
 def test_ranges_func__1():
