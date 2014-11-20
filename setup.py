@@ -29,6 +29,7 @@ setup(
     packages=find_packages(exclude=['tests']),
     long_description=read('README.md'),
     setup_requires=['setuptools_git'],
+    install_requires=['tabulate'],
     classifiers=[
         "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: Other/Proprietary License",

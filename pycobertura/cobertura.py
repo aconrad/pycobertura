@@ -92,9 +92,10 @@ class Cobertura(object):
     def version(self):
         return self.xml.attrib['version']
 
-    @property
-    def line_rate(self):
-        return float(self.xml.attrib['line-rate'])
+    def line_rate(self, class_name=None):
+        if class_name is None:
+            return float(self.xml.attrib['line-rate'])
+        return self._classes[class_name]['line_rate']
 
     @property
     def branch_rate(self):
@@ -135,6 +136,16 @@ class Cobertura(object):
                 ranges(self.line_misses(class_name))
 
         return self._lines_missed['ranges'][class_name]
+
+    def total_misses(self, class_name):
+        return len(self.line_misses(class_name))
+
+    def total_hits(self, class_name):
+        return len(self.line_hits(class_name))
+
+    def total_lines(self, class_name):
+        line_hits = self._classes[class_name]['line_hits']
+        return len(line_hits)
 
     def classes(self):
         if self._class_list is None:
