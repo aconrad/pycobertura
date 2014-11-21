@@ -100,22 +100,6 @@ def test_line_hits__by_iterating_over_classes():
         expected_lines['search.LinearSearch']
 
 
-def test_line_hits_ranges():
-    cobertura = make_cobertura()
-
-    expected_ranges = {
-        'Main': [(10, 10), (16, 19), (23, 23), (25, 26), (28, 30)],
-        'search.BinarySearch': [
-            (12, 12), (16, 16), (18, 18), (20, 21), (23, 23), (25, 26),
-            (28, 29), (31, 31)],
-        'search.LinearSearch': [(9, 9), (13, 13), (15, 17)],
-    }
-
-    for class_name in cobertura.classes():
-        assert cobertura.line_hits_ranges(class_name) == \
-            expected_ranges[class_name]
-
-
 def test_line_misses():
     cobertura = make_cobertura()
 
@@ -125,10 +109,10 @@ def test_line_misses():
         'search.LinearSearch': [19, 20, 24],
     }
 
-    assert cobertura.line_misses('Main') == expected_lines['Main']
-    assert cobertura.line_misses('search.BinarySearch') == \
+    assert cobertura.missed_lines('Main') == expected_lines['Main']
+    assert cobertura.missed_lines('search.BinarySearch') == \
         expected_lines['search.BinarySearch']
-    assert cobertura.line_misses('search.LinearSearch') == \
+    assert cobertura.missed_lines('search.LinearSearch') == \
         expected_lines['search.LinearSearch']
 
 
@@ -142,21 +126,7 @@ def test_line_misses__by_iterating_over_classes():
     }
 
     for class_name in cobertura.classes():
-        assert cobertura.line_misses(class_name) == expected_lines[class_name]
-
-
-def test_line_misses_ranges():
-    cobertura = make_cobertura()
-
-    expected_ranges = {
-        'Main': [],
-        'search.BinarySearch': [(24, 24)],
-        'search.LinearSearch': [(19, 20), (24, 24)],
-    }
-
-    for class_name in cobertura.classes():
-        assert cobertura.line_misses_ranges(class_name) == \
-            expected_ranges[class_name]
+        assert cobertura.missed_lines(class_name) == expected_lines[class_name]
 
 
 def test_total_lines():
@@ -193,57 +163,3 @@ def test_total_hits():
     for class_name in cobertura.classes():
         assert cobertura.total_hits(class_name) == \
             expected_total_misses[class_name]
-
-
-def test_ranges_func__1():
-    from pycobertura.cobertura import ranges
-
-    assert ranges([1]) == [(1, 1)]
-
-
-def test_ranges_func__1_2():
-    from pycobertura.cobertura import ranges
-
-    assert ranges([1, 2]) == [(1, 2)]
-
-
-def test_ranges_func__1_2_3():
-    from pycobertura.cobertura import ranges
-
-    assert ranges([1, 2, 3]) == [(1, 3)]
-
-
-def test_ranges_func__1_2_3_and_7():
-    from pycobertura.cobertura import ranges
-
-    assert ranges([1, 2, 3, 7]) == [(1, 3), (7, 7)]
-
-
-def test_ranges_func__1_2_3_and_7_8():
-    from pycobertura.cobertura import ranges
-
-    assert ranges([1, 2, 3, 7, 8]) == [(1, 3), (7, 8)]
-
-
-def test_ranges_func__1_2_3_and_7_8_9():
-    from pycobertura.cobertura import ranges
-
-    assert ranges([1, 2, 3, 7, 8, 9]) == [(1, 3), (7, 9)]
-
-
-def test_ranges_func__1_and_7_8_9():
-    from pycobertura.cobertura import ranges
-
-    assert ranges([1, 7, 8, 9]) == [(1, 1), (7, 9)]
-
-
-def test_ranges_func__1_2_and_7_8_9():
-    from pycobertura.cobertura import ranges
-
-    assert ranges([1, 2, 7, 8, 9]) == [(1, 2), (7, 9)]
-
-
-def test_ranges_func__1_and_7():
-    from pycobertura.cobertura import ranges
-
-    assert ranges([1, 7]) == [(1, 1), (7, 7)]

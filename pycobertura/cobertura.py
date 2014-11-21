@@ -17,8 +17,8 @@ class Cobertura(object):
         self._classes = None
         self._packages = None
 
-        self._lines_missed = {'all': {}, 'ranges': {}}
-        self._lines_hit = {'all': {}, 'ranges': {}}
+        self._lines_missed = {}
+        self._lines_hit = {}
 
         self._package_list = None
         self._class_list = None
@@ -101,44 +101,30 @@ class Cobertura(object):
     def branch_rate(self):
         return float(self.xml.attrib['branch-rate'])
 
-    def line_misses(self, class_name):
-        if class_name not in self._lines_missed['all']:
+    def missed_lines(self, class_name):
+        if class_name not in self._lines_missed:
             if self._classes is None:
                 self._scan()
 
             line_hits = self._classes[class_name]['line_hits']
-            self._lines_missed['all'][class_name] = \
+            self._lines_missed[class_name] = \
                 [l for l in sorted(line_hits) if line_hits[l] == 0]
 
-        return self._lines_missed['all'][class_name]
+        return self._lines_missed[class_name]
 
     def line_hits(self, class_name):
-        if class_name not in self._lines_hit['all']:
+        if class_name not in self._lines_hit:
             if self._classes is None:
                 self._scan()
 
             line_hits = self._classes[class_name]['line_hits']
-            self._lines_hit['all'][class_name] = \
+            self._lines_hit[class_name] = \
                 [l for l in sorted(line_hits) if line_hits[l] > 0]
 
-        return self._lines_hit['all'][class_name]
-
-    def line_hits_ranges(self, class_name):
-        if class_name not in self._lines_hit['ranges']:
-            self._lines_hit['ranges'][class_name] = \
-                ranges(self.line_hits(class_name))
-
-        return self._lines_hit['ranges'][class_name]
-
-    def line_misses_ranges(self, class_name):
-        if class_name not in self._lines_missed['ranges']:
-            self._lines_missed['ranges'][class_name] = \
-                ranges(self.line_misses(class_name))
-
-        return self._lines_missed['ranges'][class_name]
+        return self._lines_hit[class_name]
 
     def total_misses(self, class_name):
-        return len(self.line_misses(class_name))
+        return len(self.missed_lines(class_name))
 
     def total_hits(self, class_name):
         return len(self.line_hits(class_name))
@@ -157,6 +143,10 @@ class Cobertura(object):
 
         return self._class_list
 
+    def has_class(self, class_name):
+        # FIXME: this will lookup a list which is slow, make it O(1)
+        return class_name in self.classes()
+
     def packages(self):
         if self._package_list is None:
 
@@ -166,21 +156,3 @@ class Cobertura(object):
             self._package_list = sorted(self._packages)
 
         return self._package_list
-
-
-def ranges(number_list):
-    """Assumes the list is sorted."""
-    if not number_list:
-        return number_list
-
-    ranges = []
-
-    range_start = prev_num = number_list[0]
-    for num in number_list[1:]:
-        if num != (prev_num + 1):
-            ranges.append((range_start, prev_num))
-            range_start = num
-        prev_num = num
-
-    ranges.append((range_start, prev_num))
-    return ranges
