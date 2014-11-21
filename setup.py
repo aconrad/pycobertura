@@ -29,7 +29,7 @@ setup(
     packages=find_packages(exclude=['tests']),
     long_description=read('README.md'),
     setup_requires=['setuptools_git'],
-    install_requires=['tabulate'],
+    install_requires=['click', 'tabulate'],
     classifiers=[
         "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: Other/Proprietary License",
@@ -37,4 +37,9 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
     ],
+    entry_points = {
+        'console_scripts': [
+            'pycobertura=pycobertura.cli:pycobertura'
+        ],
+    },
 )
