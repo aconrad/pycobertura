@@ -1,3 +1,22 @@
+import colorama
+import sys
+
+
+def colorize(text, color):
+    if not sys.stdout.isatty():
+        return text
+    color_code = getattr(colorama.Fore, color.upper())
+    return '%s%s%s' % (color_code, text, colorama.Fore.RESET)
+
+
+def red(text):
+    return colorize(text, 'red')
+
+
+def green(text):
+    return colorize(text, 'green')
+
+
 def rangify(number_list):
     """Assumes the list is sorted."""
     if not number_list:
