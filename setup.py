@@ -27,7 +27,7 @@ setup(
     zip_safe=False,
     include_package_data=True,
     packages=find_packages(exclude=['tests']),
-    long_description=read('README.md'),
+    long_description=read('README.md') + '\n\n' + read('CHANGES.md'),
     setup_requires=['setuptools_git'],
     install_requires=['click', 'tabulate'],
     classifiers=[
