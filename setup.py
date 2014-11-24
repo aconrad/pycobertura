@@ -23,7 +23,7 @@ setup(
     description="A Cobertura coverage report parser written in Python.",
     license="SurveyMonkey. All Rights Reserved.",
     keywords="cobertura coverage parser parse xml",
-    url="http://code.corp.surveymonkey.com/devmonkeys/smjenkins",
+    url="https://github.com/SMFOSS/pycobertura",
     zip_safe=False,
     include_package_data=True,
     packages=find_packages(exclude=['tests']),
@@ -36,6 +36,10 @@ setup(
         "Natural Language :: English",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4"
     ],
     entry_points = {
         'console_scripts': [
