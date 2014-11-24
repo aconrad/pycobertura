@@ -1,3 +1,5 @@
-# unreleased
+# Release Notes
+
+## unreleased
 
 * Initial version
