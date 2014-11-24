@@ -1,5 +1,8 @@
+import colorama
+import sys
+
+from pycobertura.utils import green, rangify, red
 from tabulate import tabulate
-from pycobertura.utils import rangify
 
 
 def get_class_summary_row(cobertura, class_name):
@@ -145,8 +148,8 @@ class TextReportDelta(object):
 
         formatted_lines = []
         for line in all_lines:
-            sign = ["-", "+"][line in added_lines]
-            formatted_line = '%s%d' % (sign, line)
+            sign, colorize = ('+', red) if line in added_lines else ('-', green)
+            formatted_line = colorize('%s%d' % (sign, line))
             formatted_lines.append(formatted_line)
 
         if None not in (line1, line2):
