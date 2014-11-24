@@ -1,4 +1,6 @@
 # Before you release
+# - install pandoc on your system: apt-get install pandoc
+# - install pypandoc: pip install pypandoc
 # - bump package version in setup.py
 # - update the package version in the CHANGES file
 

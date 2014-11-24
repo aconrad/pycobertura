@@ -2,16 +2,19 @@ import os
 import sys
 from setuptools import setup, find_packages
 
-# Utility function to read the README file.
-# Used for the long_description.  It's nice, because now 1) we have a top level
-# README file and 2) it's easier to type in the README file than to put a raw
-# string in below ...
-
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 version = '0.0.1'
+
+try:
+    import pypandoc
+    README = pypandoc.convert('README.md', 'rst')
+    CHANGES = pypandoc.convert('CHANGES.md', 'rst')
+except:
+    README = read('README.md')
+    CHANGES = read('CHANGES.md')
 
 setup(
     name="pycobertura",
@@ -27,7 +30,7 @@ setup(
     zip_safe=False,
     include_package_data=True,
     packages=find_packages(exclude=['tests']),
-    long_description=read('README.md') + '\n\n' + read('CHANGES.md'),
+    long_description='%s\n\n%s' % (README, CHANGES),
     setup_requires=['setuptools_git'],
     install_requires=['click', 'colorama', 'tabulate'],
     classifiers=[
