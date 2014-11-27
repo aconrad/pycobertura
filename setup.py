@@ -26,7 +26,7 @@ setup(
     description="A Cobertura coverage report parser written in Python.",
     license="SurveyMonkey. All Rights Reserved.",
     keywords="cobertura coverage parser parse xml",
-    url="https://github.com/SMFOSS/pycobertura",
+    url="https://github.com/SurveyMonkey/pycobertura",
     zip_safe=False,
     include_package_data=True,
     packages=find_packages(exclude=['tests']),
@@ -35,7 +35,7 @@ setup(
     install_requires=['click', 'colorama', 'tabulate'],
     classifiers=[
         "Topic :: Software Development :: Libraries :: Python Modules",
-        "License :: Other/Proprietary License",
+        "License :: OSI Approved :: MIT License",
         "Natural Language :: English",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
