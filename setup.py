@@ -24,7 +24,7 @@ setup(
     maintainer="Alex Conrad",
     maintainer_email="alexandre@surveymonkey.com",
     description="A Cobertura coverage report parser written in Python.",
-    license="SurveyMonkey. All Rights Reserved.",
+    license="MIT License",
     keywords="cobertura coverage parser parse xml",
     url="https://github.com/SurveyMonkey/pycobertura",
     zip_safe=False,
