@@ -19,12 +19,13 @@ def show(cobertura_file):
 @pycobertura.command()
 @click.argument('cobertura_file1')
 @click.argument('cobertura_file2')
-def diff(cobertura_file1, cobertura_file2):
+@click.option(
+    '--color/--no-color', default=None,
+    help='Colorize the output. By default, pycobertura emits color codes only '
+         'when standard output is connected to a terminal.')
+def diff(cobertura_file1, cobertura_file2, color):
     """compare two coverage files"""
-    from pycobertura.cobertura import Cobertura
-    from pycobertura.reports import TextReportDelta
-
     cobertura1 = Cobertura(cobertura_file1)
     cobertura2 = Cobertura(cobertura_file2)
-    report = TextReportDelta(cobertura1, cobertura2)
+    report = TextReportDelta(cobertura1, cobertura2, color=color)
     print(report.generate())

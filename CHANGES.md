@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* add `--color` and `--no-color` options to `pycobertura diff`.
+
 ## 0.0.2 (2014-11-27)
 
 * MIT license
