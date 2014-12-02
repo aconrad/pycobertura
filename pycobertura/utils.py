@@ -3,8 +3,6 @@ import sys
 
 
 def colorize(text, color):
-    if not sys.stdout.isatty():
-        return text
     color_code = getattr(colorama.Fore, color.upper())
     return '%s%s%s' % (color_code, text, colorama.Fore.RESET)
 

@@ -113,9 +113,11 @@ class TextReport(object):
 
 
 class TextReportDelta(object):
-    def __init__(self, cobertura1, cobertura2):
+    def __init__(self, cobertura1, cobertura2, color=None):
         self.cobertura1 = cobertura1
         self.cobertura2 = cobertura2
+
+        self.color = sys.stdout.isatty() if color is None else color is True
 
     def get_diff_line(self, line1, line2):
         if line1 is not None:
@@ -149,6 +151,10 @@ class TextReportDelta(object):
         formatted_lines = []
         for line in all_lines:
             sign, colorize = ('+', red) if line in added_lines else ('-', green)
+
+            if self.color is False:
+                colorize = lambda x: x  # numb coloring
+
             formatted_line = colorize('%s%d' % (sign, line))
             formatted_lines.append(formatted_line)
 
