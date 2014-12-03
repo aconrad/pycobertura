@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.0 (2014-12-03)
+
 * add `--color` and `--no-color` options to `pycobertura diff`.
 * add option `-f` and `--format` with output of `text` (default) and `html`.
 * renamed *[Rr]eport -> *[Rr]eporter
