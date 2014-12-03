@@ -6,7 +6,7 @@
 
 * add `--color` and `--no-color` options to `pycobertura diff`.
 * add option `-f` and `--format` with output of `text` (default) and `html`.
-* renamed *[Rr]eport -> *[Rr]eporter
+* change class naming from `report` to `reporter`
 
 ## 0.0.2 (2014-11-27)
 

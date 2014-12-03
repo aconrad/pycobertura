@@ -3,6 +3,7 @@
 A Cobertura coverage report parser written in Python.
 
 Features:
+
 * show coverage summary of a cobertura file
 * diff two cobertura files and show relative progress
 * output in plain text or HTML
