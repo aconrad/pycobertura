@@ -2,6 +2,12 @@
 
 A Cobertura coverage report parser written in Python.
 
+Features:
+* show coverage summary of a cobertura file
+* diff two cobertura files and show relative progress
+* output in plain text or HTML
+* colorized diff output
+
 ## CLI usage
 
 pycobertura provides a command line interface to report on coverage files:
@@ -54,8 +60,8 @@ cobertura.classes() == [
 ]
 cobertura.line_rate('pycobertura/cli') == 1.0
 
-from pycobertura import TextReport
-tr = TextReport(cobertura)
+from pycobertura import TextReporter
+tr = TextReporter(cobertura)
 tr.generate() == """\
 Name                     Stmts    Miss  Cover    Missing
 ---------------------  -------  ------  -------  ---------
@@ -66,11 +72,11 @@ pycobertura/reports        129       0  100.00%
 pycobertura/utils           12       0  100.00%
 TOTAL                      253       0  100.00%"""
 
-from pycobertura import TextReportDelta
+from pycobertura import TextReporterDelta
 
 coverage1 = Cobertura('coverage1.xml')
 coverage2 = Cobertura('coverage2.xml')
-delta = TextReportDelta(coverage1, coverage2)
+delta = TextReporterDelta(coverage1, coverage2)
 delta.generate() == """\
 Name          Stmts    Miss    Cover     Missing
 ------------  -------  ------  --------  ---------
