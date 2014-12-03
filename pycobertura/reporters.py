@@ -3,6 +3,10 @@ import sys
 
 from pycobertura.utils import green, rangify, red
 from tabulate import tabulate
+from jinja2 import Environment, PackageLoader, Template
+
+
+env = Environment(loader=PackageLoader('pycobertura', 'templates'))
 
 
 def get_class_summary_row(cobertura, class_name):
@@ -19,7 +23,7 @@ def get_class_summary_row(cobertura, class_name):
     return row
 
 
-class TextReport(object):
+class Reporter(object):
     def __init__(self, cobertura):
         self.cobertura = cobertura
 
@@ -39,7 +43,7 @@ class TextReport(object):
 
         return row
 
-    def make_footer_row(self, lines):
+    def get_footer_row(self, lines):
         total_statements = 0
         total_misses = 0
         line_rates = []
@@ -68,11 +72,13 @@ class TextReport(object):
             row = get_class_summary_row(self.cobertura, class_name)
             lines.append(row)
 
-        footer = self.make_footer_row(lines)
+        footer = self.get_footer_row(lines)
         lines.append(footer)
 
         return lines
 
+
+class TextReporter(Reporter):
     def format_row(self, row):
         class_name, total_lines, total_misses, line_rate, missed_lines = row
 
@@ -112,7 +118,24 @@ class TextReport(object):
         return report
 
 
-class TextReportDelta(object):
+class HtmlReporter(TextReporter):
+
+    def generate(self):
+        lines = self.get_report_lines()
+
+        formatted_lines = []
+        for row in lines:
+            formatted_row = self.format_row(row)
+            formatted_lines.append(formatted_row)
+
+        template = env.get_template('html.jinja2')
+        return template.render(
+            lines=formatted_lines[:-1],
+            footer=formatted_lines[-1]
+        )
+
+
+class DeltaReporter(object):
     def __init__(self, cobertura1, cobertura2, color=None):
         self.cobertura1 = cobertura1
         self.cobertura2 = cobertura2
@@ -150,12 +173,8 @@ class TextReportDelta(object):
 
         formatted_lines = []
         for line in all_lines:
-            sign, colorize = ('+', red) if line in added_lines else ('-', green)
-
-            if self.color is False:
-                colorize = lambda x: x  # numb coloring
-
-            formatted_line = colorize('%s%d' % (sign, line))
+            sign = '+' if line in added_lines else '-'
+            formatted_line = (sign, line)
             formatted_lines.append(formatted_line)
 
         if None not in (line1, line2):
@@ -177,7 +196,7 @@ class TextReportDelta(object):
 
         return diff_line
 
-    def make_footer_row(self, lines):
+    def get_footer_row(self, lines):
         total_statements = 0
         total_misses = 0
         line_rates = []
@@ -213,18 +232,31 @@ class TextReportDelta(object):
             row = self.get_diff_line(row1, row2)
             lines.append(row)
 
-        footer = self.make_footer_row(lines)
+        footer = self.get_footer_row(lines)
         lines.append(footer)
 
         return lines
 
+
+class TextReporterDelta(DeltaReporter):
     def format_row(self, row):
         class_name, total_lines, total_misses, line_rate, missed_lines = row
 
         total_lines = '%+d' % total_lines if total_lines else '-'
         total_misses = '%+d' % total_misses if total_misses else '-'
         line_rate = '%+.2f%%' % (line_rate * 100) if line_rate else '-'
-        missed_lines = ', '.join(missed_lines)
+        missed_lines = ['%s%d' % l for l in missed_lines]
+
+        if self.color is True:
+            missed_lines_colored = []
+            for line in missed_lines:
+                colorize = [green, red][line[0] == '+']
+                colored_line = colorize(line)
+                missed_lines_colored.append(colored_line)
+        else:
+            missed_lines_colored = missed_lines
+
+        missed_lines = ', '.join(missed_lines_colored)
 
         row = [
             class_name,
@@ -250,3 +282,47 @@ class TextReportDelta(object):
         )
 
         return report
+
+
+class HtmlReporterDelta(TextReporterDelta):
+    def __init__(self, *args, **kwargs):
+        kwargs['color'] = False
+        super(HtmlReporterDelta, self).__init__(*args, **kwargs)
+
+    def format_row(self, row):
+        class_name, total_lines, total_misses, line_rate, missed_lines = row
+
+        total_lines = '%+d' % total_lines if total_lines else '-'
+        total_misses = '%+d' % total_misses if total_misses else '-'
+        line_rate = '%+.2f%%' % (line_rate * 100) if line_rate else '-'
+        missed_lines = ['%s%d' % l for l in missed_lines]
+
+        missed_lines_colored = []
+        for line in missed_lines:
+            colorize = [green, red][line[0] == '+']
+            colored_line = colorize(line)
+            missed_lines_colored.append(colored_line)
+
+        row = [
+            class_name,
+            total_lines,
+            total_misses,
+            line_rate,
+            missed_lines,
+        ]
+
+        return row
+
+    def generate(self):
+        lines = self.get_report_lines()
+
+        formatted_lines = []
+        for row in lines:
+            formatted_row = self.format_row(row)
+            formatted_lines.append(formatted_row)
+
+        template = env.get_template('html-delta.jinja2')
+        return template.render(
+            lines=formatted_lines[:-1],
+            footer=formatted_lines[-1]
+        )
