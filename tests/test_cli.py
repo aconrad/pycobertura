@@ -46,6 +46,7 @@ def test_show__format_html():
         'tests/dummy.original.xml', '--format', 'html'
     ], catch_exceptions=False)
     assert result.output.startswith('<html>')
+    assert result.output.endswith('</html>\n')
 
 
 def test_show__output_to_file():
@@ -192,55 +193,5 @@ def test_diff__format_html():
         'tests/dummy.with-dummy2-better-cov.xml',
         'tests/dummy.with-dummy2-better-and-worse.xml',
     ], catch_exceptions=False)
-    assert result.output == """\
-<html>
-  <head>
-    <title>pycobertura report</title>
-    <meta charset="UTF-8">
-    <style>
-.red {color: red}
-.green {color: green}
-    </style>
-  </head>
-  <body>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Stmts</th>
-          <th>Miss</th>
-          <th>Cover</th>
-          <th>Missing</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>dummy/dummy</td>
-          <td>-</td>
-          <td>+1</td>
-          <td>-25.00%</td>
-          <td><span class="red">+5</span>
-          </td>
-        </tr>
-        <tr>
-          <td>dummy/dummy2</td>
-          <td>-</td>
-          <td>-1</td>
-          <td>+50.00%</td>
-          <td><span class="green">-2</span>
-          </td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr>
-          <td>TOTAL</td>
-          <td>-</td>
-          <td>-</td>
-          <td>-</td>
-          <td></td>
-        </tr>
-      </tfoot>
-    </table>
-  </body>
-</html>
-"""
+    assert result.output.startswith('<html>')
+    assert result.output.endswith('</html>\n')

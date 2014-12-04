@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* apply Skeleton 2.0 theme to html output
 * add `-o` / `--output` option to write reports to a file.
 * known issue: diffing 2 files with options `--format text`, `--color` and
   `--output` does not render color under PY2.
