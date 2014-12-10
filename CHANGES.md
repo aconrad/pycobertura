@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+* fix py26 compatibility by switching the XML parser to `lxml` which has a more
+  predictible behavior when used across all Python versions.
+
 ## 0.2.0 (2014-12-10)
 
 * apply Skeleton 2.0 theme to html output
