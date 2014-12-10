@@ -198,42 +198,7 @@ dummy/dummy2  -        -1      +50.00%  -2
 TOTAL         -        -       -"""
 
 
-@mock.patch('pycobertura.utils.sys.stdout.isatty', return_value=True)
-def test_text_report_delta__colorize_for_tty(mock_tty):
-    from pycobertura.reporters import TextReporterDelta
-
-    cobertura1 = make_cobertura('tests/dummy.with-dummy2-better-cov.xml')
-    cobertura2 = make_cobertura('tests/dummy.with-dummy2-better-and-worse.xml')
-
-    report_delta = TextReporterDelta(cobertura1, cobertura2)
-
-    assert report_delta.generate() == """\
-Name          Stmts    Miss    Cover    Missing
-------------  -------  ------  -------  ---------
-dummy/dummy   -        +1      -25.00%  \x1b[31m+5\x1b[39m
-dummy/dummy2  -        -1      +50.00%  \x1b[32m-2\x1b[39m
-TOTAL         -        -       -"""
-
-
-@mock.patch('pycobertura.utils.sys.stdout.isatty', return_value=False)
-def test_text_report_delta__no_colorize_for_non_tty(mock_tty):
-    from pycobertura.reporters import TextReporterDelta
-
-    cobertura1 = make_cobertura('tests/dummy.with-dummy2-better-cov.xml')
-    cobertura2 = make_cobertura('tests/dummy.with-dummy2-better-and-worse.xml')
-
-    report_delta = TextReporterDelta(cobertura1, cobertura2)
-
-    assert report_delta.generate() == """\
-Name          Stmts    Miss    Cover    Missing
-------------  -------  ------  -------  ---------
-dummy/dummy   -        +1      -25.00%  +5
-dummy/dummy2  -        -1      +50.00%  -2
-TOTAL         -        -       -"""
-
-
-@mock.patch('pycobertura.utils.sys.stdout.isatty', return_value=True)
-def test_text_report_delta__force_colorize_when_tty_is_true(mock_tty):
+def test_text_report_delta__colorize_True():
     from pycobertura.reporters import TextReporterDelta
 
     cobertura1 = make_cobertura('tests/dummy.with-dummy2-better-cov.xml')
@@ -249,42 +214,7 @@ dummy/dummy2  -        -1      +50.00%  \x1b[32m-2\x1b[39m
 TOTAL         -        -       -"""
 
 
-@mock.patch('pycobertura.utils.sys.stdout.isatty', return_value=False)
-def test_text_report_delta__force_colorize_when_tty_is_false(mock_tty):
-    from pycobertura.reporters import TextReporterDelta
-
-    cobertura1 = make_cobertura('tests/dummy.with-dummy2-better-cov.xml')
-    cobertura2 = make_cobertura('tests/dummy.with-dummy2-better-and-worse.xml')
-
-    report_delta = TextReporterDelta(cobertura1, cobertura2, color=True)
-
-    assert report_delta.generate() == """\
-Name          Stmts    Miss    Cover    Missing
-------------  -------  ------  -------  ---------
-dummy/dummy   -        +1      -25.00%  \x1b[31m+5\x1b[39m
-dummy/dummy2  -        -1      +50.00%  \x1b[32m-2\x1b[39m
-TOTAL         -        -       -"""
-
-
-@mock.patch('pycobertura.utils.sys.stdout.isatty', return_value=True)
-def test_text_report_delta__force_no_colorize_when_tty_is_true(mock_tty):
-    from pycobertura.reporters import TextReporterDelta
-
-    cobertura1 = make_cobertura('tests/dummy.with-dummy2-better-cov.xml')
-    cobertura2 = make_cobertura('tests/dummy.with-dummy2-better-and-worse.xml')
-
-    report_delta = TextReporterDelta(cobertura1, cobertura2, color=False)
-
-    assert report_delta.generate() == """\
-Name          Stmts    Miss    Cover    Missing
-------------  -------  ------  -------  ---------
-dummy/dummy   -        +1      -25.00%  +5
-dummy/dummy2  -        -1      +50.00%  -2
-TOTAL         -        -       -"""
-
-
-@mock.patch('pycobertura.utils.sys.stdout.isatty', return_value=False)
-def test_text_report_delta__force_no_colorize_when_tty_is_false(mock_tty):
+def test_text_report_delta__colorize_False():
     from pycobertura.reporters import TextReporterDelta
 
     cobertura1 = make_cobertura('tests/dummy.with-dummy2-better-cov.xml')

@@ -1,5 +1,4 @@
 import colorama
-import sys
 
 
 def colorize(text, color):
