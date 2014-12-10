@@ -4,6 +4,15 @@ import mock
 SOURCE_FILE = 'tests/cobertura.xml'
 
 
+def remove_style_tag(html):
+    style_pattern_start = '\n    <style>'
+    style_pattern_stop = '\n    </style>'
+    style_starts = html.find(style_pattern_start)
+    style_stops = html.find(style_pattern_stop) + len(style_pattern_stop)
+    html_nostyle = html[:style_starts] + html[style_stops:]
+    return html_nostyle
+
+
 def make_cobertura(xml_file=SOURCE_FILE):
     from pycobertura import Cobertura
     cobertura = Cobertura(xml_file)
@@ -235,8 +244,12 @@ def test_html_report():
 
     cobertura = make_cobertura()
     report = HtmlReporter(cobertura)
+    html_output = report.generate()
 
-    assert report.generate() == """\
+    assert "normalize.css" in html_output
+    assert "Skeleton V2.0" in html_output
+
+    assert remove_style_tag(html_output) == """\
 <html>
   <head>
     <title>pycobertura report</title>
@@ -297,16 +310,17 @@ def test_html_report_delta():
     cobertura2 = make_cobertura('tests/dummy.with-dummy2-no-cov.xml')
 
     report_delta = HtmlReporterDelta(cobertura1, cobertura2)
+    html_output = report_delta.generate()
+    assert '.red {color: red}' in html_output
+    assert '.green {color: green}' in html_output
+    assert "normalize.css" in html_output
+    assert "Skeleton V2.0" in html_output
 
-    assert report_delta.generate() == """\
+    assert remove_style_tag(html_output) == """\
 <html>
   <head>
     <title>pycobertura report</title>
     <meta charset="UTF-8">
-    <style>
-.red {color: red}
-.green {color: green}
-    </style>
   </head>
   <body>
     <table>
