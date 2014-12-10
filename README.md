@@ -1,6 +1,7 @@
 # pycobertura
 
-A Cobertura coverage report parser written in Python.
+A [Cobertura](http://cobertura.github.io/cobertura/) coverage report
+parser written in Python.
 
 Features:
 
