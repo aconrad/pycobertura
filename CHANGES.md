@@ -2,8 +2,11 @@
 
 ## Unreleased
 
+## 0.2.1 (2014-12-10)
+
 * fix py26 compatibility by switching the XML parser to `lxml` which has a more
   predictible behavior when used across all Python versions.
+* add Travis CI
 
 ## 0.2.0 (2014-12-10)
 
