@@ -1,6 +1,6 @@
 import os
 
-from xml.etree import ElementTree as ET
+import lxml.etree as ET
 
 
 class Cobertura(object):

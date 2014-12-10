@@ -1,6 +1,6 @@
 import mock
 
-import xml.etree.ElementTree as ET
+import lxml.etree as ET
 
 
 SOURCE_FILE = 'tests/cobertura.xml'
@@ -19,7 +19,7 @@ def test_parse_string():
         xml = f.read()
 
     cobertura = Cobertura(xml)
-    assert isinstance(cobertura.xml, ET.Element)
+    assert isinstance(cobertura.xml, ET._Element)
 
 
 def test_parse_fileobj():
@@ -27,7 +27,7 @@ def test_parse_fileobj():
 
     with open(SOURCE_FILE) as f:
         cobertura = Cobertura(f)
-    assert isinstance(cobertura.xml, ET.Element)
+    assert isinstance(cobertura.xml, ET._Element)
 
 
 def test_parse_path():

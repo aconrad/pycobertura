@@ -1,7 +1,7 @@
 from click.testing import CliRunner
 import sys
 
-PY2 = sys.version_info.major == 2
+PY2 = sys.version_info[0] == 2
 
 
 def test_show__format_default():
