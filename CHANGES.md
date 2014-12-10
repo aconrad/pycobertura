@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.0 (2014-12-10)
+
 * apply Skeleton 2.0 theme to html output
 * add `-o` / `--output` option to write reports to a file.
 * known issue: diffing 2 files with options `--format text`, `--color` and
