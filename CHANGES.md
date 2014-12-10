@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+* add `-o` / `--output` option to write reports to a file.
+* known issue: diffing 2 files with options `--format text`, `--color` and
+  `--output` does not render color under PY2.
+
 ## 0.1.0 (2014-12-03)
 
 * add `--color` and `--no-color` options to `pycobertura diff`.
