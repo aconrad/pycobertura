@@ -2,6 +2,9 @@
 
 A Cobertura coverage report parser written in Python.
 
+[![Travis](http://img.shields.io/travis/SurveyMonkey/pycobertura.svg)]()
+[![PyPI](http://img.shields.io/pypi/v/pycobertura.svg)]()
+
 Features:
 
 * show coverage summary of a cobertura file
