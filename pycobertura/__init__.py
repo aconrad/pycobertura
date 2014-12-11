@@ -1,2 +1,2 @@
-from .cobertura import Cobertura
-from .reporters import TextReporter, TextReporterDelta
+from .cobertura import Cobertura  # noqa
+from .reporters import TextReporter, TextReporterDelta  # noqa

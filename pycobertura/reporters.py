@@ -1,9 +1,6 @@
-import colorama
-import sys
-
+from jinja2 import Environment, PackageLoader
 from pycobertura.utils import green, rangify, red
 from tabulate import tabulate
-from jinja2 import Environment, PackageLoader, Template
 
 
 env = Environment(loader=PackageLoader('pycobertura', 'templates'))
@@ -89,7 +86,8 @@ class TextReporter(Reporter):
             if line_start == line_stop:
                 formatted_missed_lines.append('%s' % line_start)
             else:
-                formatted_missed_lines.append('%s-%s' % (line_start, line_stop))
+                line_range = '%s-%s' % (line_start, line_stop)
+                formatted_missed_lines.append(line_range)
         formatted_missed_lines = ', '.join(formatted_missed_lines)
 
         row = [
@@ -142,13 +140,21 @@ class DeltaReporter(object):
 
     def get_diff_line(self, line1, line2):
         if line1 is not None:
-            class_name1, total_lines1, total_misses1, line_rate1, missed_lines1 = line1
+            (class_name1,
+             total_lines1,
+             total_misses1,
+             line_rate1,
+             missed_lines1) = line1
             class_name = class_name1
         if line2 is not None:
-            class_name2, total_lines2, total_misses2, line_rate2, missed_lines2 = line2
+            (class_name2,
+             total_lines2,
+             total_misses2,
+             line_rate2,
+             missed_lines2) = line2
             class_name = class_name2
 
-        if not None in (line1, line2):
+        if None not in (line1, line2):
             added_lines = set(missed_lines2).difference(missed_lines1)
             removed_lines = set(missed_lines1).difference(missed_lines2)
             all_lines = sorted(added_lines.union(removed_lines))
@@ -158,8 +164,8 @@ class DeltaReporter(object):
             added_lines = set()
             all_lines = missed_lines1
 
-	# Early return if line2 is None, the class doesn't exist anymore in
-	# the latest version.
+        # Early return if line2 is None, the class doesn't exist anymore in
+        # the latest version.
         if line2 is None:
             return [
                 class_name,
@@ -242,7 +248,7 @@ class TextReporterDelta(DeltaReporter):
         Takes the same arguments as `DeltaReporter` but also takes the keyword
         argument `color` which can be set to True or False depending if the
         generated report should be colored or not (default `color=False`).
-	"""
+        """
         self.color = kwargs.pop('color', False)
         super(TextReporterDelta, self).__init__(*args, **kwargs)
 
