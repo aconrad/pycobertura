@@ -89,5 +89,5 @@ def diff(cobertura_file1, cobertura_file2, color, format, output):
     # color=True/False flag which will allow us to override ANSI code
     # auto-detection.
     # https://github.com/mitsuhiko/click/commit/5cf7f2ddfba328070751cbda32782520d4e0d6f5
-    #click.echo(report, file=output, nl=isatty, color=color)  # click 4.x
+    # click.echo(report, file=output, nl=isatty, color=color)  # click 4.x
     click.echo(report, file=output, nl=isatty)
