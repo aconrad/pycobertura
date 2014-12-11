@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* update description of pycobertura
+
 ## 0.2.1 (2014-12-10)
 
 * fix py26 compatibility by switching the XML parser to `lxml` which has a more

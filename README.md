@@ -1,7 +1,7 @@
 # pycobertura
 
-A [Cobertura](http://cobertura.github.io/cobertura/) coverage report
-parser written in Python.
+A [Cobertura](http://cobertura.github.io/cobertura/) coverage parser that can
+diff reports.
 
 [![Travis](http://img.shields.io/travis/SurveyMonkey/pycobertura.svg)]()
 [![PyPI](http://img.shields.io/pypi/v/pycobertura.svg)]()
