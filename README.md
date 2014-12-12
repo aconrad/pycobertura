@@ -13,6 +13,12 @@ Features:
 * output in plain text or HTML
 * colorized diff output
 
+## Install
+
+```
+pip install pycobertura
+```
+
 ## CLI usage
 
 pycobertura provides a command line interface to report on coverage files:
