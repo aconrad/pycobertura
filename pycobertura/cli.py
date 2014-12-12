@@ -91,3 +91,7 @@ def diff(cobertura_file1, cobertura_file2, color, format, output):
     # https://github.com/mitsuhiko/click/commit/5cf7f2ddfba328070751cbda32782520d4e0d6f5
     # click.echo(report, file=output, nl=isatty, color=color)  # click 4.x
     click.echo(report, file=output, nl=isatty)
+
+    # non-zero exit code if line rate worsened
+    exit_code = cobertura1.line_rate() > cobertura2.line_rate()
+    raise SystemExit(exit_code)

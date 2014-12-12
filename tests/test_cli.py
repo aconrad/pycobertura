@@ -195,3 +195,36 @@ def test_diff__format_html():
     ], catch_exceptions=False)
     assert result.output.startswith('<html>')
     assert result.output.endswith('</html>\n')
+
+
+def test_diff__same_coverage_has_exit_status_of_zero():
+    from pycobertura.cli import diff
+
+    runner = CliRunner()
+    result = runner.invoke(diff, [
+        'tests/dummy.original.xml',
+        'tests/dummy.original.xml',
+    ], catch_exceptions=False)
+    assert result.exit_code == 0
+
+
+def test_diff__better_coverage_has_exit_status_of_zero():
+    from pycobertura.cli import diff
+
+    runner = CliRunner()
+    result = runner.invoke(diff, [
+        'tests/dummy.original.xml',
+        'tests/dummy.original-full-cov.xml',
+    ], catch_exceptions=False)
+    assert result.exit_code == 0
+
+
+def test_diff__worse_coverage_has_exit_status_of_one():
+    from pycobertura.cli import diff
+
+    runner = CliRunner()
+    result = runner.invoke(diff, [
+        'tests/dummy.original-full-cov.xml',
+        'tests/dummy.original.xml',
+    ], catch_exceptions=False)
+    assert result.exit_code == 1
