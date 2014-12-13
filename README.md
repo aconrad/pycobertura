@@ -95,3 +95,21 @@ dummy/dummy   -        -2      +50.00%   -2, -5
 dummy/dummy2  +2       -       +100.00%
 TOTAL         +2       -2      +50.00%"""
 ```
+
+## Contribute
+
+Found a bug? Got a patch? Have an idea? Please use Github issues or fork
+pycobertura and submit a pull request (PR). All contributions are welcome!
+
+If you submit a PR:
+* ensure the description of your PR illustrates your changes clearly by showing
+  what the problem was and how you fixed it (before/after)
+* make sure your changes are covered with one or more tests
+* add a descriptive note in the CHANGES file under the `Unreleased` section
+* update the README accordingly if your changes outdate the documentation
+* make sure all tests are passing using `tox`
+
+```
+pip install tox
+tox
+```
