@@ -6,6 +6,10 @@
 * pep8-ify
 * add pep8 tasks for tox and travis
 * diff command returns non-zero exit code if coverage worsened
+* `Cobertura.branch_rate` is now a method that can take an optional
+  `class_name` argument
+* refactor internals for improved readability
+* show classes that contain no lines, e.g. `__init__.py`
 
 ## 0.2.1 (2014-12-10)
 
