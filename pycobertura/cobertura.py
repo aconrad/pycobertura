@@ -4,13 +4,19 @@ import lxml.etree as ET
 
 
 class Cobertura(object):
+    """
+    An XML cobertura parser.
+    """
+
     def __init__(self, xml_source):
         """
+        Initialize a cobertura report given an XML file `xml_source` that is
+        in the cobertura format.
+
         `xml_source` may be:
         - a path to an XML file
         - an open file object
-        - an XML `string
-
+        - an XML string
         """
         self.source = xml_source
 
@@ -45,14 +51,19 @@ class Cobertura(object):
     def _parse_xml_string(self, xml_string):
         return ET.fromstring(xml_string)
 
-    @property
-    def version(self):
-        return self.xml.attrib['version']
-
     def _get_element_by_class_name(self, class_name):
         return self.xml.xpath("//class[@name='%s'][1]" % class_name)[0]
 
+    @property
+    def version(self):
+        """Return the version number of the coverage report."""
+        return self.xml.attrib['version']
+
     def line_rate(self, class_name=None):
+        """
+        Return the global line rate of the coverage report. If the class
+        `class_name` is given, return the line rate of the class.
+        """
         if class_name is None:
             el = self.xml
         else:
@@ -61,44 +72,77 @@ class Cobertura(object):
         return float(el.attrib['line-rate'])
 
     def branch_rate(self, class_name=None):
+        """
+        Return the global branch rate of the coverage report. If the class
+        `class_name` is given, return the branch rate of the class.
+        """
         if class_name is None:
             el = self.xml
         else:
             el = self._get_element_by_class_name(class_name)
+
         return float(el.attrib['branch-rate'])
 
     def missed_lines(self, class_name):
+        """
+        Return the list of uncovered line numbers for the class `class_name`.
+        """
         el = self._get_element_by_class_name(class_name)
         lines = el.xpath('./lines/line[@hits=0]')
         return [int(l.attrib['number']) for l in lines]
 
     def line_hits(self, class_name):
+        """
+        Return the list of covered line numbers for the class `class_name`.
+        """
         el = self._get_element_by_class_name(class_name)
         lines = el.xpath('./lines/line[@hits>0]')
         return [int(l.attrib['number']) for l in lines]
 
     def total_misses(self, class_name):
+        """
+        Return the number of uncovered line numbers for the class `class_name`.
+        """
         return len(self.missed_lines(class_name))
 
     def total_hits(self, class_name):
+        """
+        Return the number of covered line numbers for the class `class_name`.
+        """
         return len(self.line_hits(class_name))
 
     def total_lines(self, class_name):
+        """
+        Return the total number of lines for the class `class_name`.
+        """
         el = self._get_element_by_class_name(class_name)
         lines = el.xpath('./lines/line')
         return len(lines)
 
     def filename(self, class_name):
+        """
+        Return the filename of the class `class_name`.
+        """
         el = self._get_element_by_class_name(class_name)
         filename = el.attrib['filename']
         return filename
 
     def classes(self):
+        """
+        Return the list of available classes in the coverage report.
+        """
         return [el.attrib['name'] for el in self.xml.xpath("//class")]
 
     def has_class(self, class_name):
+        """
+        Return `True` if the class `class_name` is present in the report,
+        return `False` otherwise.
+        """
         # FIXME: this will lookup a list which is slow, make it O(1)
         return class_name in self.classes()
 
     def packages(self):
+        """
+        Return the list of available packages in the coverage report.
+        """
         return [el.attrib['name'] for el in self.xml.xpath("//package")]
