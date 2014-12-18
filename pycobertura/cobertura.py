@@ -88,6 +88,11 @@ class Cobertura(object):
         lines = el.xpath('./lines/line')
         return len(lines)
 
+    def filename(self, class_name):
+        el = self._get_element_by_class_name(class_name)
+        filename = el.attrib['filename']
+        return filename
+
     def classes(self):
         return [el.attrib['name'] for el in self.xml.xpath("//class")]
 

@@ -10,6 +10,7 @@
   `class_name` argument
 * refactor internals for improved readability
 * show classes that contain no lines, e.g. `__init__.py`
+* add `Cobertura.filename(class_name)` to retrieve the filename of a class
 
 ## 0.2.1 (2014-12-10)
 
