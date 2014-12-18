@@ -13,10 +13,11 @@ def test_show__format_default():
         catch_exceptions=False
     )
     assert result.output == """\
-Name           Stmts    Miss  Cover    Missing
------------  -------  ------  -------  ---------
-dummy/dummy        4       2  50.00%   2, 5
-TOTAL              4       2  50.00%
+Name              Stmts    Miss  Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__        0       0  0.00%
+dummy/dummy           4       2  50.00%   2, 5
+TOTAL                 4       2  50.00%
 """
 
 
@@ -31,10 +32,11 @@ def test_show__format_text():
             catch_exceptions=False
         )
         assert result.output == """\
-Name           Stmts    Miss  Cover    Missing
------------  -------  ------  -------  ---------
-dummy/dummy        4       2  50.00%   2, 5
-TOTAL              4       2  50.00%
+Name              Stmts    Miss  Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__        0       0  0.00%
+dummy/dummy           4       2  50.00%   2, 5
+TOTAL                 4       2  50.00%
 """
 
 
@@ -67,10 +69,11 @@ def test_show__output_to_file():
                 report = f.read()
             assert result.output == ""
             assert report == """\
-Name           Stmts    Miss  Cover    Missing
------------  -------  ------  -------  ---------
-dummy/dummy        4       2  50.00%   2, 5
-TOTAL              4       2  50.00%"""
+Name              Stmts    Miss  Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__        0       0  0.00%
+dummy/dummy           4       2  50.00%   2, 5
+TOTAL                 4       2  50.00%"""
 
 
 def test_diff__format_default():
@@ -84,19 +87,21 @@ def test_diff__format_default():
     # FIXME: Fails in PY2, requires click>=4.x to pass
     if not PY2:
         assert result.output == """\
-Name          Stmts    Miss    Cover    Missing
-------------  -------  ------  -------  ---------
-dummy/dummy   -        +1      -25.00%  \x1b[31m+5\x1b[39m
-dummy/dummy2  -        -1      +50.00%  \x1b[32m-2\x1b[39m
-TOTAL         -        -       -
+Name            Stmts    Miss    Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__  -        -       -
+dummy/dummy     -        +1      -25.00%  \x1b[31m+5\x1b[39m
+dummy/dummy2    -        -1      +50.00%  \x1b[32m-2\x1b[39m
+TOTAL           -        -       -
 """
     else:
         assert result.output == """\
-Name          Stmts    Miss    Cover    Missing
-------------  -------  ------  -------  ---------
-dummy/dummy   -        +1      -25.00%  +5
-dummy/dummy2  -        -1      +50.00%  -2
-TOTAL         -        -       -
+Name            Stmts    Miss    Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__  -        -       -
+dummy/dummy     -        +1      -25.00%  +5
+dummy/dummy2    -        -1      +50.00%  -2
+TOTAL           -        -       -
 """
 
 
@@ -113,19 +118,21 @@ def test_diff__format_text():
         # FIXME: Fails in PY2, requires click>=4.x to pass
         if not PY2:
             assert result.output == """\
-Name          Stmts    Miss    Cover    Missing
-------------  -------  ------  -------  ---------
-dummy/dummy   -        +1      -25.00%  \x1b[31m+5\x1b[39m
-dummy/dummy2  -        -1      +50.00%  \x1b[32m-2\x1b[39m
-TOTAL         -        -       -
+Name            Stmts    Miss    Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__  -        -       -
+dummy/dummy     -        +1      -25.00%  \x1b[31m+5\x1b[39m
+dummy/dummy2    -        -1      +50.00%  \x1b[32m-2\x1b[39m
+TOTAL           -        -       -
 """
         else:
             assert result.output == """\
-Name          Stmts    Miss    Cover    Missing
-------------  -------  ------  -------  ---------
-dummy/dummy   -        +1      -25.00%  +5
-dummy/dummy2  -        -1      +50.00%  -2
-TOTAL         -        -       -
+Name            Stmts    Miss    Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__  -        -       -
+dummy/dummy     -        +1      -25.00%  +5
+dummy/dummy2    -        -1      +50.00%  -2
+TOTAL           -        -       -
 """
 
 
@@ -158,11 +165,12 @@ def test_diff__output_to_file():
                 report = f.read()
             assert result.output == ""
             assert report == """\
-Name          Stmts    Miss    Cover    Missing
-------------  -------  ------  -------  ---------
-dummy/dummy   -        +1      -25.00%  +5
-dummy/dummy2  -        -1      +50.00%  -2
-TOTAL         -        -       -"""
+Name            Stmts    Miss    Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__  -        -       -
+dummy/dummy     -        +1      -25.00%  +5
+dummy/dummy2    -        -1      +50.00%  -2
+TOTAL           -        -       -"""
 
 
 # FIXME: when Click 4 is available, uncomment this.

@@ -28,7 +28,8 @@ def test_report_row_by_class():
     expected_rows = {
         'Main': ['Main', 11, 0, 1, []],
         'search.BinarySearch': ['search.BinarySearch', 12, 1, 0.9166666666666666, [24]],
-        'search.LinearSearch': ['search.LinearSearch', 8, 3, 0.7142857142857143, [19, 20, 24]],
+        'search.ISortedArraySearch': ['search.ISortedArraySearch', 0, 0, 1.0, []],
+        'search.LinearSearch': ['search.LinearSearch', 7, 2, 0.7142857142857143, [19, 24]],
     }
 
     for class_name in cobertura.classes():
@@ -43,12 +44,28 @@ def test_text_report():
     report = TextReporter(cobertura)
 
     assert report.generate() == """\
-Name                   Stmts    Miss  Cover    Missing
--------------------  -------  ------  -------  ---------
-Main                      11       0  100.00%
-search.BinarySearch       12       1  91.67%   24
-search.LinearSearch        8       3  71.43%   19-20, 24
-TOTAL                     31       4  90.00%"""
+Name                         Stmts    Miss  Cover    Missing
+-------------------------  -------  ------  -------  ---------
+Main                            11       0  100.00%
+search.BinarySearch             12       1  91.67%   24
+search.ISortedArraySearch        0       0  100.00%
+search.LinearSearch              7       2  71.43%   19, 24
+TOTAL                           30       3  90.00%"""
+
+
+def test_text_report__with_missing_range():
+    from pycobertura.reporters import TextReporter
+
+    cobertura = make_cobertura('tests/dummy.with-dummy2-no-cov.xml')
+    report = TextReporter(cobertura)
+
+    assert report.generate() == """\
+Name              Stmts    Miss  Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__        0       0  0.00%
+dummy/dummy           4       0  100.00%
+dummy/dummy2          2       2  0.00%    1-2
+TOTAL                 6       2  66.67%"""
 
 
 def test_text_report_delta__no_diff():
@@ -60,10 +77,11 @@ def test_text_report_delta__no_diff():
     report_delta = TextReporterDelta(cobertura1, cobertura2)
 
     assert report_delta.generate() == """\
-Name         Stmts    Miss    Cover    Missing
------------  -------  ------  -------  ---------
-dummy/dummy  -        -       -
-TOTAL        -        -       -"""
+Name            Stmts    Miss    Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__  -        -       -
+dummy/dummy     -        -       -
+TOTAL           -        -       -"""
 
 
 def test_text_report_delta__improve_coverage():
@@ -75,10 +93,11 @@ def test_text_report_delta__improve_coverage():
     report_delta = TextReporterDelta(cobertura1, cobertura2)
 
     assert report_delta.generate() == """\
-Name         Stmts      Miss  Cover    Missing
------------  -------  ------  -------  ---------
-dummy/dummy  -            -1  +25.00%  -2
-TOTAL        -            -1  +25.00%"""
+Name            Stmts    Miss    Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__  -        -       -
+dummy/dummy     -        -1      +25.00%  -2
+TOTAL           -        -1      +25.00%"""
 
 
 def test_text_report_delta__full_coverage():
@@ -90,10 +109,11 @@ def test_text_report_delta__full_coverage():
     report_delta = TextReporterDelta(cobertura1, cobertura2)
 
     assert report_delta.generate() == """\
-Name         Stmts      Miss  Cover    Missing
------------  -------  ------  -------  ---------
-dummy/dummy  -            -2  +50.00%  -2, -5
-TOTAL        -            -2  +50.00%"""
+Name            Stmts    Miss    Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__  -        -       -
+dummy/dummy     -        -2      +50.00%  -2, -5
+TOTAL           -        -2      +50.00%"""
 
 
 def test_text_report_delta__worsen_coverage():
@@ -105,10 +125,11 @@ def test_text_report_delta__worsen_coverage():
     report_delta = TextReporterDelta(cobertura1, cobertura2)
 
     assert report_delta.generate() == """\
-Name         Stmts      Miss  Cover    Missing
------------  -------  ------  -------  ---------
-dummy/dummy  -            +1  -25.00%  +2
-TOTAL        -            +1  -25.00%"""
+Name            Stmts    Miss    Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__  -        -       -
+dummy/dummy     -        +1      -25.00%  +2
+TOTAL           -        +1      -25.00%"""
 
 
 def test_text_report_delta__new_dummy2_class_has_no_coverage():
@@ -120,11 +141,12 @@ def test_text_report_delta__new_dummy2_class_has_no_coverage():
     report_delta = TextReporterDelta(cobertura1, cobertura2)
 
     assert report_delta.generate() == """\
-Name          Stmts    Miss    Cover    Missing
-------------  -------  ------  -------  ---------
-dummy/dummy   -        -       -
-dummy/dummy2  +2       +2      -        +1, +2
-TOTAL         +2       +2      -33.33%"""
+Name            Stmts    Miss    Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__  -        -       -
+dummy/dummy     -        -       -
+dummy/dummy2    +2       +2      -        +1, +2
+TOTAL           +2       +2      -33.33%"""
 
 
 def test_text_report_delta__new_dummy2_class_has_improved_coverage():
@@ -136,11 +158,12 @@ def test_text_report_delta__new_dummy2_class_has_improved_coverage():
     report_delta = TextReporterDelta(cobertura1, cobertura2)
 
     assert report_delta.generate() == """\
-Name          Stmts    Miss    Cover    Missing
-------------  -------  ------  -------  ---------
-dummy/dummy   -        -       -
-dummy/dummy2  +2       +1      +50.00%  +2
-TOTAL         +2       +1      -16.67%"""
+Name            Stmts    Miss    Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__  -        -       -
+dummy/dummy     -        -       -
+dummy/dummy2    +2       +1      +50.00%  +2
+TOTAL           +2       +1      -16.67%"""
 
 
 def test_text_report_delta__new_dummy2_class_has_full_coverage():
@@ -152,11 +175,12 @@ def test_text_report_delta__new_dummy2_class_has_full_coverage():
     report_delta = TextReporterDelta(cobertura1, cobertura2)
 
     assert report_delta.generate() == """\
-Name          Stmts    Miss    Cover     Missing
-------------  -------  ------  --------  ---------
-dummy/dummy   -        -       -
-dummy/dummy2  +2       -       +100.00%
-TOTAL         +2       -       -"""
+Name            Stmts    Miss    Cover     Missing
+--------------  -------  ------  --------  ---------
+dummy/__init__  -        -       -
+dummy/dummy     -        -       -
+dummy/dummy2    +2       -       +100.00%
+TOTAL           +2       -       -"""
 
 
 def test_text_report_delta__removed_dummy2_class():
@@ -168,11 +192,12 @@ def test_text_report_delta__removed_dummy2_class():
     report_delta = TextReporterDelta(cobertura1, cobertura2)
 
     assert report_delta.generate() == """\
-Name          Stmts    Miss    Cover    Missing
-------------  -------  ------  -------  ---------
-dummy/dummy   -        -       -
-dummy/dummy2  -2       -       -
-TOTAL         -2       -       -"""
+Name            Stmts    Miss    Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__  -        -       -
+dummy/dummy     -        -       -
+dummy/dummy2    -2       -       -
+TOTAL           -2       -       -"""
 
 
 def test_text_report_delta__removed_dummy2_class_and_worsen_coverage():
@@ -184,11 +209,12 @@ def test_text_report_delta__removed_dummy2_class_and_worsen_coverage():
     report_delta = TextReporterDelta(cobertura1, cobertura2)
 
     assert report_delta.generate() == """\
-Name          Stmts    Miss    Cover    Missing
-------------  -------  ------  -------  ---------
-dummy/dummy   -        +1      -25.00%  +5
-dummy/dummy2  -2       -       -
-TOTAL         -2       +1      -25.00%"""
+Name            Stmts    Miss    Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__  -        -       -
+dummy/dummy     -        +1      -25.00%  +5
+dummy/dummy2    -2       -       -
+TOTAL           -2       +1      -25.00%"""
 
 
 def test_text_report_delta__better_and_worse_coverage():
@@ -200,11 +226,12 @@ def test_text_report_delta__better_and_worse_coverage():
     report_delta = TextReporterDelta(cobertura1, cobertura2)
 
     assert report_delta.generate() == """\
-Name          Stmts    Miss    Cover    Missing
-------------  -------  ------  -------  ---------
-dummy/dummy   -        +1      -25.00%  +5
-dummy/dummy2  -        -1      +50.00%  -2
-TOTAL         -        -       -"""
+Name            Stmts    Miss    Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__  -        -       -
+dummy/dummy     -        +1      -25.00%  +5
+dummy/dummy2    -        -1      +50.00%  -2
+TOTAL           -        -       -"""
 
 
 def test_text_report_delta__colorize_True():
@@ -216,27 +243,46 @@ def test_text_report_delta__colorize_True():
     report_delta = TextReporterDelta(cobertura1, cobertura2, color=True)
 
     assert report_delta.generate() == """\
-Name          Stmts    Miss    Cover    Missing
-------------  -------  ------  -------  ---------
-dummy/dummy   -        +1      -25.00%  \x1b[31m+5\x1b[39m
-dummy/dummy2  -        -1      +50.00%  \x1b[32m-2\x1b[39m
-TOTAL         -        -       -"""
+Name            Stmts    Miss    Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__  -        -       -
+dummy/dummy     -        +1      -25.00%  \x1b[31m+5\x1b[39m
+dummy/dummy2    -        -1      +50.00%  \x1b[32m-2\x1b[39m
+TOTAL           -        -       -"""
+
+
+def test_text_report_delta__colorize_True__with_missing_range():
+    from pycobertura.reporters import TextReporterDelta
+
+    cobertura1 = make_cobertura('tests/dummy.original.xml')
+    cobertura2 = make_cobertura('tests/dummy.with-dummy2-no-cov.xml')
+
+    report_delta = TextReporterDelta(cobertura1, cobertura2, color=True)
+
+    assert report_delta.generate() == """\
+Name            Stmts    Miss    Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__  -        -       -
+dummy/dummy     -        -2      +50.00%  \x1b[32m-2\x1b[39m, \x1b[32m-5\x1b[39m
+dummy/dummy2    +2       +2      -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
+TOTAL           +2       -       +16.67%"""
 
 
 def test_text_report_delta__colorize_False():
     from pycobertura.reporters import TextReporterDelta
 
-    cobertura1 = make_cobertura('tests/dummy.with-dummy2-better-cov.xml')
-    cobertura2 = make_cobertura('tests/dummy.with-dummy2-better-and-worse.xml')
+    cobertura1 = make_cobertura('tests/dummy.original.xml')
+    cobertura2 = make_cobertura('tests/dummy.with-dummy2-no-cov.xml')
 
     report_delta = TextReporterDelta(cobertura1, cobertura2, color=False)
 
     assert report_delta.generate() == """\
-Name          Stmts    Miss    Cover    Missing
-------------  -------  ------  -------  ---------
-dummy/dummy   -        +1      -25.00%  +5
-dummy/dummy2  -        -1      +50.00%  -2
-TOTAL         -        -       -"""
+Name            Stmts    Miss    Cover    Missing
+--------------  -------  ------  -------  ---------
+dummy/__init__  -        -       -
+dummy/dummy     -        -2      +50.00%  -2, -5
+dummy/dummy2    +2       +2      -        +1, +2
+TOTAL           +2       -       +16.67%"""
 
 
 def test_html_report():
@@ -282,18 +328,25 @@ def test_html_report():
           <td>24</td>
         </tr>
         <tr>
+          <td>search.ISortedArraySearch</td>
+          <td>0</td>
+          <td>0</td>
+          <td>100.00%</td>
+          <td></td>
+        </tr>
+        <tr>
           <td>search.LinearSearch</td>
-          <td>8</td>
-          <td>3</td>
+          <td>7</td>
+          <td>2</td>
           <td>71.43%</td>
-          <td>19-20, 24</td>
+          <td>19, 24</td>
         </tr>
       </tbody>
       <tfoot>
         <tr>
           <td>TOTAL</td>
-          <td>31</td>
-          <td>4</td>
+          <td>30</td>
+          <td>3</td>
           <td>90.00%</td>
           <td></td>
         </tr>
@@ -334,6 +387,14 @@ def test_html_report_delta():
         </tr>
       </thead>
       <tbody>
+        <tr>
+          <td>dummy/__init__</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>
+          </td>
+        </tr>
         <tr>
           <td>dummy/dummy</td>
           <td>-</td>

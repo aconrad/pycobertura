@@ -45,83 +45,37 @@ class Cobertura(object):
     def _parse_xml_string(self, xml_string):
         return ET.fromstring(xml_string)
 
-    def _scan(self):
-        self._packages = {}
-        self._classes = {}
-        current_class = None
-
-        for event, el in ET.iterparse(self.source, events=['start', 'end']):
-            if event == 'start' and el.tag == 'class':
-                current_class = el
-
-            elif event == 'end':
-                if el.tag == 'line':
-                    class_name = current_class.attrib['name']
-                    line_number = int(el.attrib['number'])
-                    line_hit_count = int(el.attrib['hits'])
-                    if class_name not in self._classes:
-                        self._classes[class_name] = {
-                            'line_hits': {},
-                            'line_rate': float(
-                                current_class.attrib['line-rate']),
-                            'complexity': float(
-                                current_class.attrib['complexity']),
-                            'branch_rate': float(
-                                current_class.attrib['branch-rate']),
-                            'filename': current_class.attrib['filename'],
-                        }
-
-                    line_hits = self._classes[class_name]['line_hits']
-                    if line_number not in line_hits:
-                        line_hits[line_number] = 0
-                    line_hits[line_number] += line_hit_count
-
-                elif el.tag == 'class':
-                    current_class = None
-                elif el.tag == 'package':
-                    package_name = el.attrib['name']
-
-                    if package_name not in self._packages:
-                        self._packages[package_name] = {
-                            'line_rate': float(el.attrib['line-rate']),
-                            'complexity': float(el.attrib['complexity']),
-                            'branch_rate': float(el.attrib['branch-rate'])
-                        }
-
     @property
     def version(self):
         return self.xml.attrib['version']
 
+    def _get_element_by_class_name(self, class_name):
+        return self.xml.xpath("//class[@name='%s'][1]" % class_name)[0]
+
     def line_rate(self, class_name=None):
         if class_name is None:
-            return float(self.xml.attrib['line-rate'])
-        return self._classes[class_name]['line_rate']
+            el = self.xml
+        else:
+            el = self._get_element_by_class_name(class_name)
 
-    @property
-    def branch_rate(self):
-        return float(self.xml.attrib['branch-rate'])
+        return float(el.attrib['line-rate'])
+
+    def branch_rate(self, class_name=None):
+        if class_name is None:
+            el = self.xml
+        else:
+            el = self._get_element_by_class_name(class_name)
+        return float(el.attrib['branch-rate'])
 
     def missed_lines(self, class_name):
-        if class_name not in self._lines_missed:
-            if self._classes is None:
-                self._scan()
-
-            line_hits = self._classes[class_name]['line_hits']
-            self._lines_missed[class_name] = \
-                [l for l in sorted(line_hits) if line_hits[l] == 0]
-
-        return self._lines_missed[class_name]
+        el = self._get_element_by_class_name(class_name)
+        lines = el.xpath('./lines/line[@hits=0]')
+        return [int(l.attrib['number']) for l in lines]
 
     def line_hits(self, class_name):
-        if class_name not in self._lines_hit:
-            if self._classes is None:
-                self._scan()
-
-            line_hits = self._classes[class_name]['line_hits']
-            self._lines_hit[class_name] = \
-                [l for l in sorted(line_hits) if line_hits[l] > 0]
-
-        return self._lines_hit[class_name]
+        el = self._get_element_by_class_name(class_name)
+        lines = el.xpath('./lines/line[@hits>0]')
+        return [int(l.attrib['number']) for l in lines]
 
     def total_misses(self, class_name):
         return len(self.missed_lines(class_name))
@@ -130,29 +84,16 @@ class Cobertura(object):
         return len(self.line_hits(class_name))
 
     def total_lines(self, class_name):
-        line_hits = self._classes[class_name]['line_hits']
-        return len(line_hits)
+        el = self._get_element_by_class_name(class_name)
+        lines = el.xpath('./lines/line')
+        return len(lines)
 
     def classes(self):
-        if self._class_list is None:
-
-            if self._classes is None:
-                self._scan()
-
-            self._class_list = sorted(self._classes)
-
-        return self._class_list
+        return [el.attrib['name'] for el in self.xml.xpath("//class")]
 
     def has_class(self, class_name):
         # FIXME: this will lookup a list which is slow, make it O(1)
         return class_name in self.classes()
 
     def packages(self):
-        if self._package_list is None:
-
-            if self._packages is None:
-                self._scan()
-
-            self._package_list = sorted(self._packages)
-
-        return self._package_list
+        return [el.attrib['name'] for el in self.xml.xpath("//package")]
