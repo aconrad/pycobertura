@@ -12,7 +12,7 @@ def get_class_summary_row(cobertura, class_name):
 
     row = [
         class_name,
-        cobertura.total_lines(class_name),
+        cobertura.total_statements(class_name),
         cobertura.total_misses(class_name),
         cobertura.line_rate(class_name),
         cobertura.missed_lines(class_name),
@@ -25,7 +25,7 @@ class Reporter(object):
         self.cobertura = cobertura
 
     def get_report_row_by_class(self, class_name):
-        total_lines = self.cobertura.total_lines(class_name)
+        total_lines = self.cobertura.total_statements(class_name)
         line_rate = self.cobertura.line_rate(class_name)
         total_misses = self.cobertura.total_misses(class_name)
         missed_lines = self.cobertura.missed_lines(class_name)
@@ -117,6 +117,13 @@ class TextReporter(Reporter):
 
 
 class HtmlReporter(TextReporter):
+    def __init__(self, *args, **kwargs):
+        super(HtmlReporter, self).__init__(*args, **kwargs)
+
+    def get_source(self, class_name):
+        lines = self.cobertura.class_source(class_name)
+        status_map = {True: 'hit', False: 'miss', None: 'noop'}
+        return [(lno, src, status_map[status]) for lno, src, status in lines]
 
     def generate(self):
         lines = self.get_report_lines()
@@ -126,10 +133,17 @@ class HtmlReporter(TextReporter):
             formatted_row = self.format_row(row)
             formatted_lines.append(formatted_row)
 
+        sources = []
+        for class_name in self.cobertura.classes():
+            source = self.get_source(class_name)
+            filename = self.cobertura.filename(class_name)
+            sources.append((class_name, filename, source))
+
         template = env.get_template('html.jinja2')
         return template.render(
             lines=formatted_lines[:-1],
-            footer=formatted_lines[-1]
+            footer=formatted_lines[-1],
+            sources=sources
         )
 
 

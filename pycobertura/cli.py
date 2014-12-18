@@ -25,9 +25,13 @@ reporters = {
     '-o', '--output', metavar='<file>', type=click.File('wb'),
     help='Write output to <file> instead of stdout.'
 )
-def show(cobertura_file, format, output):
+@click.option(
+    '-s', '--source', metavar='<path-to-source>',
+    help='Provide path to source code directory for HTML output.'
+)
+def show(cobertura_file, format, output, source):
     """show coverage summary of a Cobertura report"""
-    cobertura = Cobertura(cobertura_file)
+    cobertura = Cobertura(cobertura_file, base_path=source)
     Reporter = reporters[format]
     reporter = Reporter(cobertura)
     report = reporter.generate()
@@ -70,6 +74,7 @@ def diff(cobertura_file1, cobertura_file2, color, format, output):
     reporter_kwargs = {}
 
     isatty = True if output is None else output.isatty()
+
     if format == 'text':
         color = isatty if color is None else color is True
         reporter_kwargs['color'] = color

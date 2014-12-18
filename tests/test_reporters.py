@@ -302,56 +302,98 @@ def test_html_report():
     <meta charset="UTF-8">
   </head>
   <body>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Stmts</th>
-          <th>Miss</th>
-          <th>Cover</th>
-          <th>Missing</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Main</td>
-          <td>11</td>
-          <td>0</td>
-          <td>100.00%</td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>search.BinarySearch</td>
-          <td>12</td>
-          <td>1</td>
-          <td>91.67%</td>
-          <td>24</td>
-        </tr>
-        <tr>
-          <td>search.ISortedArraySearch</td>
-          <td>0</td>
-          <td>0</td>
-          <td>100.00%</td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>search.LinearSearch</td>
-          <td>7</td>
-          <td>2</td>
-          <td>71.43%</td>
-          <td>19-24</td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr>
-          <td>TOTAL</td>
-          <td>30</td>
-          <td>3</td>
-          <td>90.00%</td>
-          <td></td>
-        </tr>
-      </tfoot>
-    </table>
+    <div class="container">
+      <table class="u-full-width">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Stmts</th>
+            <th>Miss</th>
+            <th>Cover</th>
+            <th>Missing</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="#Main">Main</a></td>
+            <td>11</td>
+            <td>0</td>
+            <td>100.00%</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><a href="#search.BinarySearch">search.BinarySearch</a></td>
+            <td>12</td>
+            <td>1</td>
+            <td>91.67%</td>
+            <td>24</td>
+          </tr>
+          <tr>
+            <td><a href="#search.ISortedArraySearch">search.ISortedArraySearch</a></td>
+            <td>0</td>
+            <td>0</td>
+            <td>100.00%</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><a href="#search.LinearSearch">search.LinearSearch</a></td>
+            <td>7</td>
+            <td>2</td>
+            <td>71.43%</td>
+            <td>19-24</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>TOTAL</td>
+            <td>30</td>
+            <td>3</td>
+            <td>90.00%</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+      <h4 id="Main">Main</h4>
+      <div class="row">
+        <div class="one column lineno">
+          <pre>0
+</pre>
+        </div>
+        <div class="eleven columns code">
+          <pre><span class="noop">Main.java not found</span></pre>
+        </div>
+      </div>
+      <h4 id="search.BinarySearch">search.BinarySearch</h4>
+      <div class="row">
+        <div class="one column lineno">
+          <pre>0
+</pre>
+        </div>
+        <div class="eleven columns code">
+          <pre><span class="noop">search/BinarySearch.java not found</span></pre>
+        </div>
+      </div>
+      <h4 id="search.ISortedArraySearch">search.ISortedArraySearch</h4>
+      <div class="row">
+        <div class="one column lineno">
+          <pre>0
+</pre>
+        </div>
+        <div class="eleven columns code">
+          <pre><span class="noop">search/ISortedArraySearch.java not found</span></pre>
+        </div>
+      </div>
+      <h4 id="search.LinearSearch">search.LinearSearch</h4>
+      <div class="row">
+        <div class="one column lineno">
+          <pre>0
+</pre>
+        </div>
+        <div class="eleven columns code">
+          <pre><span class="noop">search/LinearSearch.java not found</span></pre>
+        </div>
+      </div>
+    </div>
   </body>
 </html>"""
 
@@ -376,51 +418,53 @@ def test_html_report_delta():
     <meta charset="UTF-8">
   </head>
   <body>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Stmts</th>
-          <th>Miss</th>
-          <th>Cover</th>
-          <th>Missing</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>dummy/__init__</td>
-          <td>-</td>
-          <td>-</td>
-          <td>-</td>
-          <td>
-          </td>
-        </tr>
-        <tr>
-          <td>dummy/dummy</td>
-          <td>-</td>
-          <td>-</td>
-          <td>-</td>
-          <td>
-          </td>
-        </tr>
-        <tr>
-          <td>dummy/dummy2</td>
-          <td>+2</td>
-          <td>+2</td>
-          <td>-</td>
-          <td><span class="red">+1</span>, <span class="red">+2</span>
-          </td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr>
-          <td>TOTAL</td>
-          <td>+2</td>
-          <td>+2</td>
-          <td>-33.33%</td>
-          <td></td>
-        </tr>
-      </tfoot>
-    </table>
+    <div class="container">
+      <table class="u-full-width">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Stmts</th>
+            <th>Miss</th>
+            <th>Cover</th>
+            <th>Missing</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>dummy/__init__</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <td>dummy/dummy</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <td>dummy/dummy2</td>
+            <td>+2</td>
+            <td>+2</td>
+            <td>-</td>
+            <td><span class="red">+1</span>, <span class="red">+2</span>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>TOTAL</td>
+            <td>+2</td>
+            <td>+2</td>
+            <td>-33.33%</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
   </body>
 </html>"""
