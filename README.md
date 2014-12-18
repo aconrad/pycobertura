@@ -16,12 +16,18 @@ Features:
 ## Install
 
 ```
-pip install pycobertura
+$ pip install pycobertura
 ```
 
 ## CLI usage
 
-pycobertura provides a command line interface to report on coverage files:
+pycobertura provides a command line interface to report on coverage files.
+
+```
+$ pycobertura --help
+```
+
+The `show` command displays the report summary of a coverage file.
 
 ```
 $ pycobertura show coverage.xml
@@ -36,7 +42,7 @@ TOTAL                      253       0  100.00%
 ```
 
 You can also use the `diff` command to show the difference between two coverage
-files:
+files.
 
 ```
 $ pycobertura diff coverage.old.xml coverage.new.xml
