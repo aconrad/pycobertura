@@ -169,3 +169,16 @@ def test_total_hits():
     for class_name in cobertura.classes():
         assert cobertura.total_hits(class_name) == \
             expected_total_misses[class_name]
+
+
+def test_filename():
+    cobertura = make_cobertura()
+    expected_filenames = {
+        'Main': 'Main.java',
+        'search.BinarySearch': 'search/BinarySearch.java',
+        'search.ISortedArraySearch': 'search/ISortedArraySearch.java',
+        'search.LinearSearch': 'search/LinearSearch.java',
+    }
+    for class_name in cobertura.classes():
+        assert cobertura.filename(class_name) == \
+            expected_filenames[class_name]
