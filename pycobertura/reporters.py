@@ -118,6 +118,24 @@ class TextReporter(Reporter):
 
 class HtmlReporter(TextReporter):
 
+    def get_source(self, class_name):
+        filename = self.cobertura.filename(class_name)
+        lines = []
+        missed_lines = frozenset(self.cobertura.missed_lines(class_name))
+
+        with open(filename) as f:
+            for lineno, line in enumerate(f, start=1):
+                if line == '\n':
+                    line_status = 'blank'
+                elif lineno in missed_lines:
+                    line_status = 'miss'
+                else:
+                    line_status = 'hit'
+
+                lines.append((lineno, line, line_status))
+
+        return lines
+
     def generate(self):
         lines = self.get_report_lines()
 
@@ -126,10 +144,17 @@ class HtmlReporter(TextReporter):
             formatted_row = self.format_row(row)
             formatted_lines.append(formatted_row)
 
+        sources = []
+        for class_name in self.cobertura.classes():
+            source = self.get_source(class_name)
+            filename = self.cobertura.filename(class_name)
+            sources.append((class_name, filename, source))
+
         template = env.get_template('html.jinja2')
         return template.render(
             lines=formatted_lines[:-1],
-            footer=formatted_lines[-1]
+            footer=formatted_lines[-1],
+            sources=sources
         )
 
 

@@ -21,7 +21,7 @@
       <tbody>
 {%- for class_name, total_lines, total_misses, line_rate, missing_lines in lines %}
         <tr>
-          <td>{{ class_name }}</td>
+          <td><a href="#{{ class_name }}">{{ class_name }}</a></td>
           <td>{{ total_lines }}</td>
           <td>{{ total_misses }}</td>
           <td>{{ line_rate }}</td>
@@ -39,5 +39,18 @@
         </tr>
       </tfoot>
     </table>
+{% for class_name, filename, source in sources %}
+    <h4 id="{{class_name}}">{{ class_name }}</h4>
+    <table>
+      <tbody>
+{% for lineno, line, line_status in source -%}
+        <tr>
+          <td class="{{ line_status }}">{{ lineno }}</td>
+          <td><code>{{ line }}</code></td>
+        </tr>
+{% endfor %}
+      </tbody>
+    </table>
+{% endfor %}
   </body>
 </html>
