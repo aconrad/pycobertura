@@ -29,7 +29,7 @@ def test_report_row_by_class():
         'Main': ['Main', 11, 0, 1, []],
         'search.BinarySearch': ['search.BinarySearch', 12, 1, 0.9166666666666666, [24]],
         'search.ISortedArraySearch': ['search.ISortedArraySearch', 0, 0, 1.0, []],
-        'search.LinearSearch': ['search.LinearSearch', 7, 2, 0.7142857142857143, [19, 24]],
+        'search.LinearSearch': ['search.LinearSearch', 7, 2, 0.7142857142857143, [19, 20, 21, 22, 23, 24]],
     }
 
     for class_name in cobertura.classes():
@@ -49,7 +49,7 @@ Name                         Stmts    Miss  Cover    Missing
 Main                            11       0  100.00%
 search.BinarySearch             12       1  91.67%   24
 search.ISortedArraySearch        0       0  100.00%
-search.LinearSearch              7       2  71.43%   19, 24
+search.LinearSearch              7       2  71.43%   19-24
 TOTAL                           30       3  90.00%"""
 
 
@@ -339,7 +339,7 @@ def test_html_report():
           <td>7</td>
           <td>2</td>
           <td>71.43%</td>
-          <td>19, 24</td>
+          <td>19-24</td>
         </tr>
       </tbody>
       <tfoot>

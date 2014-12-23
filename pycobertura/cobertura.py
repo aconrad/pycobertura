@@ -54,6 +54,10 @@ class Cobertura(object):
     def _get_element_by_class_name(self, class_name):
         return self.xml.xpath("//class[@name='%s'][1]" % class_name)[0]
 
+    def _get_lines_by_class_name(self, class_name):
+        el = self._get_element_by_class_name(class_name)
+        return el.xpath('./lines/line')
+
     @property
     def version(self):
         """Return the version number of the coverage report."""
@@ -87,9 +91,28 @@ class Cobertura(object):
         """
         Return the list of uncovered line numbers for the class `class_name`.
         """
-        el = self._get_element_by_class_name(class_name)
-        lines = el.xpath('./lines/line[@hits=0]')
-        return [int(l.attrib['number']) for l in lines]
+        line_elements = self._get_lines_by_class_name(class_name)
+        lines = []
+        prev_was_missed = False
+        for line in line_elements:
+            if line.attrib['hits'] != '0':
+                prev_was_missed = False
+                continue
+
+            lineno = int(line.attrib['number'])
+            if prev_was_missed is False:
+                lines.append(lineno)
+                prev_was_missed = True
+            else:
+                # A missed line (hits=0) in the Cobertura report actually
+                # indicates a missed statement. A multiline statement will only
+                # appear as 1 uncovered line in the source code (the line on
+                # which the statement started) so we need to backfill the rest
+                # of the lines part of the same statement by showing them as
+                # missing too.
+                missed_range = range(lines[-1]+1, lineno+1)
+                lines += missed_range
+        return lines
 
     def line_hits(self, class_name):
         """
@@ -103,7 +126,9 @@ class Cobertura(object):
         """
         Return the number of uncovered line numbers for the class `class_name`.
         """
-        return len(self.missed_lines(class_name))
+        el = self._get_element_by_class_name(class_name)
+        statements = el.xpath('./lines/line[@hits=0]')
+        return len(statements)
 
     def total_hits(self, class_name):
         """

@@ -11,6 +11,8 @@
 * refactor internals for improved readability
 * show classes that contain no lines, e.g. `__init__.py`
 * add `Cobertura.filename(class_name)` to retrieve the filename of a class
+* fix erroneous reporting of missing lines which was equal to the number of
+  missed statements (wrong because of multiline statements)
 
 ## 0.2.1 (2014-12-10)
 
