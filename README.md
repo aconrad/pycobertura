@@ -3,8 +3,8 @@
 A [Cobertura](http://cobertura.github.io/cobertura/) coverage parser that can
 diff reports.
 
-[![Travis](http://img.shields.io/travis/SurveyMonkey/pycobertura.svg?style=flat)]()
-[![PyPI](http://img.shields.io/pypi/v/pycobertura.svg?style=flat)]()
+![Travis](http://img.shields.io/travis/SurveyMonkey/pycobertura.svg?style=flat)
+![PyPI](http://img.shields.io/pypi/v/pycobertura.svg?style=flat)
 
 Features:
 
