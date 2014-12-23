@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.3.0 (2014-12-23)
+
 * update description of pycobertura
 * pep8-ify
 * add pep8 tasks for tox and travis
