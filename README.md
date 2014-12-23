@@ -108,6 +108,7 @@ Found a bug? Got a patch? Have an idea? Please use Github issues or fork
 pycobertura and submit a pull request (PR). All contributions are welcome!
 
 If you submit a PR:
+
 * ensure the description of your PR illustrates your changes clearly by showing
   what the problem was and how you fixed it (before/after)
 * make sure your changes are covered with one or more tests
