@@ -18,17 +18,15 @@ reporters = {
 @pycobertura.command()
 @click.argument('cobertura_file')
 @click.option(
-    '-f', '--format',
-    default='text',
+    '-f', '--format', default='text',
     type=click.Choice(list(reporters))
 )
 @click.option(
-    '-o', '--output', metavar='<file>',
-    type=click.File('wb'),
+    '-o', '--output', metavar='<file>', type=click.File('wb'),
     help='Write output to <file> instead of stdout.'
 )
 def show(cobertura_file, format, output):
-    """show the coverage summary"""
+    """show coverage summary of a Cobertura report"""
     cobertura = Cobertura(cobertura_file)
     Reporter = reporters[format]
     reporter = Reporter(cobertura)
@@ -60,12 +58,11 @@ delta_reporters = {
     type=click.Choice(list(delta_reporters))
 )
 @click.option(
-    '-o', '--output', metavar='<file>',
-    type=click.File('wb'),
+    '-o', '--output', metavar='<file>', type=click.File('wb'),
     help='Write output to <file> instead of stdout.'
 )
 def diff(cobertura_file1, cobertura_file2, color, format, output):
-    """compare two coverage files"""
+    """compare coverage of two Cobertura reports"""
     cobertura1 = Cobertura(cobertura_file1)
     cobertura2 = Cobertura(cobertura_file2)
     Reporter = delta_reporters[format]
