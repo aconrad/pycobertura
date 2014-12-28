@@ -30,3 +30,47 @@ def rangify(number_list):
 
     ranges.append((range_start, prev_num))
     return ranges
+
+
+def extrapolate_coverage(lines_w_status):
+    """
+    Given the following input:
+
+    >>> lines_w_status = [
+        (1, True),
+        (4, True),
+        (7, False),
+        (9, False),
+    ]
+
+    Return expanded lines with their extrapolated line status.
+
+    >>> extrapolate_coverage(lines_w_status) == [
+        (1, True),
+        (2, True),
+        (3, True),
+        (4, True),
+        (5, None),
+        (6, None),
+        (7, False),
+        (8, False),
+        (9, False),
+    ]
+
+    """
+    lines = []
+
+    prev_lineno = 0
+    prev_status = True
+    for lineno, status in lines_w_status:
+        while (lineno - prev_lineno) > 1:
+            prev_lineno += 1
+            if prev_status is status:
+                lines.append((prev_lineno, status))
+            else:
+                lines.append((prev_lineno, None))
+        lines.append((lineno, status))
+        prev_lineno = lineno
+        prev_status = status
+
+    return lines

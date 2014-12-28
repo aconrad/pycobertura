@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+* rename `Cobertura.total_lines()` -> `Cobertura.total_statements()`
+* rename `Cobertura.line_hits()` -> `Cobertura.hit_statements()`
+* introduce `Cobertura.missed_statements()`
+* introduce `Cobertura.line_statuses()` which returns line numbers for a
+  given class name with hit/miss statuses
+* introduce `Cobertura.class_source()` which returns the source code for a
+  given class along with hit/miss status
+* `pycobertura show` now includes HTML source
+* `pycobertura show` now accepts `--source` which indicates where the source
+  code is located
+* `Cobertura()` now takes an optional `base_path` argument which will be used
+  to resolve the path to the source code by joining the `base_path` value to
+  the path found in the Cobertura report.
+* an error is now raised if `Cobertura` is passed a non-existent XML file path
+
 ## 0.3.0 (2014-12-23)
 
 * update description of pycobertura
@@ -38,7 +53,8 @@
 ## 0.0.2 (2014-11-27)
 
 * MIT license
-* use pypandoc to convert the `long_description` in setup.py from Markdown to reStructuredText so pypi can digest and format the pycobertura page properly.
+* use pypandoc to convert the `long_description` in setup.py from Markdown to
+  reStructuredText so pypi can digest and format the pycobertura page properly.
 
 ## 0.0.1 (2014-11-24)
 

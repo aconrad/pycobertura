@@ -10,40 +10,42 @@
     </style>
   </head>
   <body>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Stmts</th>
-          <th>Miss</th>
-          <th>Cover</th>
-          <th>Missing</th>
-        </tr>
-      </thead>
-      <tbody>
+    <div class="container">
+      <table class="u-full-width">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Stmts</th>
+            <th>Miss</th>
+            <th>Cover</th>
+            <th>Missing</th>
+          </tr>
+        </thead>
+        <tbody>
 {%- for class_name, total_lines, total_misses, line_rate, missing_lines in lines %}
-        <tr>
-          <td>{{ class_name }}</td>
-          <td>{{ total_lines }}</td>
-          <td>{{ total_misses }}</td>
-          <td>{{ line_rate }}</td>
-          <td>
+          <tr>
+            <td>{{ class_name }}</td>
+            <td>{{ total_lines }}</td>
+            <td>{{ total_misses }}</td>
+            <td>{{ line_rate }}</td>
+            <td>
 {%- for missing_line in missing_lines %}
             {%- if not loop.first %}, {% endif %}<span class="{% if missing_line[0] == '+' %}red{% else %}green{% endif %}">{{ missing_line }}</span>
 {%- endfor %}
-          </td>
-        </tr>
+            </td>
+          </tr>
 {%- endfor %}
-      </tbody>
-      <tfoot>
-        <tr>
-          <td>{{ footer[0] }}</td>
-          <td>{{ footer[1] }}</td>
-          <td>{{ footer[2] }}</td>
-          <td>{{ footer[3] }}</td>
-          <td></td>
-        </tr>
-      </tfoot>
-    </table>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>{{ footer[0] }}</td>
+            <td>{{ footer[1] }}</td>
+            <td>{{ footer[2] }}</td>
+            <td>{{ footer[3] }}</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
   </body>
 </html>
