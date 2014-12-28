@@ -26,7 +26,7 @@ reporters = {
     help='Write output to <file> instead of stdout.'
 )
 @click.option(
-    '-s', '--source', metavar='<path-to-source>',
+    '-s', '--source', metavar='<source-dir>',
     help='Provide path to source code directory for HTML output.'
 )
 def show(cobertura_file, format, output, source):
@@ -49,7 +49,16 @@ delta_reporters = {
 }
 
 
-@pycobertura.command()
+@pycobertura.command(help="""\
+The diff command compares and shows the changes between two Cobertura reports.
+
+Missing lines with the diff command can only be accurately computed if the
+source code to each of the coverage reports is given using --source1 and
+--source2. Not providing the path to the source code assumes that each of the
+coverage files were generated against the same source code which is accessible
+by looking at the "filename" attribute in the Cobertura reports as if --source1
+and --source2 options were given the same path to the source.
+""")
 @click.argument('cobertura_file1')
 @click.argument('cobertura_file2')
 @click.option(
@@ -65,10 +74,21 @@ delta_reporters = {
     '-o', '--output', metavar='<file>', type=click.File('wb'),
     help='Write output to <file> instead of stdout.'
 )
-def diff(cobertura_file1, cobertura_file2, color, format, output):
+@click.option(
+    '-s1', '--source1', metavar='<source-dir1>',
+    help='Provide path to first source code directory.'
+)
+@click.option(
+    '-s2', '--source2', metavar='<source-dir2>',
+    help='Provide path to second source code directory.'
+)
+def diff(
+        cobertura_file1, cobertura_file2,
+        color, format, output, source1, source2):
     """compare coverage of two Cobertura reports"""
-    cobertura1 = Cobertura(cobertura_file1)
-    cobertura2 = Cobertura(cobertura_file2)
+    cobertura1 = Cobertura(cobertura_file1, base_path=source1)
+    cobertura2 = Cobertura(cobertura_file2, base_path=source2)
+
     Reporter = delta_reporters[format]
     reporter_args = [cobertura1, cobertura2]
     reporter_kwargs = {}

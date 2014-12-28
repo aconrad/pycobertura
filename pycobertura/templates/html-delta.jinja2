@@ -3,10 +3,14 @@
     <title>pycobertura report</title>
     <meta charset="UTF-8">
     <style>
-.red {color: red}
-.green {color: green}
 {% include 'normalize.css' %}
 {% include 'skeleton.css' %}
+.red {color: red}
+.green {color: green}
+.hit {background-color: #EAFFEA}
+.miss {background-color: #FFECEC}
+.container .code {margin-left: 0}
+pre {line-height: 1.3}
     </style>
   </head>
   <body>
@@ -24,7 +28,7 @@
         <tbody>
 {%- for class_name, total_lines, total_misses, line_rate, missing_lines in lines %}
           <tr>
-            <td>{{ class_name }}</td>
+            <td><a href="#{{ class_name }}">{{ class_name }}</a></td>
             <td>{{ total_lines }}</td>
             <td>{{ total_misses }}</td>
             <td>{{ line_rate }}</td>
@@ -46,6 +50,10 @@
           </tr>
         </tfoot>
       </table>
+{%- from 'macro.source.jinja2' import render_source -%}
+{%- for class_name, filename, source in sources %}
+{{ render_source(class_name, source) }}
+{%- endfor %}
     </div>
   </body>
 </html>

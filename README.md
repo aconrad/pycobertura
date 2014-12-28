@@ -9,9 +9,22 @@ diff reports.
 Features:
 
 * show coverage summary of a cobertura file
-* diff two cobertura files and show relative progress
+* compare two cobertura files and show changes
 * output in plain text or HTML
 * colorized diff output
+* diff exit status of non-zero if number of uncovered lines rose
+
+pycobertura was designed for people who want to prevent their code coverage
+from decreasing. Any line changed should be tested and newly introduced code
+that is uncovered should fail a build and clearly show the author of the change
+what is left to test.
+
+Typically, Continous Integration (CI) or Continous Delivery (CD) tools would
+want to test new code and compare it with the previous successful build (e.g.,
+production or the target branch of a pull request) whether the number of
+uncovered lines rose and if it did, fail the build. This ensures that any code
+change is tested moving forward without letting legacy uncovered lines get in
+your way, allowing developers to focus solely on their changes.
 
 ## Install
 
@@ -23,9 +36,15 @@ $ pip install pycobertura
 
 pycobertura provides a command line interface to report on coverage files.
 
+### Help commands
+
 ```
 $ pycobertura --help
+$ pycobertura show --help
+$ pycobertura diff --help
 ```
+
+### Command `show`
 
 The `show` command displays the report summary of a coverage file.
 
@@ -40,6 +59,8 @@ pycobertura/reports        129       0  100.00%
 pycobertura/utils           12       0  100.00%
 TOTAL                      253       0  100.00%
 ```
+
+### Command `diff`
 
 You can also use the `diff` command to show the difference between two coverage
 files.

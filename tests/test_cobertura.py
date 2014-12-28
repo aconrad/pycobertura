@@ -1,21 +1,13 @@
 import mock
-
 import lxml.etree as ET
 
-
-SOURCE_FILE = 'tests/cobertura.xml'
-
-
-def make_cobertura(xml=SOURCE_FILE, *args, **kwargs):
-    from pycobertura import Cobertura
-    cobertura = Cobertura(xml, *args, **kwargs)
-    return cobertura
+from .utils import make_cobertura
 
 
 def test_parse_string():
     from pycobertura import Cobertura
 
-    with open(SOURCE_FILE) as f:
+    with open('tests/cobertura.xml') as f:
         xml = f.read()
 
     cobertura = Cobertura(xml)
@@ -25,7 +17,7 @@ def test_parse_string():
 def test_parse_fileobj():
     from pycobertura import Cobertura
 
-    with open(SOURCE_FILE) as f:
+    with open('tests/cobertura.xml') as f:
         cobertura = Cobertura(f)
     assert isinstance(cobertura.xml, ET._Element)
 
@@ -125,7 +117,7 @@ def test_missed_lines():
         'Main': [],
         'search.BinarySearch': [24],
         'search.ISortedArraySearch': [],
-        'search.LinearSearch': [19, 20, 21, 22, 23, 24],
+        'search.LinearSearch': [19, 24],
     }
 
     for class_name in cobertura.classes():
@@ -209,6 +201,30 @@ def test_class_source__sources_not_found():
         assert cobertura.class_source(class_name) == expected_sources[class_name]
 
 
+def test_line_statuses():
+    cobertura = make_cobertura(
+        'tests/dummy.source1.xml',
+        base_path='tests/dummy.source1/'
+    )
+    expected_line_statuses = {
+        'dummy/__init__': [],
+        'dummy/dummy': [
+            (1, True),
+            (2, True),
+            (4, True),
+            (5, False),
+            (6, False),
+        ],
+        'dummy/dummy2': [
+            (1, True),
+            (2, True)
+        ],
+    }
+    for class_name in cobertura.classes():
+        assert cobertura.line_statuses(class_name) == \
+            expected_line_statuses[class_name]
+
+
 def test_class_source__sources_found():
     cobertura = make_cobertura(
         'tests/dummy.source1.xml',
@@ -219,9 +235,10 @@ def test_class_source__sources_found():
         'dummy/dummy': [
             (1, 'def foo():\n', True),
             (2, '    pass\n', True),
-            (3, '\n', True),
+            (3, '\n', None),
             (4, 'def bar():\n', True),
-            (5, '    pass\n', True)
+            (5, "    a = 'a'\n", False),
+            (6, "    b = 'b'\n", False),
         ],
         'dummy/dummy2': [
             (1, 'def baz():\n', True),

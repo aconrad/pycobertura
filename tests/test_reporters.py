@@ -1,7 +1,6 @@
 import mock
 
-
-SOURCE_FILE = 'tests/cobertura.xml'
+from .utils import make_cobertura
 
 
 def remove_style_tag(html):
@@ -11,12 +10,6 @@ def remove_style_tag(html):
     style_stops = html.find(style_pattern_stop) + len(style_pattern_stop)
     html_nostyle = html[:style_starts] + html[style_stops:]
     return html_nostyle
-
-
-def make_cobertura(xml_file=SOURCE_FILE):
-    from pycobertura import Cobertura
-    cobertura = Cobertura(xml_file)
-    return cobertura
 
 
 def test_report_row_by_class():
@@ -29,7 +22,7 @@ def test_report_row_by_class():
         'Main': ['Main', 11, 0, 1, []],
         'search.BinarySearch': ['search.BinarySearch', 12, 1, 0.9166666666666666, [24]],
         'search.ISortedArraySearch': ['search.ISortedArraySearch', 0, 0, 1.0, []],
-        'search.LinearSearch': ['search.LinearSearch', 7, 2, 0.7142857142857143, [19, 20, 21, 22, 23, 24]],
+        'search.LinearSearch': ['search.LinearSearch', 7, 2, 0.7142857142857143, [19, 24]],
     }
 
     for class_name in cobertura.classes():
@@ -49,7 +42,7 @@ Name                         Stmts    Miss  Cover    Missing
 Main                            11       0  100.00%
 search.BinarySearch             12       1  91.67%   24
 search.ISortedArraySearch        0       0  100.00%
-search.LinearSearch              7       2  71.43%   19-24
+search.LinearSearch              7       2  71.43%   19, 24
 TOTAL                           30       3  90.00%"""
 
 
@@ -340,7 +333,7 @@ def test_html_report():
             <td>7</td>
             <td>2</td>
             <td>71.43%</td>
-            <td>19-24</td>
+            <td>19, 24</td>
           </tr>
         </tbody>
         <tfoot>
@@ -353,46 +346,46 @@ def test_html_report():
           </tr>
         </tfoot>
       </table>
-      <h4 id="Main">Main</h4>
-      <div class="row">
-        <div class="one column lineno">
-          <pre>0
+<h4 id="Main">Main</h4>
+<div class="row">
+  <div class="one column lineno">
+    <pre>0
 </pre>
-        </div>
-        <div class="eleven columns code">
-          <pre><span class="noop">Main.java not found</span></pre>
-        </div>
-      </div>
-      <h4 id="search.BinarySearch">search.BinarySearch</h4>
-      <div class="row">
-        <div class="one column lineno">
-          <pre>0
+  </div>
+  <div class="eleven columns code">
+    <pre><span class="noop">Main.java not found</span></pre>
+  </div>
+</div>
+<h4 id="search.BinarySearch">search.BinarySearch</h4>
+<div class="row">
+  <div class="one column lineno">
+    <pre>0
 </pre>
-        </div>
-        <div class="eleven columns code">
-          <pre><span class="noop">search/BinarySearch.java not found</span></pre>
-        </div>
-      </div>
-      <h4 id="search.ISortedArraySearch">search.ISortedArraySearch</h4>
-      <div class="row">
-        <div class="one column lineno">
-          <pre>0
+  </div>
+  <div class="eleven columns code">
+    <pre><span class="noop">search/BinarySearch.java not found</span></pre>
+  </div>
+</div>
+<h4 id="search.ISortedArraySearch">search.ISortedArraySearch</h4>
+<div class="row">
+  <div class="one column lineno">
+    <pre>0
 </pre>
-        </div>
-        <div class="eleven columns code">
-          <pre><span class="noop">search/ISortedArraySearch.java not found</span></pre>
-        </div>
-      </div>
-      <h4 id="search.LinearSearch">search.LinearSearch</h4>
-      <div class="row">
-        <div class="one column lineno">
-          <pre>0
+  </div>
+  <div class="eleven columns code">
+    <pre><span class="noop">search/ISortedArraySearch.java not found</span></pre>
+  </div>
+</div>
+<h4 id="search.LinearSearch">search.LinearSearch</h4>
+<div class="row">
+  <div class="one column lineno">
+    <pre>0
 </pre>
-        </div>
-        <div class="eleven columns code">
-          <pre><span class="noop">search/LinearSearch.java not found</span></pre>
-        </div>
-      </div>
+  </div>
+  <div class="eleven columns code">
+    <pre><span class="noop">search/LinearSearch.java not found</span></pre>
+  </div>
+</div>
     </div>
   </body>
 </html>"""
@@ -401,8 +394,8 @@ def test_html_report():
 def test_html_report_delta():
     from pycobertura.reporters import HtmlReporterDelta
 
-    cobertura1 = make_cobertura('tests/dummy.original-full-cov.xml')
-    cobertura2 = make_cobertura('tests/dummy.with-dummy2-no-cov.xml')
+    cobertura1 = make_cobertura('tests/dummy.source1.xml', base_path='tests/dummy.source1')
+    cobertura2 = make_cobertura('tests/dummy.source2.xml', base_path='tests/dummy.source2')
 
     report_delta = HtmlReporterDelta(cobertura1, cobertura2)
     html_output = report_delta.generate()
@@ -431,7 +424,7 @@ def test_html_report_delta():
         </thead>
         <tbody>
           <tr>
-            <td>dummy/__init__</td>
+            <td><a href="#dummy/__init__">dummy/__init__</a></td>
             <td>-</td>
             <td>-</td>
             <td>-</td>
@@ -439,19 +432,19 @@ def test_html_report_delta():
             </td>
           </tr>
           <tr>
-            <td>dummy/dummy</td>
+            <td><a href="#dummy/dummy">dummy/dummy</a></td>
             <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>
+            <td>-2</td>
+            <td>+40.00%</td>
+            <td><span class="green">-5</span>, <span class="green">-6</span>
             </td>
           </tr>
           <tr>
-            <td>dummy/dummy2</td>
+            <td><a href="#dummy/dummy2">dummy/dummy2</a></td>
             <td>+2</td>
-            <td>+2</td>
-            <td>-</td>
-            <td><span class="red">+1</span>, <span class="red">+2</span>
+            <td>+1</td>
+            <td>-25.00%</td>
+            <td><span class="red">+5</span>
             </td>
           </tr>
         </tbody>
@@ -459,12 +452,61 @@ def test_html_report_delta():
           <tr>
             <td>TOTAL</td>
             <td>+2</td>
-            <td>+2</td>
-            <td>-33.33%</td>
+            <td>-1</td>
+            <td>+17.46%</td>
             <td></td>
           </tr>
         </tfoot>
       </table>
+<h4 id="dummy/__init__">dummy/__init__</h4>
+<div class="row">
+  <div class="one column lineno">
+    <pre></pre>
+  </div>
+  <div class="eleven columns code">
+    <pre></pre>
+  </div>
+</div>
+<h4 id="dummy/dummy">dummy/dummy</h4>
+<div class="row">
+  <div class="one column lineno">
+    <pre>1
+2
+3
+4
+5
+6
+</pre>
+  </div>
+  <div class="eleven columns code">
+    <pre><span class="noop">def foo():
+</span><span class="noop">    pass
+</span><span class="noop">
+</span><span class="noop">def bar():
+</span><span class="hit">    a = &#39;a&#39;
+</span><span class="hit">    d = &#39;d&#39;
+</span></pre>
+  </div>
+</div>
+<h4 id="dummy/dummy2">dummy/dummy2</h4>
+<div class="row">
+  <div class="one column lineno">
+    <pre>1
+2
+3
+4
+5
+</pre>
+  </div>
+  <div class="eleven columns code">
+    <pre><span class="noop">def baz():
+</span><span class="hit">    c = &#39;c&#39;
+</span><span class="noop">
+</span><span class="hit">def bat():
+</span><span class="miss">    pass
+</span></pre>
+  </div>
+</div>
     </div>
   </body>
 </html>"""

@@ -1,5 +1,6 @@
 from jinja2 import Environment, PackageLoader
 from pycobertura.utils import green, rangify, red
+from pycobertura.cobertura import CoberturaDiff
 from tabulate import tabulate
 
 
@@ -149,8 +150,7 @@ class HtmlReporter(TextReporter):
 
 class DeltaReporter(object):
     def __init__(self, cobertura1, cobertura2):
-        self.cobertura1 = cobertura1
-        self.cobertura2 = cobertura2
+        self.differ = CoberturaDiff(cobertura1, cobertura2)
 
     def get_diff_line(self, line1, line2):
         if line1 is not None:
@@ -224,8 +224,8 @@ class DeltaReporter(object):
             total_misses += misses
             line_rates.append(line_rate)
 
-        total_line_rate1 = self.cobertura1.line_rate()
-        total_line_rate2 = self.cobertura2.line_rate()
+        total_line_rate1 = self.differ.cobertura1.line_rate()
+        total_line_rate2 = self.differ.cobertura2.line_rate()
         total_line_rate = total_line_rate2 - total_line_rate1
 
         footer = [
@@ -241,12 +241,12 @@ class DeltaReporter(object):
     def get_report_lines(self):
         lines = []
 
-        classes1 = self.cobertura1.classes()
-        classes2 = self.cobertura2.classes()
+        classes1 = self.differ.cobertura1.classes()
+        classes2 = self.differ.cobertura2.classes()
         all_classes = set(classes1).union(set(classes2))
         for class_name in sorted(all_classes):
-            row1 = get_class_summary_row(self.cobertura1, class_name)
-            row2 = get_class_summary_row(self.cobertura2, class_name)
+            row1 = get_class_summary_row(self.differ.cobertura1, class_name)
+            row2 = get_class_summary_row(self.differ.cobertura2, class_name)
             row = self.get_diff_line(row1, row2)
             lines.append(row)
 
@@ -312,6 +312,11 @@ class TextReporterDelta(DeltaReporter):
 
 
 class HtmlReporterDelta(TextReporterDelta):
+    def get_source(self, class_name):
+        lines = self.differ.class_source(class_name)
+        status_map = {True: 'hit', False: 'miss', None: 'noop'}
+        return [(lno, src, status_map[status]) for lno, src, status in lines]
+
     def format_row(self, row):
         class_name, total_lines, total_misses, line_rate, missed_lines = row
 
@@ -344,8 +349,15 @@ class HtmlReporterDelta(TextReporterDelta):
             formatted_row = self.format_row(row)
             formatted_lines.append(formatted_row)
 
+        sources = []
+        for class_name in self.differ.cobertura2.classes():
+            source = self.get_source(class_name)
+            filename = self.differ.cobertura2.filename(class_name)
+            sources.append((class_name, filename, source))
+
         template = env.get_template('html-delta.jinja2')
         return template.render(
             lines=formatted_lines[:-1],
-            footer=formatted_lines[-1]
+            footer=formatted_lines[-1],
+            sources=sources
         )

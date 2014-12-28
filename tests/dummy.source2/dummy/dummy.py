@@ -3,4 +3,4 @@ def foo():
 
 def bar():
     a = 'a'
-    b = 'b'
+    d = 'd'
