@@ -1,7 +1,7 @@
-import os
 import lxml.etree as ET
+import os
 
-from pycobertura.utils import extrapolate_coverage
+from pycobertura.utils import reconcile_lines
 
 
 class Cobertura(object):
@@ -108,48 +108,8 @@ class Cobertura(object):
         """
         Return a list of tuples `(lineno, status)` of all the lines found in
         the Cobertura report where `lineno` is the line number and `status` is
-        coverage status of the line which can be either `True` (line hit),
-        `False` (line miss) or `None` (unknown).
-
-        When `status` is `None`, it usually means that the source at the at the
-        line number `lineno` is not a statement (a comment, whitespace, ...).
-        That said, an attempt is made to extrapolate the status of
-        non-statement lines to hit/miss. This makes computing ranges of line
-        hits/misses more concise. For example, given this code and line
-        statuses::
-
-          def foo():                  # line1, status `True`
-              "docstring"             # line2, status `None`
-              foo = "foo"             # line3, status `True`
-                                      # line4, status `None`
-              # this is a commment    # line5, status `True`
-              if not foo:             # line6, status `True`
-                  pass                # line7, status `False`
-                                      # line8, status `None`
-              # we are now returning  # line9, status `None`
-              return foo              # line10, status `True`
-
-        The ranges of line hits would be represented as::
-
-          1, 3, 5-6, 10
-
-        After extrapolation of the line coverage, it would result in the
-        following statuses::
-
-          def foo():                  # line1, status `True`
-              "docstring"             # line2, status `True`
-              foo = "foo"             # line3, status `True`
-                                      # line4, status `True`
-              # this is a commment    # line5, status `True`
-              if not foo:             # line6, status `True`
-                  pass                # line7, status `False`
-                                      # line8, status `None`
-              # we are now returning  # line9, status `None`
-              return foo              # line10, status `True`
-
-        The ranges of line hits would be represented as::
-
-          1-6, 10
+        coverage status of the line which can be either `True` (line hit) or
+        `False` (line miss).
 
         """
         line_elements = self._get_lines_by_class_name(class_name)
@@ -159,8 +119,6 @@ class Cobertura(object):
             lineno = int(line.attrib['number'])
             status = line.attrib['hits'] != '0'
             lines_w_status.append((lineno, status))
-
-        lines_w_status = extrapolate_coverage(lines_w_status)
 
         return lines_w_status
 
@@ -194,11 +152,9 @@ class Cobertura(object):
         with open(filename) as f:
             lines = []
             line_statuses = dict(self.line_statuses(class_name))
-            last_status = None
             for lineno, source in enumerate(f, start=1):
-                line_status = line_statuses.get(lineno, last_status)
+                line_status = line_statuses.get(lineno)
                 lines.append((lineno, source, line_status))
-                last_status = line_status
 
         return lines
 
@@ -262,3 +218,57 @@ class Cobertura(object):
 
         """
         return [el.attrib['name'] for el in self.xml.xpath("//package")]
+
+
+class CoberturaDiff(object):
+    """
+    Diff Cobertura objects.
+    """
+    def __init__(self, cobertura1, cobertura2):
+        self.cobertura1 = cobertura1
+        self.cobertura2 = cobertura2
+
+    def class_source(self, class_name):
+        filename1 = self.cobertura1.filename(class_name)
+        filename2 = self.cobertura2.filename(class_name)
+
+        for filename in (filename1, filename2):
+            if not os.path.exists(filename):
+                return [(0, '%s not found' % filename, None)]
+
+        try:
+            f1 = open(filename1)
+            f2 = open(filename2)
+            lines1 = f1.readlines()
+            lines2 = f2.readlines()
+        finally:
+            f1.close()
+            f2.close()
+
+        # Build a dict of lineno2 -> lineno1
+        lineno_map = reconcile_lines(lines2, lines1)
+
+        line_statuses1 = dict(self.cobertura1.line_statuses(class_name))
+        line_statuses2 = dict(self.cobertura2.line_statuses(class_name))
+
+        lines = []
+        for lineno, line in enumerate(lines2, start=1):
+
+            if lineno not in lineno_map:
+                # line was added or removed, just use whatever coverage status
+                # is available as there is nothing to compare against.
+                line_status = line_statuses2.get(lineno)
+            else:
+                other_lineno = lineno_map[lineno]
+                line_status1 = line_statuses1.get(other_lineno)
+                line_status2 = line_statuses2.get(lineno)
+                if line_status1 is line_status2:
+                    line_status = None  # unchanged
+                elif line_status1 is True and line_status2 is False:
+                    line_status = False  # decreased
+                elif line_status1 is False and line_status2 is True:
+                    line_status = True  # increased
+
+            lines.append((lineno, line, line_status))
+
+        return lines

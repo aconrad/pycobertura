@@ -11,11 +11,15 @@
   given class along with hit/miss status
 * `pycobertura show` now includes HTML source
 * `pycobertura show` now accepts `--source` which indicates where the source
-  code is located
+  code directory is located
 * `Cobertura()` now takes an optional `base_path` argument which will be used
   to resolve the path to the source code by joining the `base_path` value to
   the path found in the Cobertura report.
 * an error is now raised if `Cobertura` is passed a non-existent XML file path
+* `pycobertura diff` now includes HTML source
+* `pycobertura diff` now accepts `--source1` and `--source2` which indicates
+  where the source code directory of each of the Cobertura reports are located
+* introduce `CoberturaDiff` used to diff `Cobertura` objects
 
 ## 0.3.0 (2014-12-23)
 

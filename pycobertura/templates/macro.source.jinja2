@@ -1,0 +1,19 @@
+{% macro render_source(class_name, lines) -%}
+<h4 id="{{class_name}}">{{ class_name }}</h4>
+<div class="row">
+  <div class="one column lineno">
+    <pre>
+{%- for lineno, line, line_status in lines -%}
+{{ lineno }}
+{% endfor -%}
+    </pre>
+  </div>
+  <div class="eleven columns code">
+    <pre>
+{%- for lineno, line, line_status in lines -%}
+<span class="{{ line_status }}">{{ line|escape }}</span>
+{%- endfor -%}
+    </pre>
+  </div>
+</div>
+{%- endmacro %}
