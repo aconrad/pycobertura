@@ -77,6 +77,25 @@ def test_branch_rate_by_class():
             expected_branch_rates[class_name]
 
 
+def test_total_misses():
+    cobertura = make_cobertura()
+    assert cobertura.total_misses() == 3
+
+
+def test_missed_statements_by_class_name():
+    cobertura = make_cobertura()
+    expected_missed_statements = {
+        'Main': [],
+        'search.BinarySearch': [24],
+        'search.ISortedArraySearch': [],
+        'search.LinearSearch': [19, 24],
+    }
+
+    for class_name in cobertura.classes():
+        assert cobertura.missed_statements(class_name) == \
+            expected_missed_statements[class_name]
+
+
 def test_list_packages():
     cobertura = make_cobertura()
 
@@ -126,6 +145,11 @@ def test_missed_lines():
 
 def test_total_statements():
     cobertura = make_cobertura()
+    assert cobertura.total_statements() == 30
+
+
+def test_total_statements_by_class():
+    cobertura = make_cobertura()
     expected_total_statements = {
         'Main': 11,
         'search.BinarySearch': 12,
@@ -138,6 +162,11 @@ def test_total_statements():
 
 
 def test_total_misses():
+    cobertura = make_cobertura()
+    assert cobertura.total_misses() == 3
+
+
+def test_total_misses_by_class():
     cobertura = make_cobertura()
     expected_total_misses = {
         'Main': 0,
