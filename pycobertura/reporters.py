@@ -41,16 +41,9 @@ class Reporter(object):
 
         return row
 
-    def get_footer_row(self, lines):
-        total_statements = 0
-        total_misses = 0
-        line_rates = []
-
-        for class_name, total_lines, misses, line_rate, missed_lines in lines:
-            total_statements += total_lines
-            total_misses += misses
-            line_rates.append(line_rate)
-
+    def get_footer_row(self):
+        total_statements = self.cobertura.total_statements()
+        total_misses = self.cobertura.total_misses()
         total_line_rate = self.cobertura.line_rate()
 
         footer = [
@@ -70,7 +63,7 @@ class Reporter(object):
             row = get_class_summary_row(self.cobertura, class_name)
             lines.append(row)
 
-        footer = self.get_footer_row(lines)
+        footer = self.get_footer_row()
         lines.append(footer)
 
         return lines
@@ -214,19 +207,10 @@ class DeltaReporter(object):
 
         return diff_line
 
-    def get_footer_row(self, lines):
-        total_statements = 0
-        total_misses = 0
-        line_rates = []
-
-        for class_name, total_lines, misses, line_rate, missed_lines in lines:
-            total_statements += total_lines
-            total_misses += misses
-            line_rates.append(line_rate)
-
-        total_line_rate1 = self.differ.cobertura1.line_rate()
-        total_line_rate2 = self.differ.cobertura2.line_rate()
-        total_line_rate = total_line_rate2 - total_line_rate1
+    def get_footer_row(self):
+        total_statements = self.differ.diff_total_statements()
+        total_misses = self.differ.diff_total_misses()
+        total_line_rate = self.differ.diff_line_rate()
 
         footer = [
             'TOTAL',
@@ -250,7 +234,7 @@ class DeltaReporter(object):
             row = self.get_diff_line(row1, row2)
             lines.append(row)
 
-        footer = self.get_footer_row(lines)
+        footer = self.get_footer_row()
         lines.append(footer)
 
         return lines

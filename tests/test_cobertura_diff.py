@@ -32,6 +32,133 @@ def test_diff_class_source():
             (5, '    pass\n', False)
         ],
     }
+
     for class_name in cobertura2.classes():
         assert differ.class_source(class_name) == \
             expected_sources[class_name]
+
+
+def test_diff_total_misses():
+    from pycobertura.cobertura import CoberturaDiff
+
+    cobertura1 = make_cobertura(
+        'tests/dummy.source1.xml',
+        base_path='tests/dummy.source1/'
+    )
+    cobertura2 = make_cobertura(
+        'tests/dummy.source2.xml',
+        base_path='tests/dummy.source2/'
+    )
+    differ = CoberturaDiff(cobertura1, cobertura2)
+
+    expected_sources = {
+        'dummy/__init__': 0,
+        'dummy/dummy': -2,
+        'dummy/dummy2': 1,
+    }
+
+    assert differ.diff_total_misses() == -1
+
+
+def test_diff_total_misses_by_class():
+    from pycobertura.cobertura import CoberturaDiff
+
+    cobertura1 = make_cobertura(
+        'tests/dummy.source1.xml',
+        base_path='tests/dummy.source1/'
+    )
+    cobertura2 = make_cobertura(
+        'tests/dummy.source2.xml',
+        base_path='tests/dummy.source2/'
+    )
+    differ = CoberturaDiff(cobertura1, cobertura2)
+
+    expected_sources = {
+        'dummy/__init__': 0,
+        'dummy/dummy': -2,
+        'dummy/dummy2': 1,
+    }
+
+    for class_name in cobertura2.classes():
+        assert differ.diff_total_misses(class_name) == \
+            expected_sources[class_name]
+
+
+def test_diff_line_rate():
+    from pycobertura.cobertura import CoberturaDiff
+
+    cobertura1 = make_cobertura(
+        'tests/dummy.source1.xml',
+        base_path='tests/dummy.source1/'
+    )
+    cobertura2 = make_cobertura(
+        'tests/dummy.source2.xml',
+        base_path='tests/dummy.source2/'
+    )
+    differ = CoberturaDiff(cobertura1, cobertura2)
+
+    assert differ.diff_line_rate() == 0.17459999999999998
+
+
+def test_diff_line_rate_by_class():
+    from pycobertura.cobertura import CoberturaDiff
+
+    cobertura1 = make_cobertura(
+        'tests/dummy.source1.xml',
+        base_path='tests/dummy.source1/'
+    )
+    cobertura2 = make_cobertura(
+        'tests/dummy.source2.xml',
+        base_path='tests/dummy.source2/'
+    )
+    differ = CoberturaDiff(cobertura1, cobertura2)
+
+    expected_sources = {
+        'dummy/__init__': 0,
+        'dummy/dummy': 0.4,
+        'dummy/dummy2': -0.25,
+    }
+
+    for class_name in cobertura2.classes():
+        assert differ.diff_line_rate(class_name) == \
+            expected_sources[class_name]
+
+
+def test_diff_total_hits():
+    from pycobertura.cobertura import CoberturaDiff
+
+    cobertura1 = make_cobertura(
+        'tests/dummy.source1.xml',
+        base_path='tests/dummy.source1/'
+    )
+    cobertura2 = make_cobertura(
+        'tests/dummy.source2.xml',
+        base_path='tests/dummy.source2/'
+    )
+    differ = CoberturaDiff(cobertura1, cobertura2)
+
+    assert differ.diff_total_hits() == 3
+
+
+def test_diff_total_hits_by_class():
+    from pycobertura.cobertura import CoberturaDiff
+
+    cobertura1 = make_cobertura(
+        'tests/dummy.source1.xml',
+        base_path='tests/dummy.source1/'
+    )
+    cobertura2 = make_cobertura(
+        'tests/dummy.source2.xml',
+        base_path='tests/dummy.source2/'
+    )
+    differ = CoberturaDiff(cobertura1, cobertura2)
+
+    expected_total_hits = {
+        'dummy/__init__': 0,
+        'dummy/dummy': 2,
+        'dummy/dummy2': 1,
+    }
+
+    for class_name in cobertura2.classes():
+        assert differ.diff_total_hits(class_name) == \
+            expected_total_hits[class_name]

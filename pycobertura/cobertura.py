@@ -7,7 +7,6 @@ from pycobertura.utils import reconcile_lines
 class Cobertura(object):
     """
     An XML cobertura parser.
-
     """
     def __init__(self, xml_source, base_path=None):
         """
@@ -22,7 +21,6 @@ class Cobertura(object):
         - a path to an XML file
         - an open file object
         - an XML string
-
         """
         self.base_path = base_path
         self.source = xml_source
@@ -63,7 +61,6 @@ class Cobertura(object):
         """
         Return the global line rate of the coverage report. If the class
         `class_name` is given, return the line rate of the class.
-
         """
         if class_name is None:
             el = self.xml
@@ -88,7 +85,6 @@ class Cobertura(object):
         """
         Return a list of uncovered line numbers for each of the missed
         statements found for the class `class_name`.
-
         """
         el = self._get_element_by_class_name(class_name)
         lines = el.xpath('./lines/line[@hits=0]')
@@ -98,7 +94,6 @@ class Cobertura(object):
         """
         Return a list of covered line numbers for each of the hit statements
         found for the class `class_name`.
-
         """
         el = self._get_element_by_class_name(class_name)
         lines = el.xpath('./lines/line[@hits>0]')
@@ -110,7 +105,6 @@ class Cobertura(object):
         the Cobertura report where `lineno` is the line number and `status` is
         coverage status of the line which can be either `True` (line hit) or
         `False` (line miss).
-
         """
         line_elements = self._get_lines_by_class_name(class_name)
 
@@ -138,11 +132,7 @@ class Cobertura(object):
         The 3 elements in each tuple are:
         `lineno`: line number in the source code
         `source`: actual source code for line number `lineno`
-        `status`: True (hit), False (miss) or None (unknown)
-
-        See `Cobertura.line_statuses` for more information about the meaning of
-        a status of `None`.
-
+        `status`: True (hit) or False (miss)
         """
         filename = self.filename(class_name)
 
@@ -158,34 +148,58 @@ class Cobertura(object):
 
         return lines
 
-    def total_misses(self, class_name):
+    def total_misses(self, class_name=None):
         """
-        Return the number of uncovered statements for the class `class_name`.
+        Return the total number of uncovered statements for the class
+        `class_name`. If `class_name` is not given, return the total number of
+        uncovered statements for all classes.
+        """
+        if class_name is not None:
+            return len(self.missed_statements(class_name))
 
-        """
-        return len(self.missed_statements(class_name))
+        total = 0
+        for class_name in self.classes():
+            total += len(self.missed_statements(class_name))
 
-    def total_hits(self, class_name):
-        """
-        Return the number of covered statements for the class `class_name`.
+        return total
 
+    def total_hits(self, class_name=None):
         """
-        return len(self.hit_statements(class_name))
+        Return the total number of covered statements for the class
+        `class_name`. If `class_name` is not given, return the total number of
+        covered statements for all classes.
+        """
+        if class_name is not None:
+            return len(self.hit_statements(class_name))
 
-    def total_statements(self, class_name):
-        """
-        Return the total number of statements for the class `class_name`.
+        total = 0
+        for class_name in self.classes():
+            total += len(self.hit_statements(class_name))
 
+        return total
+
+    def total_statements(self, class_name=None):
         """
-        statements = self._get_lines_by_class_name(class_name)
-        return len(statements)
+        Return the total number of statements for the class `class_name`. If
+        `class_name` is not given, return the total number of statements for
+        all classes.
+        """
+        if class_name is not None:
+            statements = self._get_lines_by_class_name(class_name)
+            return len(statements)
+
+        total = 0
+        for class_name in self.classes():
+            statements = self._get_lines_by_class_name(class_name)
+            total += len(statements)
+
+        return total
 
     def filename(self, class_name):
         """
         Return the filename of the class `class_name`. If `base_path` was
         provided in the constructor, it will be prefixed to the filename using
         `os.path.join`.
-
         """
         el = self._get_element_by_class_name(class_name)
         filename = el.attrib['filename']
@@ -199,7 +213,6 @@ class Cobertura(object):
     def classes(self):
         """
         Return the list of available classes in the coverage report.
-
         """
         return [el.attrib['name'] for el in self.xml.xpath("//class")]
 
@@ -207,7 +220,6 @@ class Cobertura(object):
         """
         Return `True` if the class `class_name` is present in the report,
         return `False` otherwise.
-
         """
         # FIXME: this will lookup a list which is slow, make it O(1)
         return class_name in self.classes()
@@ -215,7 +227,6 @@ class Cobertura(object):
     def packages(self):
         """
         Return the list of available packages in the coverage report.
-
         """
         return [el.attrib['name'] for el in self.xml.xpath("//package")]
 
@@ -227,6 +238,26 @@ class CoberturaDiff(object):
     def __init__(self, cobertura1, cobertura2):
         self.cobertura1 = cobertura1
         self.cobertura2 = cobertura2
+
+    def diff_total_statements(self, class_name=None):
+        statements1 = self.cobertura1.total_statements(class_name)
+        statements2 = self.cobertura2.total_statements(class_name)
+        return statements2 - statements1
+
+    def diff_total_misses(self, class_name=None):
+        misses1 = self.cobertura1.total_misses(class_name)
+        misses2 = self.cobertura2.total_misses(class_name)
+        return misses2 - misses1
+
+    def diff_total_hits(self, class_name=None):
+        hits1 = self.cobertura1.total_hits(class_name)
+        hits2 = self.cobertura2.total_hits(class_name)
+        return hits2 - hits1
+
+    def diff_line_rate(self, class_name=None):
+        rate1 = self.cobertura1.line_rate(class_name)
+        rate2 = self.cobertura2.line_rate(class_name)
+        return rate2 - rate1
 
     def class_source(self, class_name):
         filename1 = self.cobertura1.filename(class_name)

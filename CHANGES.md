@@ -20,6 +20,9 @@
 * `pycobertura diff` now accepts `--source1` and `--source2` which indicates
   where the source code directory of each of the Cobertura reports are located
 * introduce `CoberturaDiff` used to diff `Cobertura` objects
+* argument `class_name` for `Cobertura.total_statements` is now optional
+* argument `class_name` for `Cobertura.total_misses` is now optional
+* argument `class_name` for `Cobertura.total_hits` is now optional
 
 ## 0.3.0 (2014-12-23)
 
