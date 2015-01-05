@@ -1,7 +1,7 @@
 import lxml.etree as ET
 import os
 
-from pycobertura.utils import reconcile_lines
+from pycobertura.utils import extrapolate_coverage, reconcile_lines
 
 
 class Cobertura(object):
@@ -118,10 +118,11 @@ class Cobertura(object):
 
     def missed_lines(self, class_name):
         """
-        Return a list of line numbers that are uncovered according to
+        Return a list of extrapolated uncovered line numbers according to
         `Cobertura.line_statuses`.
         """
         statuses = self.line_statuses(class_name)
+        statuses = extrapolate_coverage(statuses)
         return [lno for lno, status in statuses if status is False]
 
     def class_source(self, class_name):
