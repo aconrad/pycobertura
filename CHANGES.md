@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.4.0 (2015-01-04)
+
 * rename `Cobertura.total_lines()` -> `Cobertura.total_statements()`
 * rename `Cobertura.line_hits()` -> `Cobertura.hit_statements()`
 * introduce `Cobertura.missed_statements()`
