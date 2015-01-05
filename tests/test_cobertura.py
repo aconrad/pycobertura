@@ -136,7 +136,7 @@ def test_missed_lines():
         'Main': [],
         'search.BinarySearch': [24],
         'search.ISortedArraySearch': [],
-        'search.LinearSearch': [19, 24],
+        'search.LinearSearch': [19, 20, 21, 22, 23, 24],
     }
 
     for class_name in cobertura.classes():
