@@ -26,6 +26,33 @@ uncovered lines rose and if it did, fail the build. This ensures that any code
 change is tested moving forward without letting legacy uncovered lines get in
 your way, allowing developers to focus solely on their changes.
 
+## Screenshots
+
+### pycobertura show
+
+The following screenshot is the result of the command `pycobertura show` which
+will render a summary table (like the text version) but also include the source
+code with lines highlighted in green or green to indicate whether lines were
+covered (green) and not (red).
+
+```
+pycobertura show --format html --output coverage.html coverage.xml
+```
+
+![pycobertura show screenshot](http://i.imgur.com/sC6iIuB.png)
+
+### pycobertura diff
+
+This screenshot is a sample HTML output of the command `pycobertura diff` which
+only applies coverage highlighting to the parts of the code where the coverage
+has changed (from covered to uncovered, or vice versa).
+
+```
+pycobertura diff --format html --output coverage.html coverage.old.xml coverage.new.xml
+```
+
+![pycobertura diff screenshot](http://i.imgur.com/5xkrUwO.png)
+
 ## Install
 
 ```
