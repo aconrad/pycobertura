@@ -195,7 +195,7 @@ Moreover, pycobertura was also designed as a general purpose Cobertura parser.
 
 With the command `pycobertura show`, you don't really to provide the source
 code directory, unless you want the HTML output which will conveniently render
-the highlithed source code for you.
+the highlighted source code for you.
 
 But with `pycobertura diff`, if you care about *which* lines are
 covered/uncovered (and not just a global count), then to properly report these
@@ -222,9 +222,9 @@ line 4, miss
 line 5, hit
 ```
 
-How can you tell which line increased or decreased in coverage? Naively, you'd
-assume that lines 4-5 were added and these should be the highlighted lines, the
-ones part of your coverage diff. Well, that doesn't quite work.
+How can you tell which lines need to be highlighted? Naively, you'd assume that
+lines 4-5 were added and these should be the highlighted lines, the ones part
+of your coverage diff. Well, that doesn't quite work.
 
 The code for Report A is:
 
@@ -244,9 +244,9 @@ elif foo is True:  # line 3  # modified line
 return total       # line 5, unchanged
 ```
 
-The code change was lines 1-3 and these are the ones you want to highlight with
-coverage info. Line 4-5 don't need to be highlighted (unless coverage status
-changed in-between).
+The code change are lines 1-3 and these are the ones you want to highlight.
+Lines 4-5 don't need to be highlighted (unless coverage status changed
+in-between).
 
 So, to accurately highlight the lines that have changed, the coverage reports
 alone are not sufficient and this is why you need to provide the path to the
