@@ -27,14 +27,14 @@ developers to focus solely on their changes.
 
 The following screenshot is the result of the command `pycobertura show` which
 will render a summary table (like the text version) but also include the source
-code with lines highlighted in green or green to indicate whether lines were
-covered (green) and not (red).
+code with highlighted source code to indicate whether lines were covered
+(green) or not (red).
 
 ```
 pycobertura show --format html --output coverage.html coverage.xml
 ```
 
-![pycobertura show screenshot](http://i.imgur.com/sC6iIuB.png)
+![](http://i.imgur.com/BYnXmAp.png)
 
 ### pycobertura diff
 
@@ -46,7 +46,7 @@ has changed (from covered to uncovered, or vice versa).
 pycobertura diff --format html --output coverage.html coverage.old.xml coverage.new.xml
 ```
 
-![pycobertura diff screenshot](http://i.imgur.com/5xkrUwO.png)
+![](http://i.imgur.com/EKcdAmi.png)
 
 ## Install
 
@@ -59,6 +59,8 @@ $ pip install pycobertura
 pycobertura provides a command line interface to report on coverage files.
 
 ### Help commands
+
+Different help screens are available depending on what you need help about.
 
 ```
 $ pycobertura --help
@@ -169,14 +171,16 @@ tox
 ### Isn't pycobertura the same tool as diff-cover?
 
 [Diff-cover](https://github.com/edx/diff-cover) is a fantastic tool and
-pycobertura was heavily inspired by it. Diff-cover uses the underlying git
-repository to find of lines of code that have changed (basically `git diff`)
-and then looks at the Cobertura report to check whether the lines in the diff
-are covered or not. The drawback of this approach is that if the changes
-introduced a coverage drop elsewhere in the code base (e.g. a legacy function
-no longer being called) then it can be very hard to hunt down *where* the
-coverage dropped, especially if there is already a lot of legacy uncovered
-lines in the mix.
+pycobertura was heavily inspired by it. Their end-goal is indeed similar but
+each tool takes a different approach on how they work.
+
+Diff-cover uses the underlying git repository to find of lines of code that
+have changed (basically `git diff`) and then looks at the Cobertura report to
+check whether the lines in the diff are covered or not. The drawback of this
+approach is that if the changes introduced a coverage drop elsewhere in the
+code base (e.g. a legacy function no longer being called) then it can be very
+hard to hunt down *where* the coverage dropped, especially if there is already
+a lot of legacy uncovered lines in the mix.
 
 On the other hand, pycobertura takes two different Cobertura reports in their
 entirety and compares them line by line. If the coverage status of a line
@@ -247,7 +251,7 @@ changed in-between).
 So, to accurately highlight the lines that have changed, the coverage reports
 alone are not sufficient and this is why you need to provide the path to the
 source that was used to generate each of the Cobertura reports and diff them to
-see which lines actually changed and report coverage info.
+see which lines actually changed to report accurate coverage.
 
 ### When should I use pycobertura?
 
