@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+* `pycobertura diff` HTML output now only includes hunks of lines that have
+  coverage changes and skips unchanged classes
+
 ## 0.4.1 (2015-01-05)
 
 * return non-zero exit code if uncovered lines rises (previously based on line

@@ -51,8 +51,12 @@ pre {line-height: 1.3}
         </tfoot>
       </table>
 {%- from 'macro.source.jinja2' import render_source -%}
-{%- for class_name, filename, source in sources %}
-{{ render_source(class_name, source) }}
+
+{%- for class_name, filename, source_hunks in sources %}
+<h4 id="{{class_name}}">{{ class_name }}</h4>
+{%- for hunk in source_hunks %}
+{{ render_source(hunk) }}
+{%- endfor %}
 {%- endfor %}
     </div>
   </body>

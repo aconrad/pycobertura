@@ -1,7 +1,11 @@
 import lxml.etree as ET
 import os
 
-from pycobertura.utils import extrapolate_coverage, reconcile_lines
+from pycobertura.utils import (
+    extrapolate_coverage,
+    reconcile_lines,
+    hunkify_lines,
+)
 
 
 class Cobertura(object):
@@ -261,6 +265,15 @@ class CoberturaDiff(object):
         return rate2 - rate1
 
     def class_source(self, class_name):
+        """
+        Return a list of 3-element tuples `(lineno, source, status)` for each
+        lines of code found in the source file of the class `class_name`.
+
+        The 3 elements in each tuple are:
+        `lineno`: line number in the source code
+        `source`: actual source code for line number `lineno`
+        `status`: True (hit), False (miss) or None (coverage unchanged)
+        """
         filename1 = self.cobertura1.filename(class_name)
         filename2 = self.cobertura2.filename(class_name)
 
@@ -304,3 +317,13 @@ class CoberturaDiff(object):
             lines.append((lineno, line, line_status))
 
         return lines
+
+    def class_source_hunks(self, class_name):
+        """
+        Like `CoberturaDiff.class_source`, but returns a list of line hunks of
+        the lines that have changed. An empty list means that the class has no
+        lines that have a change in coverage status.
+        """
+        lines = self.class_source(class_name)
+        hunks = hunkify_lines(lines)
+        return hunks
