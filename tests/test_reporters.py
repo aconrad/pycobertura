@@ -458,20 +458,10 @@ def test_html_report_delta():
           </tr>
         </tfoot>
       </table>
-<h4 id="dummy/__init__">dummy/__init__</h4>
-<div class="row">
-  <div class="one column lineno">
-    <pre></pre>
-  </div>
-  <div class="eleven columns code">
-    <pre></pre>
-  </div>
-</div>
 <h4 id="dummy/dummy">dummy/dummy</h4>
 <div class="row">
   <div class="one column lineno">
-    <pre>1
-2
+    <pre>2
 3
 4
 5
@@ -479,8 +469,7 @@ def test_html_report_delta():
 </pre>
   </div>
   <div class="eleven columns code">
-    <pre><span class="noop">def foo():
-</span><span class="noop">    pass
+    <pre><span class="noop">    pass
 </span><span class="noop">
 </span><span class="noop">def bar():
 </span><span class="hit">    a = &#39;a&#39;

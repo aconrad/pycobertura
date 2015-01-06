@@ -296,10 +296,16 @@ class TextReporterDelta(DeltaReporter):
 
 
 class HtmlReporterDelta(TextReporterDelta):
-    def get_source(self, class_name):
-        lines = self.differ.class_source(class_name)
+    def get_source_hunks(self, class_name):
+        hunks = self.differ.class_source_hunks(class_name)
         status_map = {True: 'hit', False: 'miss', None: 'noop'}
-        return [(lno, src, status_map[status]) for lno, src, status in lines]
+        new_hunks = []
+        for hunk in hunks:
+            new_hunk = []
+            for lno, src, status in hunk:
+                new_hunk.append((lno, src, status_map[status]))
+            new_hunks.append(new_hunk)
+        return new_hunks
 
     def format_row(self, row):
         class_name, total_lines, total_misses, line_rate, missed_lines = row
@@ -335,9 +341,11 @@ class HtmlReporterDelta(TextReporterDelta):
 
         sources = []
         for class_name in self.differ.cobertura2.classes():
-            source = self.get_source(class_name)
+            source_hunks = self.get_source_hunks(class_name)
+            if not source_hunks:
+                continue
             filename = self.differ.cobertura2.filename(class_name)
-            sources.append((class_name, filename, source))
+            sources.append((class_name, filename, source_hunks))
 
         template = env.get_template('html-delta.jinja2')
         return template.render(
