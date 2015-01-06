@@ -115,5 +115,6 @@ def diff(
     click.echo(report, file=output, nl=isatty)
 
     # non-zero exit code if line rate worsened
-    exit_code = cobertura1.line_rate() > cobertura2.line_rate()
+    differ = reporter.differ
+    exit_code = differ.diff_total_misses() > 0
     raise SystemExit(exit_code)

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+* return non-zero exit code if uncovered lines rises (previously based on line
+  rate)
+
 ## 0.4.0 (2015-01-04)
 
 * rename `Cobertura.total_lines()` -> `Cobertura.total_statements()`
