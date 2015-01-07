@@ -229,6 +229,13 @@ class Cobertura(object):
         # FIXME: this will lookup a list which is slow, make it O(1)
         return class_name in self.classes()
 
+    def class_lines(self, class_name):
+        """
+        Return a list for source lines of class `class_name`.
+        """
+        with open(self.filename(class_name)) as f:
+            return f.readlines()
+
     def packages(self):
         """
         Return the list of available packages in the coverage report.
@@ -250,18 +257,48 @@ class CoberturaDiff(object):
         return statements2 - statements1
 
     def diff_total_misses(self, class_name=None):
-        misses1 = self.cobertura1.total_misses(class_name)
+        if class_name is None:
+            misses1 = self.cobertura1.total_misses(class_name)
+            misses2 = self.cobertura2.total_misses(class_name)
+            return misses2 - misses1
+
+        if self.cobertura1.has_class(class_name):
+            misses1 = self.cobertura1.total_misses(class_name)
+        else:
+            misses1 = 0
+
         misses2 = self.cobertura2.total_misses(class_name)
+
         return misses2 - misses1
 
     def diff_total_hits(self, class_name=None):
-        hits1 = self.cobertura1.total_hits(class_name)
+        if class_name is None:
+            hits1 = self.cobertura1.total_hits(class_name)
+            hits2 = self.cobertura2.total_hits(class_name)
+            return hits2 - hits1
+
+        if self.cobertura1.has_class(class_name):
+            hits1 = self.cobertura1.total_hits(class_name)
+        else:
+            hits1 = 0
+
         hits2 = self.cobertura2.total_hits(class_name)
+
         return hits2 - hits1
 
     def diff_line_rate(self, class_name=None):
-        rate1 = self.cobertura1.line_rate(class_name)
+        if class_name is None:
+            rate1 = self.cobertura1.line_rate(class_name)
+            rate2 = self.cobertura2.line_rate(class_name)
+            return rate2 - rate1
+
+        if self.cobertura1.has_class(class_name):
+            rate1 = self.cobertura1.line_rate(class_name)
+        else:
+            rate1 = 0.0
+
         rate2 = self.cobertura2.line_rate(class_name)
+
         return rate2 - rate1
 
     def class_source(self, class_name):
@@ -274,27 +311,21 @@ class CoberturaDiff(object):
         `source`: actual source code for line number `lineno`
         `status`: True (hit), False (miss) or None (coverage unchanged)
         """
-        filename1 = self.cobertura1.filename(class_name)
-        filename2 = self.cobertura2.filename(class_name)
+        if self.cobertura1.has_class(class_name):
+            lines1 = self.cobertura1.class_lines(class_name)
+            line_statuses1 = dict(self.cobertura1.line_statuses(class_name))
+        else:
+            lines1 = []
+            line_statuses1 = {}
 
-        for filename in (filename1, filename2):
-            if not os.path.exists(filename):
-                return [(0, '%s not found' % filename, None)]
+#            if not os.path.exists(filename):
+#                return [(0, '%s not found' % filename, None)]
 
-        try:
-            f1 = open(filename1)
-            f2 = open(filename2)
-            lines1 = f1.readlines()
-            lines2 = f2.readlines()
-        finally:
-            f1.close()
-            f2.close()
+        lines2 = self.cobertura2.class_lines(class_name)
+        line_statuses2 = dict(self.cobertura2.line_statuses(class_name))
 
         # Build a dict of lineno2 -> lineno1
         lineno_map = reconcile_lines(lines2, lines1)
-
-        line_statuses1 = dict(self.cobertura1.line_statuses(class_name))
-        line_statuses2 = dict(self.cobertura2.line_statuses(class_name))
 
         lines = []
         for lineno, line in enumerate(lines2, start=1):

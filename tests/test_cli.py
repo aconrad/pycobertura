@@ -198,6 +198,8 @@ def test_diff__format_html():
     runner = CliRunner()
     result = runner.invoke(diff, [
         '--format', 'html',
+        '--source1', 'tests/dummy',
+        '--source2', 'tests/dummy',
         'tests/dummy.with-dummy2-better-cov.xml',
         'tests/dummy.with-dummy2-better-and-worse.xml',
     ], catch_exceptions=False)

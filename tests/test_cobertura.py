@@ -225,6 +225,7 @@ def test_class_source__sources_not_found():
         'dummy/__init__': [(0, 'dummy/__init__.py not found', None)],
         'dummy/dummy': [(0, 'dummy/dummy.py not found', None)],
         'dummy/dummy2': [(0, 'dummy/dummy2.py not found', None)],
+        'dummy/dummy4': [(0, 'dummy/dummy4.py not found', None)],
     }
     for class_name in cobertura.classes():
         assert cobertura.class_source(class_name) == expected_sources[class_name]
@@ -246,7 +247,14 @@ def test_line_statuses():
         ],
         'dummy/dummy2': [
             (1, True),
-            (2, True)
+            (2, True),
+        ],
+        'dummy/dummy4': [
+            (1, False),
+            (2, False),
+            (4, False),
+            (5, False),
+            (6, False)
         ],
     }
     for class_name in cobertura.classes():
@@ -272,6 +280,14 @@ def test_class_source__sources_found():
         'dummy/dummy2': [
             (1, 'def baz():\n', True),
             (2, '    pass\n', True)
+        ],
+        'dummy/dummy4': [
+            (1, 'def barbaz():\n', False),
+            (2, '    pass\n', False),
+            (3, '\n', None),
+            (4, 'def foobarbaz():\n', False),
+            (5, '    a = 1 + 3\n', False),
+            (6, '    pass\n', False)
         ],
     }
     for class_name in cobertura.classes():
