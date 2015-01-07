@@ -447,13 +447,29 @@ def test_html_report_delta():
             <td><span class="red">+5</span>
             </td>
           </tr>
+          <tr>
+            <td><a href="#dummy/dummy3">dummy/dummy3</a></td>
+            <td>+2</td>
+            <td>+2</td>
+            <td>-</td>
+            <td><span class="red">+1</span>, <span class="red">+2</span>
+            </td>
+          </tr>
+          <tr>
+            <td><a href="#dummy/dummy4">dummy/dummy4</a></td>
+            <td>-5</td>
+            <td>-</td>
+            <td>-</td>
+            <td>
+            </td>
+          </tr>
         </tbody>
         <tfoot>
           <tr>
             <td>TOTAL</td>
-            <td>+2</td>
             <td>-1</td>
-            <td>+17.46%</td>
+            <td>-4</td>
+            <td>+31.06%</td>
             <td></td>
           </tr>
         </tfoot>
@@ -492,6 +508,19 @@ def test_html_report_delta():
 </span><span class="hit">    c = &#39;c&#39;
 </span><span class="noop">
 </span><span class="hit">def bat():
+</span><span class="miss">    pass
+</span></pre>
+  </div>
+</div>
+<h4 id="dummy/dummy3">dummy/dummy3</h4>
+<div class="row">
+  <div class="one column lineno">
+    <pre>1
+2
+</pre>
+  </div>
+  <div class="eleven columns code">
+    <pre><span class="miss">def foobar():
 </span><span class="miss">    pass
 </span></pre>
   </div>
