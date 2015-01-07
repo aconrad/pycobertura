@@ -4,24 +4,6 @@ import lxml.etree as ET
 from .utils import make_cobertura
 
 
-def test_parse_string():
-    from pycobertura import Cobertura
-
-    with open('tests/cobertura.xml') as f:
-        xml = f.read()
-
-    cobertura = Cobertura(xml)
-    assert isinstance(cobertura.xml, ET._Element)
-
-
-def test_parse_fileobj():
-    from pycobertura import Cobertura
-
-    with open('tests/cobertura.xml') as f:
-        cobertura = Cobertura(f)
-    assert isinstance(cobertura.xml, ET._Element)
-
-
 def test_parse_path():
     from pycobertura import Cobertura
 
@@ -205,37 +187,34 @@ def test_filename():
             expected_filenames[class_name]
 
 
-def test_filename__with_base_path():
+def test_filepath():
     base_path = 'foo/bar/baz'
     cobertura = make_cobertura(base_path=base_path)
-    expected_filenames = {
+    expected_filepaths = {
         'Main': 'foo/bar/baz/Main.java',
         'search.BinarySearch': 'foo/bar/baz/search/BinarySearch.java',
         'search.ISortedArraySearch': 'foo/bar/baz/search/ISortedArraySearch.java',
         'search.LinearSearch': 'foo/bar/baz/search/LinearSearch.java',
     }
     for class_name in cobertura.classes():
-        assert cobertura.filename(class_name) == \
-            expected_filenames[class_name]
+        assert cobertura.filepath(class_name) == \
+            expected_filepaths[class_name]
 
 
 def test_class_source__sources_not_found():
-    cobertura = make_cobertura('tests/dummy.source1.xml')
+    cobertura = make_cobertura('tests/cobertura.xml')
     expected_sources = {
-        'dummy/__init__': [(0, 'dummy/__init__.py not found', None)],
-        'dummy/dummy': [(0, 'dummy/dummy.py not found', None)],
-        'dummy/dummy2': [(0, 'dummy/dummy2.py not found', None)],
-        'dummy/dummy4': [(0, 'dummy/dummy4.py not found', None)],
+        'Main': [(0, 'tests/Main.java not found', None)],
+        'search.BinarySearch': [(0, 'tests/search/BinarySearch.java not found', None)],
+        'search.ISortedArraySearch': [(0, 'tests/search/ISortedArraySearch.java not found', None)],
+        'search.LinearSearch': [(0, 'tests/search/LinearSearch.java not found', None)],
     }
     for class_name in cobertura.classes():
         assert cobertura.class_source(class_name) == expected_sources[class_name]
 
 
 def test_line_statuses():
-    cobertura = make_cobertura(
-        'tests/dummy.source1.xml',
-        base_path='tests/dummy.source1/'
-    )
+    cobertura = make_cobertura('tests/dummy.source1/coverage.xml')
     expected_line_statuses = {
         'dummy/__init__': [],
         'dummy/dummy': [
@@ -263,10 +242,7 @@ def test_line_statuses():
 
 
 def test_class_source__sources_found():
-    cobertura = make_cobertura(
-        'tests/dummy.source1.xml',
-        base_path='tests/dummy.source1/'
-    )
+    cobertura = make_cobertura('tests/dummy.source1/coverage.xml')
     expected_sources = {
         'dummy/__init__': [],
         'dummy/dummy': [

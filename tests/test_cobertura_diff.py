@@ -4,14 +4,8 @@ from .utils import make_cobertura
 def test_diff_class_source():
     from pycobertura.cobertura import CoberturaDiff
 
-    cobertura1 = make_cobertura(
-        'tests/dummy.source1.xml',
-        base_path='tests/dummy.source1/'
-    )
-    cobertura2 = make_cobertura(
-        'tests/dummy.source2.xml',
-        base_path='tests/dummy.source2/'
-    )
+    cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
+    cobertura2 = make_cobertura( 'tests/dummy.source2/coverage.xml')
     differ = CoberturaDiff(cobertura1, cobertura2)
 
     expected_sources = {
@@ -45,14 +39,8 @@ def test_diff_class_source():
 def test_diff_total_misses():
     from pycobertura.cobertura import CoberturaDiff
 
-    cobertura1 = make_cobertura(
-        'tests/dummy.source1.xml',
-        base_path='tests/dummy.source1/'
-    )
-    cobertura2 = make_cobertura(
-        'tests/dummy.source2.xml',
-        base_path='tests/dummy.source2/'
-    )
+    cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
+    cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
     differ = CoberturaDiff(cobertura1, cobertura2)
 
     expected_sources = {
@@ -68,14 +56,8 @@ def test_diff_total_misses():
 def test_diff_total_misses_by_class():
     from pycobertura.cobertura import CoberturaDiff
 
-    cobertura1 = make_cobertura(
-        'tests/dummy.source1.xml',
-        base_path='tests/dummy.source1/'
-    )
-    cobertura2 = make_cobertura(
-        'tests/dummy.source2.xml',
-        base_path='tests/dummy.source2/'
-    )
+    cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
+    cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
     differ = CoberturaDiff(cobertura1, cobertura2)
 
     expected_sources = {
@@ -93,14 +75,8 @@ def test_diff_total_misses_by_class():
 def test_diff_line_rate():
     from pycobertura.cobertura import CoberturaDiff
 
-    cobertura1 = make_cobertura(
-        'tests/dummy.source1.xml',
-        base_path='tests/dummy.source1/'
-    )
-    cobertura2 = make_cobertura(
-        'tests/dummy.source2.xml',
-        base_path='tests/dummy.source2/'
-    )
+    cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
+    cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
     differ = CoberturaDiff(cobertura1, cobertura2)
 
     assert differ.diff_line_rate() == 0.31059999999999993
@@ -109,14 +85,8 @@ def test_diff_line_rate():
 def test_diff_line_rate_by_class():
     from pycobertura.cobertura import CoberturaDiff
 
-    cobertura1 = make_cobertura(
-        'tests/dummy.source1.xml',
-        base_path='tests/dummy.source1/'
-    )
-    cobertura2 = make_cobertura(
-        'tests/dummy.source2.xml',
-        base_path='tests/dummy.source2/'
-    )
+    cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
+    cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
     differ = CoberturaDiff(cobertura1, cobertura2)
 
     expected_sources = {
@@ -134,14 +104,8 @@ def test_diff_line_rate_by_class():
 def test_diff_total_hits():
     from pycobertura.cobertura import CoberturaDiff
 
-    cobertura1 = make_cobertura(
-        'tests/dummy.source1.xml',
-        base_path='tests/dummy.source1/'
-    )
-    cobertura2 = make_cobertura(
-        'tests/dummy.source2.xml',
-        base_path='tests/dummy.source2/'
-    )
+    cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
+    cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
     differ = CoberturaDiff(cobertura1, cobertura2)
 
     assert differ.diff_total_hits() == 3
@@ -150,14 +114,8 @@ def test_diff_total_hits():
 def test_diff_total_hits_by_class():
     from pycobertura.cobertura import CoberturaDiff
 
-    cobertura1 = make_cobertura(
-        'tests/dummy.source1.xml',
-        base_path='tests/dummy.source1/'
-    )
-    cobertura2 = make_cobertura(
-        'tests/dummy.source2.xml',
-        base_path='tests/dummy.source2/'
-    )
+    cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
+    cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
     differ = CoberturaDiff(cobertura1, cobertura2)
 
     expected_total_hits = {

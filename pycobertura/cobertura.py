@@ -12,42 +12,21 @@ class Cobertura(object):
     """
     An XML cobertura parser.
     """
-    def __init__(self, xml_source, base_path=None):
+    def __init__(self, xml_path, base_path=None):
         """
-        Initialize a Cobertura report given an XML file `xml_source` that is
-        in the cobertura format.
+        Initialize a Cobertura report given a path to an XML file `xml_path`
+        that is in the cobertura format.
 
         The optional argument `base_path` can be provided to resolve the path
-        to the source code. `base_path` will prefix the filename attribute
-        found in the Cobertura report.
-
-        `xml_source` may be:
-        - a path to an XML file
-        - an open file object
-        - an XML string
+        to the source code. If omitted, `base_path` will be set to
+        `os.path.dirname(xml_source)`.
         """
+        if base_path is None:
+            base_path = os.path.dirname(xml_path)
+
         self.base_path = base_path
-        self.source = xml_source
-        self.xml = self._parse(xml_source)
-
-    def _parse(self, xml_source):
-        if hasattr(xml_source, 'startswith'):
-            if xml_source.startswith('<?xml'):
-                return self._parse_xml_string(xml_source)
-
-            return self._parse_xml_file(xml_source)
-
-        elif hasattr(xml_source, 'read'):
-            return self._parse_xml_fileobj(xml_source)
-
-    def _parse_xml_file(self, xml_file):
-        return ET.parse(xml_file).getroot()
-
-    def _parse_xml_fileobj(self, xml_fileobj):
-        return self._parse_xml_string(xml_fileobj.read())
-
-    def _parse_xml_string(self, xml_string):
-        return ET.fromstring(xml_string)
+        self.xml_path = xml_path
+        self.xml = ET.parse(xml_path).getroot()
 
     def _get_element_by_class_name(self, class_name):
         return self.xml.xpath("//class[@name='%s'][1]" % class_name)[0]
@@ -139,7 +118,7 @@ class Cobertura(object):
         `source`: actual source code for line number `lineno`
         `status`: True (hit) or False (miss)
         """
-        filename = self.filename(class_name)
+        filename = self.filepath(class_name)
 
         if not os.path.exists(filename):
             return [(0, '%s not found' % filename, None)]
@@ -202,18 +181,22 @@ class Cobertura(object):
 
     def filename(self, class_name):
         """
-        Return the filename of the class `class_name`. If `base_path` was
-        provided in the constructor, it will be prefixed to the filename using
-        `os.path.join`.
+        Return the filename of the class `class_name` as found in the Cobertura
+        report.
         """
         el = self._get_element_by_class_name(class_name)
         filename = el.attrib['filename']
+        return filename
 
-        if self.base_path is None:
-            return filename
-
-        path = os.path.join(self.base_path, filename)
-        return path
+    def filepath(self, class_name):
+        """
+        Return the filesystem path to the actual class file. It uses the
+        `base_path` value initialized in the constructor by prefixing it to the
+        class filename using `os.path.join(base_path, filename)`.
+        """
+        filename = self.filename(class_name)
+        filepath = os.path.join(self.base_path, filename)
+        return filepath
 
     def classes(self):
         """
@@ -233,7 +216,7 @@ class Cobertura(object):
         """
         Return a list for source lines of class `class_name`.
         """
-        with open(self.filename(class_name)) as f:
+        with open(self.filepath(class_name)) as f:
             return f.readlines()
 
     def packages(self):
@@ -252,8 +235,18 @@ class CoberturaDiff(object):
         self.cobertura2 = cobertura2
 
     def diff_total_statements(self, class_name=None):
-        statements1 = self.cobertura1.total_statements(class_name)
+        if class_name is None:
+            statements1 = self.cobertura1.total_statements(class_name)
+            statements2 = self.cobertura2.total_statements(class_name)
+            return statements2 - statements1
+
+        if self.cobertura1.has_class(class_name):
+            statements1 = self.cobertura1.total_statements(class_name)
+        else:
+            statements1 = 0
+
         statements2 = self.cobertura2.total_statements(class_name)
+
         return statements2 - statements1
 
     def diff_total_misses(self, class_name=None):
@@ -300,6 +293,31 @@ class CoberturaDiff(object):
         rate2 = self.cobertura2.line_rate(class_name)
 
         return rate2 - rate1
+
+    def diff_missed_lines(self, class_name):
+        """
+        Return a list of 2-element tuples `(lineno, is_new)` where `lineno` is
+        a missed line number and `is_new` indicates whether the missed line was
+        introduced (True) or removed (False).
+        """
+        line_changed = []
+        for lineno, line, status in self.class_source(class_name):
+            if status is not None:
+                is_new = not status
+                line_changed.append((lineno, is_new))
+        return line_changed
+
+    def classes(self):
+        """
+        Return `self.cobertura2.classes()`.
+        """
+        return self.cobertura2.classes()
+
+    def filename(self, class_name):
+        """
+        Return `self.cobertura2.filename(class_name)`.
+        """
+        return self.cobertura2.filename(class_name)
 
     def class_source(self, class_name):
         """

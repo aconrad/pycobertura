@@ -76,22 +76,31 @@ and --source2 options were given the same path to the source.
 )
 @click.option(
     '-s1', '--source1', metavar='<source-dir1>',
-    help='Provide path to first source code directory.'
+    help='Provide path to source code directory of first Cobertura report. '
+         'This is necessary if the filename path defined in the report is not '
+         'accessible from the location of the report.'
 )
 @click.option(
     '-s2', '--source2', metavar='<source-dir2>',
-    help='Provide path to second source code directory.'
+    help='Provide path to source code directory of second Cobertura report. '
+         'This is necessary if the filename path defined in the report is not '
+         'accessible from the location of the report.'
 )
+@click.option(
+    '--missed/--no-missed', default=True,
+    help='Show missing lines. This option requires access to the source code '
+         'that was used to generate both Cobertura reports (see --source1 '
+         'and --source2). Default: --missed')
 def diff(
         cobertura_file1, cobertura_file2,
-        color, format, output, source1, source2):
+        color, format, output, source1, source2, missed):
     """compare coverage of two Cobertura reports"""
     cobertura1 = Cobertura(cobertura_file1, base_path=source1)
     cobertura2 = Cobertura(cobertura_file2, base_path=source2)
 
     Reporter = delta_reporters[format]
     reporter_args = [cobertura1, cobertura2]
-    reporter_kwargs = {}
+    reporter_kwargs = {'show_missed': missed}
 
     isatty = True if output is None else output.isatty()
 

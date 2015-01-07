@@ -6,6 +6,23 @@
   coverage changes and skips unchanged classes
 * handle asymmetric presence of classes in the reports (regression
   introduced in 0.4.0)
+* introduce `CoberturaDiff.diff_missed_lines()`
+* introduce `CoberturaDiff.classes()`
+* introduce `CoberturaDiff.filename()`
+* introduce `Cobertura.filepath()` which will return the system path to the
+  file. It uses `base_path` to resolve the path.
+* the summary table of `pycobertura diff` no longer shows classes that are no
+  longer present
+* `Cobertura.filename()` now only returns the filename of the class as found in
+  the Cobertura report, any `base_path` computation is omitted.
+* Argument `xml_source` of `Cobertura.__init__()` is renamed to `xml_path` and
+  only accepts an XML path because much of the logic involved in source code
+  path resolution is based on the path provided which cannot work with file
+  objects or XML strings.
+* Rename `Cobertura.source` -> `Cobertura.xml_path`
+* `pycobertura diff` now takes options `--missed` (default) or `--no-missed` to
+  show missed line numbers. If `--missed` is given, the paths to the source
+  code must be accessible.
 
 ## 0.4.1 (2015-01-05)
 
