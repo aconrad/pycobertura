@@ -186,8 +186,12 @@ class TextReporterDelta(DeltaReporter):
             '%+d' % row.total_statements
             if row.total_statements else '-'
         )
-        total_misses = '%+d' % row.total_misses if row.total_misses else '-'
         line_rate = '%+.2f%%' % (row.line_rate * 100) if row.line_rate else '-'
+        total_misses = '%+d' % row.total_misses if row.total_misses else '-'
+
+        if self.color is True and total_misses != '-':
+            colorize = [green, red][total_misses[0] == '+']
+            total_misses = colorize(total_misses)
 
         if self.show_source is True:
             missed_lines = [

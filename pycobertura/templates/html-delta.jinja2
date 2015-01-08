@@ -32,7 +32,7 @@ pre {line-height: 1.3}
           <tr>
             <td><a href="#{{ line.class_name }}">{{ line.class_name }}</a></td>
             <td>{{ line.total_statements }}</td>
-            <td>{{ line.total_misses }}</td>
+            <td><span{% if line.total_misses != '-' %} class="{% if line.total_misses[0] == '+' %}red{% else %}green{% endif%}"{% endif %}>{{ line.total_misses }}</span></td>
             <td>{{ line.line_rate }}</td>
 {%- if show_source %}
             <td>
@@ -48,7 +48,7 @@ pre {line-height: 1.3}
           <tr>
             <td>{{ footer.class_name }}</td>
             <td>{{ footer.total_statements }}</td>
-            <td>{{ footer.total_misses }}</td>
+            <td><span{% if footer.total_misses != '-' %} class="{% if footer.total_misses[0] == '+' %}red{% else %}green{% endif%}"{% endif %}>{{ footer.total_misses }}</span></td>
             <td>{{ footer.line_rate }}</td>
 {%- if show_source %}
             <td></td>

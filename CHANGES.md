@@ -6,6 +6,7 @@
   `--source` and `--no-source` which will not show the source code nor display
   missing lines since they cannot be accurately computed without the source.
 * Optimized xpath syntax for faster class name lookup (~3x)
+* Colorize total missed statements
 
 ## 0.5.0 (2015-01-07)
 

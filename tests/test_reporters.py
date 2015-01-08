@@ -73,10 +73,10 @@ def test_text_report_delta__colorize_True():
 Name            Stmts    Miss    Cover    Missing
 --------------  -------  ------  -------  ----------
 dummy/__init__  -        -       -
-dummy/dummy     -        -2      +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
-dummy/dummy2    +2       +1      -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
-dummy/dummy3    +2       +2      -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
-TOTAL           -1       -4      +31.06%"""
+dummy/dummy     -        \x1b[32m-2\x1b[39m      +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
+dummy/dummy2    +2       \x1b[31m+1\x1b[39m      -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
+dummy/dummy3    +2       \x1b[31m+2\x1b[39m      -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
+TOTAL           -1       \x1b[32m-4\x1b[39m      +31.06%"""
 
 
 def test_text_report_delta__colorize_True__with_missing_range():
@@ -91,10 +91,10 @@ def test_text_report_delta__colorize_True__with_missing_range():
 Name            Stmts    Miss    Cover    Missing
 --------------  -------  ------  -------  ----------
 dummy/__init__  -        -       -
-dummy/dummy     -        -2      +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
-dummy/dummy2    +2       +1      -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
-dummy/dummy3    +2       +2      -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
-TOTAL           -1       -4      +31.06%"""
+dummy/dummy     -        \x1b[32m-2\x1b[39m      +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
+dummy/dummy2    +2       \x1b[31m+1\x1b[39m      -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
+dummy/dummy3    +2       \x1b[31m+2\x1b[39m      -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
+TOTAL           -1       \x1b[32m-4\x1b[39m      +31.06%"""
 
 
 def test_text_report_delta__colorize_False():
@@ -278,25 +278,25 @@ def test_html_report_delta__no_source():
           <tr>
             <td><a href="#dummy/__init__">dummy/__init__</a></td>
             <td>-</td>
-            <td>-</td>
+            <td><span>-</span></td>
             <td>-</td>
           </tr>
           <tr>
             <td><a href="#dummy/dummy">dummy/dummy</a></td>
             <td>-</td>
-            <td>-2</td>
+            <td><span class="green">-2</span></td>
             <td>+40.00%</td>
           </tr>
           <tr>
             <td><a href="#dummy/dummy2">dummy/dummy2</a></td>
             <td>+2</td>
-            <td>+1</td>
+            <td><span class="red">+1</span></td>
             <td>-25.00%</td>
           </tr>
           <tr>
             <td><a href="#dummy/dummy3">dummy/dummy3</a></td>
             <td>+2</td>
-            <td>+2</td>
+            <td><span class="red">+2</span></td>
             <td>-</td>
           </tr>
         </tbody>
@@ -304,7 +304,7 @@ def test_html_report_delta__no_source():
           <tr>
             <td>TOTAL</td>
             <td>-1</td>
-            <td>-4</td>
+            <td><span class="green">-4</span></td>
             <td>+31.06%</td>
           </tr>
         </tfoot>
@@ -349,7 +349,7 @@ def test_html_report_delta():
           <tr>
             <td><a href="#dummy/__init__">dummy/__init__</a></td>
             <td>-</td>
-            <td>-</td>
+            <td><span>-</span></td>
             <td>-</td>
             <td>
             </td>
@@ -357,7 +357,7 @@ def test_html_report_delta():
           <tr>
             <td><a href="#dummy/dummy">dummy/dummy</a></td>
             <td>-</td>
-            <td>-2</td>
+            <td><span class="green">-2</span></td>
             <td>+40.00%</td>
             <td><span class="green">-5</span>, <span class="green">-6</span>
             </td>
@@ -365,7 +365,7 @@ def test_html_report_delta():
           <tr>
             <td><a href="#dummy/dummy2">dummy/dummy2</a></td>
             <td>+2</td>
-            <td>+1</td>
+            <td><span class="red">+1</span></td>
             <td>-25.00%</td>
             <td><span class="green">-2</span>, <span class="green">-4</span>, <span class="red">+5</span>
             </td>
@@ -373,7 +373,7 @@ def test_html_report_delta():
           <tr>
             <td><a href="#dummy/dummy3">dummy/dummy3</a></td>
             <td>+2</td>
-            <td>+2</td>
+            <td><span class="red">+2</span></td>
             <td>-</td>
             <td><span class="red">+1</span>, <span class="red">+2</span>
             </td>
@@ -383,7 +383,7 @@ def test_html_report_delta():
           <tr>
             <td>TOTAL</td>
             <td>-1</td>
-            <td>-4</td>
+            <td><span class="green">-4</span></td>
             <td>+31.06%</td>
             <td></td>
           </tr>
