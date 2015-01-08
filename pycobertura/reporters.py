@@ -265,12 +265,6 @@ class HtmlReporterDelta(TextReporterDelta):
                 for lno, is_new in row.missed_lines
             ]
 
-            missed_lines_colored = []
-            for line in missed_lines:
-                colorize = [green, red][line[0] == '+']
-                colored_line = colorize(line)
-                missed_lines_colored.append(colored_line)
-
         row_values = [
             row.class_name,
             total_statements,
