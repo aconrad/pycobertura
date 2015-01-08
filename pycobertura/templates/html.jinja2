@@ -24,23 +24,23 @@ pre {line-height: 1.3}
           </tr>
         </thead>
         <tbody>
-{%- for class_name, total_lines, total_misses, line_rate, missing_lines in lines %}
+{%- for line in lines %}
           <tr>
-            <td><a href="#{{ class_name }}">{{ class_name }}</a></td>
-            <td>{{ total_lines }}</td>
-            <td>{{ total_misses }}</td>
-            <td>{{ line_rate }}</td>
-            <td>{{ missing_lines }}</td>
+            <td><a href="#{{ line.class_name }}">{{ line.class_name }}</a></td>
+            <td>{{ line.total_statements }}</td>
+            <td>{{ line.total_misses }}</td>
+            <td>{{ line.line_rate }}</td>
+            <td>{{ line.missed_lines }}</td>
           </tr>
 {%- endfor %}
         </tbody>
         <tfoot>
           <tr>
-            <td>{{ footer[0] }}</td>
-            <td>{{ footer[1] }}</td>
-            <td>{{ footer[2] }}</td>
-            <td>{{ footer[3] }}</td>
-            <td>{{ footer[4] }}</td>
+            <td>{{ footer.class_name }}</td>
+            <td>{{ footer.total_statements }}</td>
+            <td>{{ footer.total_misses }}</td>
+            <td>{{ footer.line_rate }}</td>
+            <td>{{ footer.missed_lines }}</td>
           </tr>
         </tfoot>
       </table>
