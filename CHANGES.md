@@ -7,6 +7,7 @@
   missing lines since they cannot be accurately computed without the source.
 * Optimized xpath syntax for faster class name lookup (~3x)
 * Colorize total missed statements
+* `pycobertura diff` exit code will be non-zero until all changes are covered
 
 ## 0.5.0 (2015-01-07)
 

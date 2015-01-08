@@ -264,23 +264,25 @@ def test_diff__same_coverage_has_exit_status_of_zero():
     assert result.exit_code == 0
 
 
-def test_diff__better_coverage_has_exit_status_of_zero():
+def test_diff__all_changes_covered_has_exit_status_of_zero():
     from pycobertura.cli import diff
 
     runner = CliRunner()
     result = runner.invoke(diff, [
-        'tests/dummy.source1/coverage.xml',
-        'tests/dummy.source2/coverage.xml',
+        'tests/dummy.original.xml',
+        'tests/dummy.original-full-cov.xml',  # has no uncovered lines
+        '--no-source',
     ], catch_exceptions=False)
     assert result.exit_code == 0
 
 
-def test_diff__worse_coverage_has_exit_status_of_one():
+def test_diff__not_all_changes_covered_has_exit_status_of_one():
     from pycobertura.cli import diff
 
     runner = CliRunner()
     result = runner.invoke(diff, [
-        'tests/dummy.source2/coverage.xml',
-        'tests/dummy.source1/coverage.xml',
+        'tests/dummy.with-dummy2-no-cov.xml',
+        'tests/dummy.with-dummy2-better-and-worse.xml',  # has covered AND uncovered lines
+        '--no-source',
     ], catch_exceptions=False)
     assert result.exit_code == 1
