@@ -209,13 +209,13 @@ def test_diff__format_html__with_source():
     assert result.output.endswith('</html>\n')
 
 
-def test_diff__format_html__missed():
+def test_diff__format_html__source():
     from pycobertura.cli import diff
 
     runner = CliRunner()
     result = runner.invoke(diff, [
         '--format', 'html',
-        '--missed',
+        '--source',
         'tests/dummy.source1/coverage.xml',
         'tests/dummy.source2/coverage.xml',
     ], catch_exceptions=False)
@@ -224,7 +224,7 @@ def test_diff__format_html__missed():
     assert result.output.endswith('</html>\n')
 
 
-def test_diff__format_html__missed_is_default():
+def test_diff__format_html__source_is_default():
     from pycobertura.cli import diff
 
     runner = CliRunner()
@@ -238,13 +238,13 @@ def test_diff__format_html__missed_is_default():
     assert result.output.endswith('</html>\n')
 
 
-def test_diff__format_html__no_missed():
+def test_diff__format_html__no_source():
     from pycobertura.cli import diff
 
     runner = CliRunner()
     result = runner.invoke(diff, [
         '--format', 'html',
-        '--no-missed',
+        '--no-source',
         'tests/dummy.source1/coverage.xml',
         'tests/dummy.source2/coverage.xml',
     ], catch_exceptions=False)

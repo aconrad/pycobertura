@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+* Options of pycobertura diff `--missed` and `--no-missed` have been renamed to
+  `--source` and `--no-source` which will not show the source code nor display
+  missing lines since they cannot be accurately computed without the source.
+
 ## 0.5.0 (2015-01-07)
 
 * `pycobertura diff` HTML output now only includes hunks of lines that have

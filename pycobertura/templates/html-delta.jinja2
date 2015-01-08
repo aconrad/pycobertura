@@ -22,7 +22,7 @@ pre {line-height: 1.3}
             <th>Stmts</th>
             <th>Miss</th>
             <th>Cover</th>
-{%- if show_missed %}
+{%- if show_source %}
             <th>Missing</th>
 {%- endif %}
           </tr>
@@ -34,7 +34,7 @@ pre {line-height: 1.3}
             <td>{{ line.total_statements }}</td>
             <td>{{ line.total_misses }}</td>
             <td>{{ line.line_rate }}</td>
-{%- if show_missed %}
+{%- if show_source %}
             <td>
 {%- for missed_line in line.missed_lines %}
             {%- if not loop.first %}, {% endif %}<span class="{% if missed_line[0] == '+' %}red{% else %}green{% endif %}">{{ missed_line }}</span>
@@ -50,13 +50,13 @@ pre {line-height: 1.3}
             <td>{{ footer.total_statements }}</td>
             <td>{{ footer.total_misses }}</td>
             <td>{{ footer.line_rate }}</td>
-{%- if show_missed %}
+{%- if show_source %}
             <td></td>
 {%- endif %}
           </tr>
         </tfoot>
       </table>
-{%- if show_missed %}
+{%- if show_source %}
 {%- from 'macro.source.jinja2' import render_source -%}
 
 {%- for class_name, filename, source_hunks in sources %}
