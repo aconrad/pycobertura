@@ -89,10 +89,10 @@ def test_diff__format_default():
 Name            Stmts    Miss    Cover    Missing
 --------------  -------  ------  -------  ----------
 dummy/__init__  -        -       -
-dummy/dummy     -        -2      +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
-dummy/dummy2    +2       +1      -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
-dummy/dummy3    +2       +2      -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
-TOTAL           -1       -4      +31.06%
+dummy/dummy     -        \x1b[32m-2\x1b[39m      +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
+dummy/dummy2    +2       \x1b[31m+1\x1b[39m      -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
+dummy/dummy3    +2       \x1b[31m+2\x1b[39m      -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
+TOTAL           -1       \x1b[32m-4\x1b[39m      +31.06%
 """
     else:
         assert result.output == """\
@@ -122,10 +122,10 @@ def test_diff__format_text():
 Name            Stmts    Miss    Cover    Missing
 --------------  -------  ------  -------  ----------
 dummy/__init__  -        -       -
-dummy/dummy     -        -2      +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
-dummy/dummy2    +2       +1      -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
-dummy/dummy3    +2       +2      -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
-TOTAL           -1       -4      +31.06%
+dummy/dummy     -        \x1b[32m-2\x1b[39m      +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
+dummy/dummy2    +2       \x1b[31m+1\x1b[39m      -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
+dummy/dummy3    +2       \x1b[31m+2\x1b[39m      -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
+TOTAL           -1       \x1b[32m-4\x1b[39m      +31.06%
 """
         else:
             assert result.output == """\
