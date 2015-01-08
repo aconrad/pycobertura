@@ -228,13 +228,13 @@ def test_html_report():
 </html>"""
 
 
-def test_text_report_delta__no_missed():
+def test_text_report_delta__no_source():
     from pycobertura.reporters import TextReporterDelta
 
     cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
     cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
 
-    report_delta = TextReporterDelta(cobertura1, cobertura2, show_missed=False)
+    report_delta = TextReporterDelta(cobertura1, cobertura2, show_source=False)
     output = report_delta.generate()
     assert output == """\
 Name            Stmts    Miss    Cover
@@ -246,13 +246,13 @@ dummy/dummy3    +2       +2      -
 TOTAL           -1       -4      +31.06%"""
 
 
-def test_html_report_delta__no_missed():
+def test_html_report_delta__no_source():
     from pycobertura.reporters import HtmlReporterDelta
 
     cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
     cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
 
-    report_delta = HtmlReporterDelta(cobertura1, cobertura2, show_missed=False)
+    report_delta = HtmlReporterDelta(cobertura1, cobertura2, show_source=False)
     html_output = report_delta.generate()
     assert 'Missing' not in html_output
     assert '<h4 id=' not in html_output

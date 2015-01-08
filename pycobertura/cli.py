@@ -52,12 +52,14 @@ delta_reporters = {
 @pycobertura.command(help="""\
 The diff command compares and shows the changes between two Cobertura reports.
 
-Missing lines with the diff command can only be accurately computed if the
-source code to each of the coverage reports is given using --source1 and
---source2. Not providing the path to the source code assumes that each of the
-coverage files were generated against the same source code which is accessible
-by looking at the "filename" attribute in the Cobertura reports as if --source1
-and --source2 options were given the same path to the source.
+NOTE: Reporting missing lines or showing the source code with the diff command
+can only be accurately computed if the versions of the source code used to
+generate each of the coverage reports is accessible. By default, the source
+will read from the Cobertura report and resolved relatively from the report's
+location. If the source is not accessible from the report's location, the
+options `--source1` and `--source2` are necessary to point to the source code
+directories. If the source is not available at all, pass `--no-source` but
+missing lines and source code will not be reported.
 """)
 @click.argument('cobertura_file1')
 @click.argument('cobertura_file2')
@@ -87,20 +89,23 @@ and --source2 options were given the same path to the source.
          'accessible from the location of the report.'
 )
 @click.option(
-    '--missed/--no-missed', default=True,
-    help='Show missing lines. This option requires access to the source code '
-         'that was used to generate both Cobertura reports (see --source1 '
-         'and --source2). Default: --missed')
+    '--source/--no-source', default=True,
+    help='Show missing lines and source code. When enabled (default), this '
+         'option requires access to the source code that was used to generate '
+         'both Cobertura reports (see --source1 and --source2). When '
+         '`--no-source` is passed, missing lines and the source code will '
+         'not be displayed.'
+)
 def diff(
         cobertura_file1, cobertura_file2,
-        color, format, output, source1, source2, missed):
+        color, format, output, source1, source2, source):
     """compare coverage of two Cobertura reports"""
     cobertura1 = Cobertura(cobertura_file1, base_path=source1)
     cobertura2 = Cobertura(cobertura_file2, base_path=source2)
 
     Reporter = delta_reporters[format]
     reporter_args = [cobertura1, cobertura2]
-    reporter_kwargs = {'show_missed': missed}
+    reporter_kwargs = {'show_source': source}
 
     isatty = True if output is None else output.isatty()
 

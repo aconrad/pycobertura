@@ -121,9 +121,9 @@ class HtmlReporter(TextReporter):
 
 
 class DeltaReporter(object):
-    def __init__(self, cobertura1, cobertura2, show_missed=True):
+    def __init__(self, cobertura1, cobertura2, show_source=True):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
-        self.show_missed = show_missed
+        self.show_source = show_source
 
     def get_class_row(self, class_name):
         row_values = [
@@ -133,7 +133,7 @@ class DeltaReporter(object):
             self.differ.diff_line_rate(class_name),
         ]
 
-        if self.show_missed is True:
+        if self.show_source is True:
             missed_lines = self.differ.diff_missed_lines(class_name)
             row_values.append(missed_lines)
             row = class_row_missed(*row_values)
@@ -150,7 +150,7 @@ class DeltaReporter(object):
             self.differ.diff_line_rate(),
         ]
 
-        if self.show_missed:
+        if self.show_source:
             footer_values.append([])  # dummy missed lines
             footer = class_row_missed(*footer_values)
         else:
@@ -189,7 +189,7 @@ class TextReporterDelta(DeltaReporter):
         total_misses = '%+d' % row.total_misses if row.total_misses else '-'
         line_rate = '%+.2f%%' % (row.line_rate * 100) if row.line_rate else '-'
 
-        if self.show_missed is True:
+        if self.show_source is True:
             missed_lines = [
                 '%s%d' % (['-', '+'][is_new], lno)
                 for lno, is_new in row.missed_lines
@@ -213,7 +213,7 @@ class TextReporterDelta(DeltaReporter):
             line_rate,
         ]
 
-        if self.show_missed is True:
+        if self.show_source is True:
             row.append(missed_lines)
 
         return row
@@ -228,7 +228,7 @@ class TextReporterDelta(DeltaReporter):
 
         headers = ['Name', 'Stmts', 'Miss', 'Cover']
 
-        if self.show_missed is True:
+        if self.show_source is True:
             headers.append('Missing')
 
         report = tabulate(
@@ -259,7 +259,7 @@ class HtmlReporterDelta(TextReporterDelta):
         total_misses = '%+d' % row.total_misses if row.total_misses else '-'
         line_rate = '%+.2f%%' % (row.line_rate * 100) if row.line_rate else '-'
 
-        if self.show_missed is True:
+        if self.show_source is True:
             missed_lines = [
                 '%s%d' % (['-', '+'][is_new], lno)
                 for lno, is_new in row.missed_lines
@@ -278,7 +278,7 @@ class HtmlReporterDelta(TextReporterDelta):
             line_rate,
         ]
 
-        if self.show_missed is True:
+        if self.show_source is True:
             row_values.append(missed_lines)
             row = class_row_missed(*row_values)
         else:
@@ -294,7 +294,7 @@ class HtmlReporterDelta(TextReporterDelta):
             formatted_row = self.format_row(row)
             formatted_lines.append(formatted_row)
 
-        if self.show_missed is True:
+        if self.show_source is True:
             sources = []
             for class_name in self.differ.classes():
                 source_hunks = self.get_source_hunks(class_name)
@@ -308,10 +308,10 @@ class HtmlReporterDelta(TextReporterDelta):
         render_kwargs = {
             'lines': formatted_lines[:-1],
             'footer': formatted_lines[-1],
-            'show_missed': self.show_missed,
+            'show_source': self.show_source,
         }
 
-        if self.show_missed is True:
+        if self.show_source is True:
             render_kwargs['sources'] = sources
 
         return template.render(**render_kwargs)
