@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.5.0 (2015-01-07)
+
 * `pycobertura diff` HTML output now only includes hunks of lines that have
   coverage changes and skips unchanged classes
 * handle asymmetric presence of classes in the reports (regression
