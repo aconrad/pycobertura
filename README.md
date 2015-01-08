@@ -301,6 +301,22 @@ pycobertura diff --format html \
 curl -F filedata=@pycobertura-diff.${BUILD_ID}.html http://ciserver/artifacts/${BUILD_ID}/
 ```
 
+### Why can't pycobertura use git to diff the source given revisions SHAs rather than passing paths to the source code?
+
+Because we don't want to maintain and support N version control systems (VCS).
+It is easy enough to generate a directory that contains the source code at a
+given commit or branch name that it's not worth the hassle for pycobertura to
+be VCS-aware:
+
+```bash
+git archive --prefix=source1/ ${BRANCH_OR_COMMIT1} | tar -xf -
+git archive --prefix=source2/ ${BRANCH_OR_COMMIT2} | tar -xf -
+pycobertura diff --source1 source1/ --source2 source2/ coverage1.xml coverage2.xml
+```
+
+Mercurial has `hg archive` and Subversion has `svn export`. These are simple
+pre-steps to running `pycobertura diff`.
+
 ### Why is the number of uncovered lines used as the metric to check if code coverage worsened rather than the line rate?
 
 The line rate (percentage of covered lines) can legitimately go down for a
