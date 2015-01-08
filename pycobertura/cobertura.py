@@ -29,7 +29,8 @@ class Cobertura(object):
         self.xml = ET.parse(xml_path).getroot()
 
     def _get_element_by_class_name(self, class_name):
-        return self.xml.xpath("//class[@name='%s'][1]" % class_name)[0]
+        syntax = "./packages/package/classes/class[@name='%s'][1]" % class_name
+        return self.xml.xpath(syntax)[0]
 
     def _get_lines_by_class_name(self, class_name):
         el = self._get_element_by_class_name(class_name)

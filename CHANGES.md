@@ -5,6 +5,7 @@
 * Options of pycobertura diff `--missed` and `--no-missed` have been renamed to
   `--source` and `--no-source` which will not show the source code nor display
   missing lines since they cannot be accurately computed without the source.
+* Optimized xpath syntax for faster class name lookup (~3x)
 
 ## 0.5.0 (2015-01-07)
 
