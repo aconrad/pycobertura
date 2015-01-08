@@ -235,6 +235,20 @@ class CoberturaDiff(object):
         self.cobertura1 = cobertura1
         self.cobertura2 = cobertura2
 
+    def has_all_changes_covered(self):
+        """
+        Return `True` if all changes in the diff are covered, `False`
+        otherwise.
+
+        This goes over every individual classes and checks whether missed
+        statements are present. Looking at the just the total missed statements
+        would be inaccurate since it could still include uncovered lines.
+        """
+        for class_name in self.classes():
+            if self.diff_total_misses(class_name) > 0:
+                return False
+        return True
+
     def diff_total_statements(self, class_name=None):
         if class_name is None:
             statements1 = self.cobertura1.total_statements(class_name)

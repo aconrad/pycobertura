@@ -130,5 +130,5 @@ def diff(
 
     # non-zero exit code if line rate worsened
     differ = reporter.differ
-    exit_code = differ.diff_total_misses() > 0
+    exit_code = not differ.has_all_changes_covered()
     raise SystemExit(exit_code)
