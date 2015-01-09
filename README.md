@@ -21,6 +21,8 @@ what is left to test. This ensures that any code change is tested moving
 forward without letting legacy uncovered lines get in your way, allowing
 developers to focus solely on their changes.
 
+NOTE: The API is unstable any may be subject to changes until it reaches 1.0.
+
 ## Screenshots
 
 ### pycobertura show
