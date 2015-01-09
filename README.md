@@ -1,25 +1,35 @@
 # pycobertura
 
-A [Cobertura](http://cobertura.github.io/cobertura/) coverage parser that can
-diff reports.
+A Cobertura coverage parser that can diff reports.
 
 ![Travis](http://img.shields.io/travis/SurveyMonkey/pycobertura.svg?style=flat)
 ![PyPI](http://img.shields.io/pypi/v/pycobertura.svg?style=flat)
 
+* [About](#about)
+* [Screenshots](#screenshots)
+* [Install](#install)
+* [CLI usage](#cli-usage)
+* [Library usage](#library-usage)
+* [How to contribute?](#how-to-contribute)
+* [FAQ](#faq)
+
+## About
+
+pycobertura is a generic [Cobertura](http://cobertura.github.io/cobertura/)
+report parser. It was also designed to help prevent code coverage from
+decreasing with the `pycobertura diff` command: any line changed should be
+tested and uncovered changes should be clearly visible without letting legacy
+uncovered code get in the way so developers can focus solely on their changes.
+
 Features:
 
 * show coverage summary of a cobertura file
-* compare two cobertura files and show changes
 * output in plain text or HTML
+* compare two cobertura files and show changes in coverage
 * colorized diff output
-* diff exit status of non-zero if number of uncovered lines rose
-
-pycobertura was designed for people who want to prevent their code coverage
-from decreasing. Any line changed should be tested and newly introduced code
-that is uncovered should fail a build and clearly show the author of the change
-what is left to test. This ensures that any code change is tested moving
-forward without letting legacy uncovered lines get in your way, allowing
-developers to focus solely on their changes.
+* diff exit status of non-zero if coverage worsened
+* fail based on uncovered lines rather than on decrease of coverage rate
+  ([see why](#why-is-the-number-of-uncovered-lines-used-as-the-metric-to-check-if-code-coverage-worsened-rather-than-the-line-rate))
 
 NOTE: The API is unstable any may be subject to changes until it reaches 1.0.
 
@@ -89,10 +99,12 @@ TOTAL                      253       0  100.00%
 ### Command `diff`
 
 You can also use the `diff` command to show the difference between two coverage
-files.
+files. To properly compute the `Missing` column, it is necessary to provide the
+source code that was used to generate each of the passed Cobertura reports
+([see why](#why-do-i-need-to-provide-the-path-to-the-source-code-directory)).
 
 ```
-$ pycobertura diff coverage.old.xml coverage.new.xml
+$ pycobertura diff coverage.old.xml coverage.new.xml --source1 old_source/ --source2 new_source/
 Name          Stmts    Miss    Cover     Missing
 ------------  -------  ------  --------  ---------
 dummy/dummy   -        -2      +50.00%   -2, -5
@@ -102,8 +114,8 @@ TOTAL         +2       -2      +50.00%
 
 The column `Missing` will show line numbers prefixed with either a plus sign
 `+` or a minus sign `-`. When prefixed with a plus sign, the line was
-introduced as uncovered, when prefixed as a minus sign, the line is no longer
-uncovered.
+introduced as uncovered and is shown in red, when prefixed as a minus sign, the
+line is no longer uncovered and is rendered in green.
 
 ## Library usage
 
@@ -149,7 +161,7 @@ dummy/dummy2  +2       -       +100.00%
 TOTAL         +2       -2      +50.00%"""
 ```
 
-## Contribute
+## How to contribute?
 
 Found a bug/typo? Got a patch? Have an idea? Please use Github issues or fork
 pycobertura and submit a pull request (PR). All contributions are welcome!
@@ -181,27 +193,44 @@ have changed (basically `git diff`) and then looks at the Cobertura report to
 check whether the lines in the diff are covered or not. The drawback of this
 approach is that if the changes introduced a coverage drop elsewhere in the
 code base (e.g. a legacy function no longer being called) then it can be very
-hard to hunt down *where* the coverage dropped, especially if there is already
+hard to hunt down *where* the coverage dropped, especially if there are already
 a lot of legacy uncovered lines in the mix.
 
 On the other hand, pycobertura takes two different Cobertura reports in their
 entirety and compares them line by line. If the coverage status of a line
 changed from covered to uncovered or vice versa, then pycobertura will report
 it regardless of where your code changes happened. Actually, sometimes you have
-no code changes at all, the only change is to add more tests and pycobertura
+no code changes at all, the only changes were to add more tests and pycobertura
 will show you the progress.
 
-Moreover, pycobertura was also designed as a general purpose Cobertura parser.
+Moreover, pycobertura was also designed as a general purpose Cobertura parser
+and can generate a summary table for a single Cobertura file (the `show`
+command).
+
+### I only have one Cobertura report and I just want to see my uncovered changes, can I do this?
+
+Yes, this is what [diff-cover](https://github.com/edx/diff-cover) already
+offers and you can achieve the same result with pycobertura. All you have to do
+is pass your same coverage report twice and provide the path to the two
+different code bases:
+
+```bash
+pycobertura diff coverage.xml coverage.xml --source1 master/ --source2 myfeature/
+```
+
+But keep in mind that this will not show you if your changes have introduced a
+drop in coverage elsewhere in the code base. See the previous question about
+the drawbacks of diff-cover.
 
 ### Why do I need to provide the path to the source code directory?
 
-With the command `pycobertura show`, you don't really to provide the source
-code directory, unless you want the HTML output which will conveniently render
-the highlighted source code for you.
+With the command `pycobertura show`, you don't need to provide the source code
+directory, unless you want the HTML output which will conveniently render the
+highlighted source code for you.
 
-But with `pycobertura diff`, if you care about *which* lines are
-covered/uncovered (and not just a global count), then to properly report these
-lines you will need to provide the source for *each* of the reports.
+But with `pycobertura diff`, if you care about *which* lines are covered or
+uncovered (and not just a global count), then you will need to provide the
+source for *each* of the reports.
 
 To better understand why, let's assume we have 2 Cobertura reports with the
 following info:
@@ -255,10 +284,31 @@ alone are not sufficient and this is why you need to provide the path to the
 source that was used to generate each of the Cobertura reports and diff them to
 see which lines actually changed to report accurate coverage.
 
+### Why doesn't pycobertura use git to diff the source given revision SHAs rather than passing paths to the source code?
+
+Because we would have to support N version control systems (VCS).  It is easy
+enough to generate a directory that contains the source code at a given commit
+or branch name that it's not worth the hassle for pycobertura to be VCS-aware:
+
+```bash
+git archive --prefix=source1/ ${BRANCH_OR_COMMIT1} | tar -xf -
+git archive --prefix=source2/ ${BRANCH_OR_COMMIT2} | tar -xf -
+pycobertura diff --source1 source1/ --source2 source2/ coverage1.xml coverage2.xml -o output.html
+rm -rf source1/ source2/
+```
+
+Mercurial has `hg archive` and Subversion has `svn export`. These are simple
+pre-steps to running `pycobertura diff`.
+
+Also, the code repository may not always be available at the time pycobertura
+is run. Typically, in Continous Delivery pipelines, only
+[artifacts](http://en.wikipedia.org/wiki/Artifact_%28software_development%29)
+are available.
+
 ### When should I use pycobertura?
 
 pycobertura was built as a tool to educate developers about the testing culture
-in such way that any code change should have a test along with it.
+in such way that any code change should have one or more tests along with it.
 
 You can use pycobertura in your Continous Integration (CI) or Continous
 Delivery (CD) pipeline which would fail a build if the code changes worsened
@@ -267,15 +317,16 @@ should have equal or better coverage than the branch it's going to be merged
 into. Or if code navigates through a release pipeline and the new code has
 worse coverage than what's already in Production, then the release is aborted.
 
-When a build is triggered by your CI/CD pipeline, each build would typically
-store as artifacts the source code and the Cobertura report for it. An extra
-stage in the pipeline could ensure that the coverage did not go down. This can
-be done by retrieving the artifacts of the current build as well as the
-"target" artifacts (code and Cobertura report of Production or target branch of
-a pull request). Then `pycobertura diff` will take care of failing the build if
-the coverage worsened (return a non-zero exit code) and submit the pycobertura
-report as an artifact (e.g., the HTML output) and make this report available
-for developers to look at.
+When a build is triggered by your CI/CD pipeline, each testing stage would
+typically store an
+[artifact](http://en.wikipedia.org/wiki/Artifact_%28software_development%29) of
+the source code and another one of the Cobertura report. An extra stage in the
+pipeline could ensure that the coverage did not worsen. This can be done by
+retrieving the artifacts of the current build as well as the "target" artifacts
+(code and Cobertura report of Production or target branch of a pull request).
+Then `pycobertura diff` will take care of failing the build if the coverage
+worsened (return a non-zero exit code) and then the pycobertura report can be
+published as an artifact to make it available to developers to look at.
 
 The step could look like this:
 
@@ -284,7 +335,7 @@ The step could look like this:
 curl -o coverage.${BUILD_ID}.xml https://ciserver/artifacts/${BUILD_ID}/coverage.xml
 curl -o source.${BUILD_ID}.zip https://ciserver/artifacts/${BUILD_ID}/source.zip
 
-# Download artifacts of "target" build
+# Download artifacts of already-in-Prod build
 curl -o coverage.${PROD_BUILD}.xml https://ciserver/artifacts/${PROD_BUILD}/coverage.xml
 curl -o source.${PROD_BUILD}.zip https://ciserver/artifacts/${PROD_BUILD}/source.zip
 
@@ -303,22 +354,6 @@ pycobertura diff --format html \
 curl -F filedata=@pycobertura-diff.${BUILD_ID}.html http://ciserver/artifacts/${BUILD_ID}/
 ```
 
-### Why can't pycobertura use git to diff the source given revisions SHAs rather than passing paths to the source code?
-
-Because we don't want to maintain and support N version control systems (VCS).
-It is easy enough to generate a directory that contains the source code at a
-given commit or branch name that it's not worth the hassle for pycobertura to
-be VCS-aware:
-
-```bash
-git archive --prefix=source1/ ${BRANCH_OR_COMMIT1} | tar -xf -
-git archive --prefix=source2/ ${BRANCH_OR_COMMIT2} | tar -xf -
-pycobertura diff --source1 source1/ --source2 source2/ coverage1.xml coverage2.xml
-```
-
-Mercurial has `hg archive` and Subversion has `svn export`. These are simple
-pre-steps to running `pycobertura diff`.
-
 ### Why is the number of uncovered lines used as the metric to check if code coverage worsened rather than the line rate?
 
 The line rate (percentage of covered lines) can legitimately go down for a
@@ -334,7 +369,8 @@ line 5: hit
 ```
 
 Here, the line rate is 80% and uncovered lines is 1 (miss). Later in version B
-of our code, the following coverage report is generated:
+of our code, we legitimately delete a covered line and the following coverage
+report is generated:
 
 ```
 line 1: hit
@@ -344,9 +380,30 @@ line 3: hit
 line 4: hit
 ```
 
-Now the line rate is 75% and uncovered lines is still 1. In this case, failing
-the build based on line rate would be inappropriate, thus making the line rate
-the wrong metric to fail a build.
+The line rate decreased from 80% to 75% but uncovered lines is still at 1. In
+this case, failing the build based on line rate would is inappropriate, thus
+making the line rate the wrong metric to look at when validating coverage.
 
 The basic idea is that a code base may have technical debt of N uncovered lines
 and you want to prevent N from ever going up.
+
+### pycobertura sounds cool, but how to I generate a Cobertura file?
+
+Depending on your programing language, you need to find a tool that measures
+code coverage and generates a Cobertura report which is an XML representation
+of your code coverage results.
+
+In Python, [coverage.py](http://nedbatchelder.com/code/coverage/) is a great
+tool for measuring code coverage and plugins such as
+[pytest-cov](https://pypi.python.org/pypi/pytest-cov) for
+[pytest](http://pytest.org/latest/) and
+[nosexcover](https://pypi.python.org/pypi/nosexcover) for
+[nose](https://nose.readthedocs.org/en/latest/) are available to generate
+Cobertura reports while running tests.
+
+Cobertura is a very common file format available in many testing tools for
+pretty much all programing languages. pycobertura is language agnostic and
+should work with reports generated by tools in any language. But it was mostly
+developped and tested against reports generated with the `pytest-cov` plugin in
+Python. If you see issues, please [create a
+ticket](https://github.com/SurveyMonkey/pycobertura/issues).
