@@ -6,7 +6,6 @@ A Cobertura coverage parser that can diff reports and show coverage progress.
 ![PyPI](http://img.shields.io/pypi/v/pycobertura.svg?style=flat)
 
 * [About](#about)
-* [Screenshots](#screenshots)
 * [Install](#install)
 * [CLI usage](#cli-usage)
 * [Library usage](#library-usage)
@@ -34,31 +33,6 @@ Features:
 NOTE: The API is unstable any may be subject to changes until it reaches 1.0.
 
 ## Screenshots
-
-### pycobertura show
-
-The following screenshot is the result of the command `pycobertura show` which
-will render a summary table (like the text version) but also include the source
-code with highlighted source code to indicate whether lines were covered
-(green) or not (red).
-
-```
-pycobertura show --format html --output coverage.html coverage.xml
-```
-
-![](http://i.imgur.com/BYnXmAp.png)
-
-### pycobertura diff
-
-This screenshot is a sample HTML output of the command `pycobertura diff` which
-only applies coverage highlighting to the parts of the code where the coverage
-has changed (from covered to uncovered, or vice versa).
-
-```
-pycobertura diff --format html --output coverage.html coverage.old.xml coverage.new.xml
-```
-
-![](http://i.imgur.com/EKcdAmi.png)
 
 ## Install
 
@@ -96,6 +70,16 @@ pycobertura/utils           12       0  100.00%
 TOTAL                      253       0  100.00%
 ```
 
+The following is a screenshot of the HTML version of another coverage file
+which also include the source code with highlighted source code to indicate
+whether lines were covered (green) or not (red).
+
+```
+pycobertura show --format html --output coverage.html coverage.xml
+```
+
+![](http://i.imgur.com/BYnXmAp.png)
+
 ### Command `diff`
 
 You can also use the `diff` command to show the difference between two coverage
@@ -116,6 +100,16 @@ The column `Missing` will show line numbers prefixed with either a plus sign
 `+` or a minus sign `-`. When prefixed with a plus sign, the line was
 introduced as uncovered and is shown in red, when prefixed as a minus sign, the
 line is no longer uncovered and is rendered in green.
+
+This screenshot shows how the HTML output only applies coverage highlighting to
+the parts of the code where the coverage has changed (from covered to
+uncovered, or vice versa).
+
+```
+pycobertura diff --format html --output coverage.html ./master/coverage.xml ./myfeature/coverage.xml
+```
+
+![](http://i.imgur.com/EKcdAmi.png)
 
 ## Library usage
 
