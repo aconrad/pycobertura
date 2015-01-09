@@ -32,8 +32,6 @@ Features:
 
 NOTE: The API is unstable any may be subject to changes until it reaches 1.0.
 
-## Screenshots
-
 ## Install
 
 ```
