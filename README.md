@@ -1,6 +1,6 @@
 # pycobertura
 
-A Cobertura coverage parser that can diff reports.
+A Cobertura coverage parser that can diff reports and show coverage progress.
 
 ![Travis](http://img.shields.io/travis/SurveyMonkey/pycobertura.svg?style=flat)
 ![PyPI](http://img.shields.io/pypi/v/pycobertura.svg?style=flat)

@@ -23,7 +23,7 @@ setup(
     author_email="alexandre@surveymonkey.com",
     maintainer="Alex Conrad",
     maintainer_email="alexandre@surveymonkey.com",
-    description="A Cobertura coverage parser that can diff reports.",
+    description="A Cobertura coverage parser that can diff reports and show coverage progress.",
     license="MIT License",
     keywords="cobertura coverage parser parse xml",
     url="https://github.com/SurveyMonkey/pycobertura",
