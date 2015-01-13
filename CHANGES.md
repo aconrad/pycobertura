@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.5.2 (2015-01-13)
+
 * fix incorrect "TOTAL" row counts of the diff command when classes were added
   or removed from the second report.
 
