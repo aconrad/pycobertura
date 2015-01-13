@@ -249,65 +249,46 @@ class CoberturaDiff(object):
                 return False
         return True
 
-    def diff_total_statements(self, class_name=None):
-        if class_name is None:
-            statements1 = self.cobertura1.total_statements(class_name)
-            statements2 = self.cobertura2.total_statements(class_name)
-            return statements2 - statements1
+    def _diff_attr(self, attr_name, class_name):
+        """
+        Return the difference between `self.cobertura2.<attr_name>(class_name)`
+        and `self.cobertura1.<attr_name>(class_name)`.
 
-        if self.cobertura1.has_class(class_name):
-            statements1 = self.cobertura1.total_statements(class_name)
+        This generic method is meant to diff the count of methods that return
+        counts for a given class name, e.g. `Cobertura.total_statements`,
+        `Cobertura.total_misses`, ...
+
+        The returned count may be a float.
+        """
+        if class_name is not None:
+            classes = [class_name]
         else:
-            statements1 = 0
+            classes = self.classes()
 
-        statements2 = self.cobertura2.total_statements(class_name)
+        total_count = 0.0
+        for class_name in classes:
+            if self.cobertura1.has_class(class_name):
+                method = getattr(self.cobertura1, attr_name)
+                count1 = method(class_name)
+            else:
+                count1 = 0.0
+            method = getattr(self.cobertura2, attr_name)
+            count2 = method(class_name)
+            total_count += count2 - count1
 
-        return statements2 - statements1
+        return total_count
+
+    def diff_total_statements(self, class_name=None):
+        return int(self._diff_attr('total_statements', class_name))
 
     def diff_total_misses(self, class_name=None):
-        if class_name is None:
-            misses1 = self.cobertura1.total_misses(class_name)
-            misses2 = self.cobertura2.total_misses(class_name)
-            return misses2 - misses1
-
-        if self.cobertura1.has_class(class_name):
-            misses1 = self.cobertura1.total_misses(class_name)
-        else:
-            misses1 = 0
-
-        misses2 = self.cobertura2.total_misses(class_name)
-
-        return misses2 - misses1
+        return int(self._diff_attr('total_misses', class_name))
 
     def diff_total_hits(self, class_name=None):
-        if class_name is None:
-            hits1 = self.cobertura1.total_hits(class_name)
-            hits2 = self.cobertura2.total_hits(class_name)
-            return hits2 - hits1
-
-        if self.cobertura1.has_class(class_name):
-            hits1 = self.cobertura1.total_hits(class_name)
-        else:
-            hits1 = 0
-
-        hits2 = self.cobertura2.total_hits(class_name)
-
-        return hits2 - hits1
+        return int(self._diff_attr('total_hits', class_name))
 
     def diff_line_rate(self, class_name=None):
-        if class_name is None:
-            rate1 = self.cobertura1.line_rate(class_name)
-            rate2 = self.cobertura2.line_rate(class_name)
-            return rate2 - rate1
-
-        if self.cobertura1.has_class(class_name):
-            rate1 = self.cobertura1.line_rate(class_name)
-        else:
-            rate1 = 0.0
-
-        rate2 = self.cobertura2.line_rate(class_name)
-
-        return rate2 - rate1
+        return self._diff_attr('line_rate', class_name)
 
     def diff_missed_lines(self, class_name):
         """

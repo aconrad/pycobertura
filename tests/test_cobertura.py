@@ -163,6 +163,11 @@ def test_total_misses_by_class():
 
 def test_total_hits():
     cobertura = make_cobertura()
+    assert cobertura.total_hits() == 27
+
+
+def test_total_hits_by_class():
+    cobertura = make_cobertura()
     expected_total_misses = {
         'Main': 11,
         'search.BinarySearch': 11,
