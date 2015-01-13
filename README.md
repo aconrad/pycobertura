@@ -214,6 +214,27 @@ But keep in mind that this will not show you if your changes have introduced a
 drop in coverage elsewhere in the code base. See the previous question about
 the drawbacks of diff-cover.
 
+### Why doesn't pycobertura use git to diff the source given revision SHAs rather than passing paths to the source code?
+
+Because we would have to support N version control systems (VCS). It is easy
+enough to generate a directory that contains the source code at a given commit
+or branch name that it's not a top priority for pycobertura to be VCS-aware:
+
+```bash
+git archive --prefix=source1/ ${BRANCH_OR_COMMIT1} | tar -xf -
+git archive --prefix=source2/ ${BRANCH_OR_COMMIT2} | tar -xf -
+pycobertura diff --source1 source1/ --source2 source2/ coverage1.xml coverage2.xml -o output.html
+rm -rf source1/ source2/
+```
+
+Mercurial has `hg archive` and Subversion has `svn export`. These are simple
+pre-steps to running `pycobertura diff`.
+
+Also, the code repository may not always be available at the time pycobertura
+is run. Typically, in Continous Delivery pipelines, only
+[artifacts](http://en.wikipedia.org/wiki/Artifact_%28software_development%29)
+are available.
+
 ### Why do I need to provide the path to the source code directory?
 
 With the command `pycobertura show`, you don't need to provide the source code
@@ -275,27 +296,6 @@ So, to accurately highlight the lines that have changed, the coverage reports
 alone are not sufficient and this is why you need to provide the path to the
 source that was used to generate each of the Cobertura reports and diff them to
 see which lines actually changed to report accurate coverage.
-
-### Why doesn't pycobertura use git to diff the source given revision SHAs rather than passing paths to the source code?
-
-Because we would have to support N version control systems (VCS).  It is easy
-enough to generate a directory that contains the source code at a given commit
-or branch name that it's not worth the hassle for pycobertura to be VCS-aware:
-
-```bash
-git archive --prefix=source1/ ${BRANCH_OR_COMMIT1} | tar -xf -
-git archive --prefix=source2/ ${BRANCH_OR_COMMIT2} | tar -xf -
-pycobertura diff --source1 source1/ --source2 source2/ coverage1.xml coverage2.xml -o output.html
-rm -rf source1/ source2/
-```
-
-Mercurial has `hg archive` and Subversion has `svn export`. These are simple
-pre-steps to running `pycobertura diff`.
-
-Also, the code repository may not always be available at the time pycobertura
-is run. Typically, in Continous Delivery pipelines, only
-[artifacts](http://en.wikipedia.org/wiki/Artifact_%28software_development%29)
-are available.
 
 ### When should I use pycobertura?
 
