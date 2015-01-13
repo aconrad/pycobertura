@@ -178,7 +178,7 @@ tox
 
 [Diff-cover](https://github.com/edx/diff-cover) is a fantastic tool and
 pycobertura was heavily inspired by it. Both tools have similar end-goals
-indeed but each tool takes a different approach on how they work.
+indeed but each tool takes a different approach to how they work.
 
 Diff-cover uses the underlying git repository to find of lines of code that
 have changed (basically `git diff`) and then looks at the Cobertura report to
