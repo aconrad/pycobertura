@@ -2,8 +2,8 @@
 
 A Cobertura coverage parser that can diff reports and show coverage progress.
 
-![Travis](http://img.shields.io/travis/SurveyMonkey/pycobertura.svg?style=flat)
-![PyPI](http://img.shields.io/pypi/v/pycobertura.svg?style=flat)
+[![Travis](http://img.shields.io/travis/SurveyMonkey/pycobertura.svg?style=flat)](https://travis-ci.org/SurveyMonkey/pycobertura)
+[![PyPI](http://img.shields.io/pypi/v/pycobertura.svg?style=flat)](https://pypi.python.org/pypi/pycobertura)
 
 * [About](#about)
 * [Features](#features)
