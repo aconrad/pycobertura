@@ -163,7 +163,8 @@ class DeltaReporter(object):
 
         for class_name in self.differ.classes():
             class_row = self.get_class_row(class_name)
-            lines.append(class_row)
+            if any(class_row[1:]):  # don't report unchanged classes
+                lines.append(class_row)
 
         footer = self.get_footer_row()
         lines.append(footer)
