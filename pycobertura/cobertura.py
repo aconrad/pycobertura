@@ -10,12 +10,12 @@ from pycobertura.utils import (
 
 class Cobertura(object):
     """
-    An XML cobertura parser.
+    An XML Cobertura parser.
     """
     def __init__(self, xml_path, base_path=None):
         """
         Initialize a Cobertura report given a path to an XML file `xml_path`
-        that is in the cobertura format.
+        that is in the Cobertura format.
 
         The optional argument `base_path` can be provided to resolve the path
         to the source code. If omitted, `base_path` will be set to
