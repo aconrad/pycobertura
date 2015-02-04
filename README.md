@@ -6,7 +6,6 @@ A Cobertura coverage parser that can diff reports and show coverage progress.
 [![PyPI](http://img.shields.io/pypi/v/pycobertura.svg?style=flat)](https://pypi.python.org/pypi/pycobertura)
 
 * [About](#about)
-* [Features](#features)
 * [Install](#install)
 * [CLI usage](#cli-usage)
 * [Library usage](#library-usage)
@@ -21,7 +20,7 @@ decreasing with the `pycobertura diff` command: any line changed should be
 tested and uncovered changes should be clearly visible without letting legacy
 uncovered code get in the way so developers can focus solely on their changes.
 
-## Features
+Features:
 
 * show coverage summary of a cobertura file
 * output in plain text or HTML
@@ -29,6 +28,7 @@ uncovered code get in the way so developers can focus solely on their changes.
 * colorized diff output
 * diff exit status of non-zero if coverage worsened
 * fail based on uncovered lines rather than on decrease of coverage rate
+  ([see why](#why-is-the-number-of-uncovered-lines-used-as-the-metric-to-check-if-code-coverage-worsened-rather-than-the-line-rate))
 
 NOTE: The API is unstable any may be subject to changes until it reaches 1.0.
 

@@ -6,29 +6,15 @@ from setuptools import setup, find_packages
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
-def get_description():
-    toc, about, features, leftover = read("README.md").split("## ", 3)
-    CHANGES = read('CHANGES.md')
-
-    DESCRIPTION = """\
-# pycobertura
-
-## %s
-
-## %s
-
-%s""" % (
-    about.strip(),
-    features.strip(),
-    CHANGES.replace('## Unreleased\n\n', ''))
-
-    try:
-        import pypandoc
-        return pypandoc.convert(DESCRIPTION, 'rst', format='md')
-    except:
-        return DESCRIPTION
-
 version = '0.5.2'
+
+try:
+    import pypandoc
+    README = pypandoc.convert('README.md', 'rst')
+    CHANGES = pypandoc.convert('CHANGES.md', 'rst')
+except:
+    README = read('README.md')
+    CHANGES = read('CHANGES.md')
 
 setup(
     name="pycobertura",
@@ -44,7 +30,7 @@ setup(
     zip_safe=False,
     include_package_data=True,
     packages=find_packages(exclude=['tests']),
-    long_description=get_description(),
+    long_description='%s\n\n%s' % (README, CHANGES),
     setup_requires=['setuptools_git'],
     install_requires=['click', 'colorama', 'jinja2', 'lxml', 'tabulate'],
     classifiers=[
