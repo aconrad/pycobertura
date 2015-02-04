@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.6.0 (2015-02-03)
+
 * expose `CoberturaDiff` under the pycobertura namespace
 * pycobertura diff no longer reports unchanged classes
 
