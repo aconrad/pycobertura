@@ -86,23 +86,21 @@ def test_diff__format_default():
     # FIXME: Fails in PY2, requires click>=4.x to pass
     if not PY2:
         assert result.output == """\
-Name            Stmts    Miss    Cover    Missing
---------------  -------  ------  -------  ----------
-dummy/__init__  -        -       -
-dummy/dummy     -        \x1b[32m-2\x1b[39m      +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
-dummy/dummy2    +2       \x1b[31m+1\x1b[39m      -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
-dummy/dummy3    +2       \x1b[31m+2\x1b[39m      -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
-TOTAL           +4       \x1b[31m+1\x1b[39m      +15.00%
+Name          Stmts      Miss  Cover    Missing
+------------  -------  ------  -------  ----------
+dummy/dummy   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
+dummy/dummy2  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
+dummy/dummy3  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
+TOTAL         +4           \x1b[31m+1\x1b[39m  +15.00%
 """
     else:
         assert result.output == """\
-Name            Stmts    Miss    Cover    Missing
---------------  -------  ------  -------  ----------
-dummy/__init__  -        -       -
-dummy/dummy     -        -2      +40.00%  -5, -6
-dummy/dummy2    +2       +1      -25.00%  -2, -4, +5
-dummy/dummy3    +2       +2      -        +1, +2
-TOTAL           +4       +1      +15.00%
+Name          Stmts      Miss  Cover    Missing
+------------  -------  ------  -------  ----------
+dummy/dummy   -            -2  +40.00%  -5, -6
+dummy/dummy2  +2           +1  -25.00%  -2, -4, +5
+dummy/dummy3  +2           +2  -        +1, +2
+TOTAL         +4           +1  +15.00%
 """
 
 
@@ -119,23 +117,21 @@ def test_diff__format_text():
         # FIXME: Fails in PY2, requires click>=4.x to pass
         if not PY2:
             assert result.output == """\
-Name            Stmts    Miss    Cover    Missing
---------------  -------  ------  -------  ----------
-dummy/__init__  -        -       -
-dummy/dummy     -        \x1b[32m-2\x1b[39m      +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
-dummy/dummy2    +2       \x1b[31m+1\x1b[39m      -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
-dummy/dummy3    +2       \x1b[31m+2\x1b[39m      -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
-TOTAL           +4       \x1b[31m+1\x1b[39m      +15.00%
+Name          Stmts      Miss  Cover    Missing
+------------  -------  ------  -------  ----------
+dummy/dummy   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
+dummy/dummy2  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
+dummy/dummy3  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
+TOTAL         +4           \x1b[31m+1\x1b[39m  +15.00%
 """
         else:
             assert result.output == """\
-Name            Stmts    Miss    Cover    Missing
---------------  -------  ------  -------  ----------
-dummy/__init__  -        -       -
-dummy/dummy     -        -2      +40.00%  -5, -6
-dummy/dummy2    +2       +1      -25.00%  -2, -4, +5
-dummy/dummy3    +2       +2      -        +1, +2
-TOTAL           +4       +1      +15.00%
+Name          Stmts      Miss  Cover    Missing
+------------  -------  ------  -------  ----------
+dummy/dummy   -            -2  +40.00%  -5, -6
+dummy/dummy2  +2           +1  -25.00%  -2, -4, +5
+dummy/dummy3  +2           +2  -        +1, +2
+TOTAL         +4           +1  +15.00%
 """
 
 
@@ -155,13 +151,12 @@ def test_diff__output_to_file():
         os.remove('report.out')
         assert result.output == ""
         assert report == """\
-Name            Stmts    Miss    Cover    Missing
---------------  -------  ------  -------  ----------
-dummy/__init__  -        -       -
-dummy/dummy     -        -2      +40.00%  -5, -6
-dummy/dummy2    +2       +1      -25.00%  -2, -4, +5
-dummy/dummy3    +2       +2      -        +1, +2
-TOTAL           +4       +1      +15.00%"""
+Name          Stmts      Miss  Cover    Missing
+------------  -------  ------  -------  ----------
+dummy/dummy   -            -2  +40.00%  -5, -6
+dummy/dummy2  +2           +1  -25.00%  -2, -4, +5
+dummy/dummy3  +2           +2  -        +1, +2
+TOTAL         +4           +1  +15.00%"""
 
 
 # FIXME: when Click 4 is available, uncomment this.
