@@ -1,5 +1,4 @@
 import os
-import sys
 from setuptools import setup, find_packages
 
 
@@ -23,7 +22,8 @@ setup(
     author_email="alexandre@surveymonkey.com",
     maintainer="Alex Conrad",
     maintainer_email="alexandre@surveymonkey.com",
-    description="A Cobertura coverage parser that can diff reports and show coverage progress.",
+    description="A Cobertura coverage parser that can diff reports and "
+                "show coverage progress.",
     license="MIT License",
     keywords="cobertura coverage parser parse xml",
     url="https://github.com/SurveyMonkey/pycobertura",
@@ -45,7 +45,7 @@ setup(
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4"
     ],
-    entry_points = {
+    entry_points={
         'console_scripts': [
             'pycobertura=pycobertura.cli:pycobertura'
         ],
