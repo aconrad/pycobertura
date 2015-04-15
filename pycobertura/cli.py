@@ -119,14 +119,7 @@ def diff(
     if not isinstance(report, bytes):
         report = report.encode('utf-8')
 
-    # FIXME: In Click 3.x, the color is stripped out if the output file is
-    # detected to not support ANSI codes causing `-o outfile --color` to write
-    # to `outfile` without colors. In Click 4.x, `echo()` will take a
-    # color=True/False flag which will allow us to override ANSI code
-    # auto-detection.
-    # https://github.com/mitsuhiko/click/commit/5cf7f2ddfba328070751cbda32782520d4e0d6f5
-    # click.echo(report, file=output, nl=isatty, color=color)  # click 4.x
-    click.echo(report, file=output, nl=isatty)
+    click.echo(report, file=output, nl=isatty, color=color)
 
     # non-zero exit code if line rate worsened
     differ = reporter.differ
