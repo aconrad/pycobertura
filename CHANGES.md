@@ -11,6 +11,7 @@
   function now return `Line` objects (namedtuple) for each line.
 * add plus sign (+) in front of lines that were added/modified on HTML diff
   report
+* upgrade to Skeleton 2.0.4 (88f03612b05f093e3f235ced77cf89d3a8fcf846)
 
 ## 0.6.0 (2015-02-03)
 
