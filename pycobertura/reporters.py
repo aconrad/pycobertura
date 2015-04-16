@@ -2,10 +2,13 @@ from collections import namedtuple
 from jinja2 import Environment, PackageLoader
 from pycobertura.cobertura import CoberturaDiff
 from pycobertura.utils import green, rangify, red
+from pycobertura.templates import filters
 from tabulate import tabulate
 
 
 env = Environment(loader=PackageLoader('pycobertura', 'templates'))
+env.filters['line_status'] = filters.line_status_class
+env.filters['line_reason'] = filters.line_reason_icon
 
 row_attributes = [
     'class_name',
@@ -95,8 +98,7 @@ class HtmlReporter(TextReporter):
 
     def get_source(self, class_name):
         lines = self.cobertura.class_source(class_name)
-        status_map = {True: 'hit', False: 'miss', None: 'noop'}
-        return [(lno, src, status_map[status]) for lno, src, status in lines]
+        return lines
 
     def generate(self):
         lines = self.get_report_lines()
@@ -247,14 +249,7 @@ class TextReporterDelta(DeltaReporter):
 class HtmlReporterDelta(TextReporterDelta):
     def get_source_hunks(self, class_name):
         hunks = self.differ.class_source_hunks(class_name)
-        status_map = {True: 'hit', False: 'miss', None: 'noop'}
-        new_hunks = []
-        for hunk in hunks:
-            new_hunk = []
-            for lno, src, status in hunk:
-                new_hunk.append((lno, src, status_map[status]))
-            new_hunks.append(new_hunk)
-        return new_hunks
+        return hunks
 
     def format_row(self, row):
         total_statements = (

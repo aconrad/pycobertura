@@ -7,6 +7,10 @@
   auto-detection of Click can be overridden (not possible in Click 3.0)
 * Introduce `Line` namedtuple object which represents a line of source code and
   coverage status.
+* *BACKWARDS INCOMPATIBLE*: List of tuples generated or handled by various
+  function now return `Line` objects (namedtuple) for each line.
+* add plus sign (+) in front of lines that were added/modified on HTML diff
+  report
 
 ## 0.6.0 (2015-02-03)
 

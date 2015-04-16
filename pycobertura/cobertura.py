@@ -17,8 +17,8 @@ class Line(namedtuple('Line', ['number', 'source', 'status', 'reason'])):
     `number`: line number in the source code
     `source`: actual source code of line
     `status`: True (covered), False (uncovered) or None (coverage unchanged)
-    `reason`: If `Line.status` is not `None` the possible values may be `"line-edit"`,
-        `"cov-up"` or `"cov-down"`. Otherwise `None`.
+    `reason`: If `Line.status` is not `None` the possible values may be
+        `"line-edit"`, `"cov-up"` or `"cov-down"`. Otherwise `None`.
     """
 
 
@@ -125,25 +125,21 @@ class Cobertura(object):
 
     def class_source(self, class_name):
         """
-        Return a list of 3-element tuples `(lineno, source, status)` for each
-        lines of code found in the source file of the class `class_name`.
-
-        The 3 elements in each tuple are:
-        `lineno`: line number in the source code
-        `source`: actual source code for line number `lineno`
-        `status`: True (hit) or False (miss)
+        Return a list of namedtuple `Line` for each line of code found in the
+        source file of the class `class_name`.
         """
         filename = self.filepath(class_name)
 
         if not os.path.exists(filename):
-            return [(0, '%s not found' % filename, None)]
+            return [Line(0, '%s not found' % filename, None, None)]
 
         with open(filename) as f:
             lines = []
             line_statuses = dict(self.line_statuses(class_name))
             for lineno, source in enumerate(f, start=1):
                 line_status = line_statuses.get(lineno)
-                lines.append((lineno, source, line_status))
+                line = Line(lineno, source, line_status, None)
+                lines.append(line)
 
         return lines
 
@@ -311,10 +307,10 @@ class CoberturaDiff(object):
         introduced (True) or removed (False).
         """
         line_changed = []
-        for lineno, line, status in self.class_source(class_name):
-            if status is not None:
-                is_new = not status
-                line_changed.append((lineno, is_new))
+        for line in self.class_source(class_name):
+            if line.status is not None:
+                is_new = not line.status
+                line_changed.append((line.number, is_new))
         return line_changed
 
     def classes(self):
@@ -331,13 +327,9 @@ class CoberturaDiff(object):
 
     def class_source(self, class_name):
         """
-        Return a list of 3-element tuples `(lineno, source, status)` for each
-        lines of code found in the source file of the class `class_name`.
+        Return a list of namedtuple `Line` for each line of code found in the
+        source file of the class `class_name`.
 
-        The 3 elements in each tuple are:
-        `lineno`: line number in the source code
-        `source`: actual source code for line number `lineno`
-        `status`: True (hit), False (miss) or None (coverage unchanged)
         """
         if self.cobertura1.has_class(class_name):
             lines1 = self.cobertura1.class_lines(class_name)
@@ -346,9 +338,6 @@ class CoberturaDiff(object):
             lines1 = []
             line_statuses1 = {}
 
-#            if not os.path.exists(filename):
-#                return [(0, '%s not found' % filename, None)]
-
         lines2 = self.cobertura2.class_lines(class_name)
         line_statuses2 = dict(self.cobertura2.line_statuses(class_name))
 
@@ -356,24 +345,29 @@ class CoberturaDiff(object):
         lineno_map = reconcile_lines(lines2, lines1)
 
         lines = []
-        for lineno, line in enumerate(lines2, start=1):
+        for lineno, source in enumerate(lines2, start=1):
 
             if lineno not in lineno_map:
                 # line was added or removed, just use whatever coverage status
                 # is available as there is nothing to compare against.
-                line_status = line_statuses2.get(lineno)
+                status = line_statuses2.get(lineno)
+                reason = 'line-edit'
             else:
                 other_lineno = lineno_map[lineno]
                 line_status1 = line_statuses1.get(other_lineno)
                 line_status2 = line_statuses2.get(lineno)
                 if line_status1 is line_status2:
-                    line_status = None  # unchanged
+                    status = None  # unchanged
+                    reason = None
                 elif line_status1 is True and line_status2 is False:
-                    line_status = False  # decreased
+                    status = False  # decreased
+                    reason = 'cov-down'
                 elif line_status1 is False and line_status2 is True:
-                    line_status = True  # increased
+                    status = True  # increased
+                    reason = 'cov-up'
 
-            lines.append((lineno, line, line_status))
+            line = Line(lineno, source, status, reason)
+            lines.append(line)
 
         return lines
 
