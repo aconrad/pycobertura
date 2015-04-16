@@ -1,13 +1,13 @@
 {% macro render_source(lines) -%}
 <div class="row">
-  <div class="one column lineno">
+  <div class="lineno u-pull-left">
     <pre>
 {%- for line in lines -%}
 {{ line.number }} {{ line|line_reason }}
 {% endfor -%}
     </pre>
   </div>
-  <div class="eleven columns code">
+  <div class="code u-pull-left">
     <pre>
 {%- for line in lines -%}
 <span class="{{ line|line_status }}">{{ line.source|escape }}</span>

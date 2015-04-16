@@ -178,41 +178,41 @@ def test_html_report():
       </table>
 <h4 id="Main">Main</h4>
 <div class="row">
-  <div class="one column lineno">
+  <div class="lineno u-pull-left">
     <pre>0 &nbsp;
 </pre>
   </div>
-  <div class="eleven columns code">
+  <div class="code u-pull-left">
     <pre><span class="noop">tests/Main.java not found</span></pre>
   </div>
 </div>
 <h4 id="search.BinarySearch">search.BinarySearch</h4>
 <div class="row">
-  <div class="one column lineno">
+  <div class="lineno u-pull-left">
     <pre>0 &nbsp;
 </pre>
   </div>
-  <div class="eleven columns code">
+  <div class="code u-pull-left">
     <pre><span class="noop">tests/search/BinarySearch.java not found</span></pre>
   </div>
 </div>
 <h4 id="search.ISortedArraySearch">search.ISortedArraySearch</h4>
 <div class="row">
-  <div class="one column lineno">
+  <div class="lineno u-pull-left">
     <pre>0 &nbsp;
 </pre>
   </div>
-  <div class="eleven columns code">
+  <div class="code u-pull-left">
     <pre><span class="noop">tests/search/ISortedArraySearch.java not found</span></pre>
   </div>
 </div>
 <h4 id="search.LinearSearch">search.LinearSearch</h4>
 <div class="row">
-  <div class="one column lineno">
+  <div class="lineno u-pull-left">
     <pre>0 &nbsp;
 </pre>
   </div>
-  <div class="eleven columns code">
+  <div class="code u-pull-left">
     <pre><span class="noop">tests/search/LinearSearch.java not found</span></pre>
   </div>
 </div>
@@ -376,7 +376,7 @@ def test_html_report_delta():
 </div>
 <h4 id="dummy/dummy">dummy/dummy</h4>
 <div class="row">
-  <div class="one column lineno">
+  <div class="lineno u-pull-left">
     <pre>2 &nbsp;
 3 &nbsp;
 4 &nbsp;
@@ -384,7 +384,7 @@ def test_html_report_delta():
 6 +
 </pre>
   </div>
-  <div class="eleven columns code">
+  <div class="code u-pull-left">
     <pre><span class="noop">    pass
 </span><span class="noop">
 </span><span class="noop">def bar():
@@ -395,7 +395,7 @@ def test_html_report_delta():
 </div>
 <h4 id="dummy/dummy2">dummy/dummy2</h4>
 <div class="row">
-  <div class="one column lineno">
+  <div class="lineno u-pull-left">
     <pre>1 &nbsp;
 2 +
 3 &nbsp;
@@ -403,7 +403,7 @@ def test_html_report_delta():
 5 &nbsp;
 </pre>
   </div>
-  <div class="eleven columns code">
+  <div class="code u-pull-left">
     <pre><span class="noop">def baz():
 </span><span class="hit">    c = &#39;c&#39;
 </span><span class="noop">
@@ -414,12 +414,12 @@ def test_html_report_delta():
 </div>
 <h4 id="dummy/dummy3">dummy/dummy3</h4>
 <div class="row">
-  <div class="one column lineno">
+  <div class="lineno u-pull-left">
     <pre>1 +
 2 +
 </pre>
   </div>
-  <div class="eleven columns code">
+  <div class="code u-pull-left">
     <pre><span class="miss">def foobar():
 </span><span class="miss">    pass
 </span></pre>
