@@ -366,7 +366,14 @@ def test_html_report_delta():
             <td></td>
           </tr>
         </tfoot>
-      </table>
+      </table><div class="legend">
+  <dl>
+    <dt><code>code</code></dt><dd>coverage unchanged</dd>
+    <dt class="hit"><code>code</code></dt><dd>coverage increased</dd>
+    <dt class="miss"><code>code</code></dt><dd>coverage decreased</dd>
+    <dt><code>+</code></dt><dd>line added or modified</dd>
+  </dl>
+</div>
 <h4 id="dummy/dummy">dummy/dummy</h4>
 <div class="row">
   <div class="one column lineno">
