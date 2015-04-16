@@ -1,11 +1,25 @@
 import lxml.etree as ET
 import os
+from collections import namedtuple
 
 from pycobertura.utils import (
     extrapolate_coverage,
     reconcile_lines,
     hunkify_lines,
 )
+
+
+class Line(namedtuple('Line', ['number', 'source', 'status', 'reason'])):
+    """
+    A namedtuple object representing a line of source code.
+
+    The namedtuple has the following attributes:
+    `number`: line number in the source code
+    `source`: actual source code of line
+    `status`: True (covered), False (uncovered) or None (coverage unchanged)
+    `reason`: If `Line.status` is not `None` the possible values may be `"line-edit"`,
+        `"cov-up"` or `"cov-down"`. Otherwise `None`.
+    """
 
 
 class Cobertura(object):
