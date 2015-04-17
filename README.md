@@ -107,7 +107,7 @@ uncovered, or vice versa).
 pycobertura diff --format html --output coverage.html ./master/coverage.xml ./myfeature/coverage.xml
 ```
 
-![](http://i.imgur.com/EKcdAmi.png)
+![](http://i.imgur.com/L5ZUarI.png)
 
 ## Library usage
 
