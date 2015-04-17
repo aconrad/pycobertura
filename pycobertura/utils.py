@@ -125,8 +125,8 @@ def hunkify_lines(lines, context=3):
     # Find contiguous line changes
     ranges = []
     range_start = None
-    for i, (lineno, source, status) in enumerate(lines):
-        if status is not None:
+    for i, line in enumerate(lines):
+        if line.status is not None:
             if range_start is None:
                 range_start = i
                 continue

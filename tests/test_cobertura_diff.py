@@ -3,6 +3,7 @@ from .utils import make_cobertura
 
 def test_diff_class_source():
     from pycobertura.cobertura import CoberturaDiff
+    from pycobertura.cobertura import Line
 
     cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
     cobertura2 = make_cobertura( 'tests/dummy.source2/coverage.xml')
@@ -11,23 +12,23 @@ def test_diff_class_source():
     expected_sources = {
         'dummy/__init__': [],
         'dummy/dummy': [
-            (1, 'def foo():\n', None),
-            (2, '    pass\n', None),
-            (3, '\n', None),
-            (4, 'def bar():\n', None),
-            (5, "    a = 'a'\n", True),
-            (6, "    d = 'd'\n", True)
+            Line(1, 'def foo():\n', None, None),
+            Line(2, '    pass\n', None, None),
+            Line(3, '\n', None, None),
+            Line(4, 'def bar():\n', None, None),
+            Line(5, "    a = 'a'\n", True, 'cov-up'),
+            Line(6, "    d = 'd'\n", True, 'line-edit')
         ],
         'dummy/dummy2': [
-            (1, 'def baz():\n', None),
-            (2, "    c = 'c'\n", True),
-            (3, '\n', None),
-            (4, 'def bat():\n', True),
-            (5, '    pass\n', False)
+            Line(1, 'def baz():\n', None, None),
+            Line(2, "    c = 'c'\n", True, 'line-edit'),
+            Line(3, '\n', None, 'line-edit'),
+            Line(4, 'def bat():\n', True, 'line-edit'),
+            Line(5, '    pass\n', False, 'cov-down')
         ],
         'dummy/dummy3': [
-            (1, 'def foobar():\n', False),
-            (2, '    pass\n', False)
+            Line(1, 'def foobar():\n', False, 'line-edit'),
+            Line(2, '    pass\n', False, 'line-edit')
         ],
     }
 

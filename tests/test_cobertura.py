@@ -207,12 +207,13 @@ def test_filepath():
 
 
 def test_class_source__sources_not_found():
+    from pycobertura.cobertura import Line
     cobertura = make_cobertura('tests/cobertura.xml')
     expected_sources = {
-        'Main': [(0, 'tests/Main.java not found', None)],
-        'search.BinarySearch': [(0, 'tests/search/BinarySearch.java not found', None)],
-        'search.ISortedArraySearch': [(0, 'tests/search/ISortedArraySearch.java not found', None)],
-        'search.LinearSearch': [(0, 'tests/search/LinearSearch.java not found', None)],
+        'Main': [Line(0, 'tests/Main.java not found', None, None)],
+        'search.BinarySearch': [Line(0, 'tests/search/BinarySearch.java not found', None, None)],
+        'search.ISortedArraySearch': [Line(0, 'tests/search/ISortedArraySearch.java not found', None, None)],
+        'search.LinearSearch': [Line(0, 'tests/search/LinearSearch.java not found', None, None)],
     }
     for class_name in cobertura.classes():
         assert cobertura.class_source(class_name) == expected_sources[class_name]
@@ -247,28 +248,29 @@ def test_line_statuses():
 
 
 def test_class_source__sources_found():
+    from pycobertura.cobertura import Line
     cobertura = make_cobertura('tests/dummy.source1/coverage.xml')
     expected_sources = {
         'dummy/__init__': [],
         'dummy/dummy': [
-            (1, 'def foo():\n', True),
-            (2, '    pass\n', True),
-            (3, '\n', None),
-            (4, 'def bar():\n', True),
-            (5, "    a = 'a'\n", False),
-            (6, "    b = 'b'\n", False),
+            Line(1, 'def foo():\n', True, None),
+            Line(2, '    pass\n', True, None),
+            Line(3, '\n', None, None),
+            Line(4, 'def bar():\n', True, None),
+            Line(5, "    a = 'a'\n", False, None),
+            Line(6, "    b = 'b'\n", False, None),
         ],
         'dummy/dummy2': [
-            (1, 'def baz():\n', True),
-            (2, '    pass\n', True)
+            Line(1, 'def baz():\n', True, None),
+            Line(2, '    pass\n', True, None)
         ],
         'dummy/dummy4': [
-            (1, 'def barbaz():\n', False),
-            (2, '    pass\n', False),
-            (3, '\n', None),
-            (4, 'def foobarbaz():\n', False),
-            (5, '    a = 1 + 3\n', False),
-            (6, '    pass\n', False)
+            Line(1, 'def barbaz():\n', False, None),
+            Line(2, '    pass\n', False, None),
+            Line(3, '\n', None, None),
+            Line(4, 'def foobarbaz():\n', False, None),
+            Line(5, '    a = 1 + 3\n', False, None),
+            Line(6, '    pass\n', False, None)
         ],
     }
     for class_name in cobertura.classes():

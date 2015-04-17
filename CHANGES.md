@@ -5,6 +5,14 @@
 * pycobertura diff now renders colors in terminal with Python 2.x (worked for
   Python 3.x). For this to work we need to require Click 4.0 so that the color
   auto-detection of Click can be overridden (not possible in Click 3.0)
+* Introduce `Line` namedtuple object which represents a line of source code and
+  coverage status.
+* *BACKWARDS INCOMPATIBLE*: List of tuples generated or handled by various
+  function now return `Line` objects (namedtuple) for each line.
+* add plus sign (+) in front of lines that were added/modified on HTML diff
+  report
+* upgrade to Skeleton 2.0.4 (88f03612b05f093e3f235ced77cf89d3a8fcf846)
+* add legend to HTML diff report
 
 ## 0.6.0 (2015-02-03)
 
