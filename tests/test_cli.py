@@ -133,26 +133,68 @@ dummy/dummy3  +2           +2  -        +1, +2
 TOTAL         +4           +1  +15.00%"""
 
 
-# FIXME: when Click 4 is available, uncomment this.
-#def test_diff__format_text__with_color():
-#    from pycobertura.cli import diff
-#
-#    runner = CliRunner()
-#    result = runner.invoke(diff, [
-#        '--color',
-#        'tests/dummy.with-dummy2-better-cov.xml',
-#        'tests/dummy.with-dummy2-better-and-worse.xml',
-#    ], catch_exceptions=False)
-#    assert result.output == """\
-#Name          Stmts    Miss    Cover    Missing
-#------------  -------  ------  -------  ---------
-#dummy/dummy   -        +1      -25.00%  \x1b[31m+5\x1b[39m
-#dummy/dummy2  -        -1      +50.00%  \x1b[32m-2\x1b[39m
-#TOTAL         -        -       -
-#"""
+def test_diff__output_to_file__force_color():
+    from pycobertura.cli import diff
+
+    runner = CliRunner()
+
+    result = runner.invoke(diff, [
+        'tests/dummy.source1/coverage.xml',
+        'tests/dummy.source2/coverage.xml',
+        '--color', '--output', 'report.out'
+    ], catch_exceptions=False)
+    with open('report.out') as f:
+        report = f.read()
+    os.remove('report.out')
+    assert result.output == ""
+    assert report == """\
+Name          Stmts      Miss  Cover    Missing
+------------  -------  ------  -------  ----------
+dummy/dummy   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
+dummy/dummy2  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
+dummy/dummy3  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
+TOTAL         +4           \x1b[31m+1\x1b[39m  +15.00%"""
 
 
-def test_diff__format_html__no_source():
+def test_diff__format_text__with_color():
+    from pycobertura.cli import diff
+
+    runner = CliRunner()
+    result = runner.invoke(diff, [
+        '--color',
+        'tests/dummy.source1/coverage.xml',
+        'tests/dummy.source2/coverage.xml',
+    ], catch_exceptions=False)
+    assert result.output == """\
+Name          Stmts      Miss  Cover    Missing
+------------  -------  ------  -------  ----------
+dummy/dummy   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
+dummy/dummy2  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
+dummy/dummy3  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
+TOTAL         +4           \x1b[31m+1\x1b[39m  +15.00%
+"""
+
+
+def test_diff__format_text__with_no_color():
+    from pycobertura.cli import diff
+
+    runner = CliRunner()
+    result = runner.invoke(diff, [
+        '--no-color',
+        'tests/dummy.source1/coverage.xml',
+        'tests/dummy.source2/coverage.xml',
+    ], catch_exceptions=False)
+    assert result.output == """\
+Name          Stmts      Miss  Cover    Missing
+------------  -------  ------  -------  ----------
+dummy/dummy   -            -2  +40.00%  -5, -6
+dummy/dummy2  +2           +1  -25.00%  -2, -4, +5
+dummy/dummy3  +2           +2  -        +1, +2
+TOTAL         +4           +1  +15.00%
+"""
+
+
+def test_diff__format_html__no_source_on_disk():
     from pycobertura.cli import diff
 
     runner = CliRunner()
