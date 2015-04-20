@@ -1,5 +1,3 @@
-import mock
-
 from .utils import make_cobertura
 
 
@@ -44,7 +42,7 @@ TOTAL                 6       2  66.67%"""
 
 
 def test_text_report_delta__no_diff():
-    from pycobertura.reporters import TextReporter, TextReporterDelta
+    from pycobertura.reporters import TextReporterDelta
 
     cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
     cobertura2 = make_cobertura('tests/dummy.source1/coverage.xml')

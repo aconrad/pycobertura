@@ -1,5 +1,4 @@
 import mock
-import lxml.etree as ET
 
 from .utils import make_cobertura
 
@@ -57,11 +56,6 @@ def test_branch_rate_by_class():
     for class_name in cobertura.classes():
         assert cobertura.branch_rate(class_name) == \
             expected_branch_rates[class_name]
-
-
-def test_total_misses():
-    cobertura = make_cobertura()
-    assert cobertura.total_misses() == 3
 
 
 def test_missed_statements_by_class_name():

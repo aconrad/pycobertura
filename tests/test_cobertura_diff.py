@@ -6,7 +6,7 @@ def test_diff_class_source():
     from pycobertura.cobertura import Line
 
     cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
-    cobertura2 = make_cobertura( 'tests/dummy.source2/coverage.xml')
+    cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
     differ = CoberturaDiff(cobertura1, cobertura2)
 
     expected_sources = {
@@ -43,13 +43,6 @@ def test_diff_total_misses():
     cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
     cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
     differ = CoberturaDiff(cobertura1, cobertura2)
-
-    expected_sources = {
-        'dummy/__init__': 0,
-        'dummy/dummy': -2,
-        'dummy/dummy2': 1,
-        'dummy/dummy3': 2,
-    }
 
     assert differ.diff_total_misses() == 1
 

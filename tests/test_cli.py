@@ -1,18 +1,14 @@
 import os
-import sys
 import pytest
 from click.testing import CliRunner
-
-PY2 = sys.version_info[0] == 2
 
 
 def test_show__format_default():
     from pycobertura.cli import show
 
     runner = CliRunner()
-    result = runner.invoke(show,
-        ['tests/dummy.original.xml'],
-        catch_exceptions=False
+    result = runner.invoke(
+        show, ['tests/dummy.original.xml'], catch_exceptions=False
     )
     assert result.output == """\
 Name              Stmts    Miss  Cover    Missing
