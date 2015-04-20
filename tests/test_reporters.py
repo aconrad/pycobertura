@@ -177,45 +177,61 @@ def test_html_report():
         </tfoot>
       </table>
 <h4 id="Main">Main</h4>
-<div class="row">
-  <div class="lineno u-pull-left">
-    <pre>0 &nbsp;
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>0 &nbsp;
 </pre>
-  </div>
-  <div class="code u-pull-left">
-    <pre><span class="noop">tests/Main.java not found</span></pre>
-  </div>
-</div>
+      </td>
+      <td class="source">
+        <pre><span class="noop">tests/Main.java not found</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
 <h4 id="search.BinarySearch">search.BinarySearch</h4>
-<div class="row">
-  <div class="lineno u-pull-left">
-    <pre>0 &nbsp;
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>0 &nbsp;
 </pre>
-  </div>
-  <div class="code u-pull-left">
-    <pre><span class="noop">tests/search/BinarySearch.java not found</span></pre>
-  </div>
-</div>
+      </td>
+      <td class="source">
+        <pre><span class="noop">tests/search/BinarySearch.java not found</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
 <h4 id="search.ISortedArraySearch">search.ISortedArraySearch</h4>
-<div class="row">
-  <div class="lineno u-pull-left">
-    <pre>0 &nbsp;
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>0 &nbsp;
 </pre>
-  </div>
-  <div class="code u-pull-left">
-    <pre><span class="noop">tests/search/ISortedArraySearch.java not found</span></pre>
-  </div>
-</div>
+      </td>
+      <td class="source">
+        <pre><span class="noop">tests/search/ISortedArraySearch.java not found</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
 <h4 id="search.LinearSearch">search.LinearSearch</h4>
-<div class="row">
-  <div class="lineno u-pull-left">
-    <pre>0 &nbsp;
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>0 &nbsp;
 </pre>
-  </div>
-  <div class="code u-pull-left">
-    <pre><span class="noop">tests/search/LinearSearch.java not found</span></pre>
-  </div>
-</div>
+      </td>
+      <td class="source">
+        <pre><span class="noop">tests/search/LinearSearch.java not found</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
     </div>
   </body>
 </html>"""
@@ -375,56 +391,68 @@ def test_html_report_delta():
   </dl>
 </div>
 <h4 id="dummy/dummy">dummy/dummy</h4>
-<div class="row">
-  <div class="lineno u-pull-left">
-    <pre>2 &nbsp;
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>2 &nbsp;
 3 &nbsp;
 4 &nbsp;
 5 &nbsp;
 6 +
 </pre>
-  </div>
-  <div class="code u-pull-left">
-    <pre><span class="noop">    pass
+      </td>
+      <td class="source">
+        <pre><span class="noop">    pass
 </span><span class="noop">
 </span><span class="noop">def bar():
 </span><span class="hit">    a = &#39;a&#39;
 </span><span class="hit">    d = &#39;d&#39;
 </span></pre>
-  </div>
-</div>
+      </td>
+    </tr>
+  </tbody>
+</table>
 <h4 id="dummy/dummy2">dummy/dummy2</h4>
-<div class="row">
-  <div class="lineno u-pull-left">
-    <pre>1 &nbsp;
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 &nbsp;
 2 +
 3 &nbsp;
 4 +
 5 &nbsp;
 </pre>
-  </div>
-  <div class="code u-pull-left">
-    <pre><span class="noop">def baz():
+      </td>
+      <td class="source">
+        <pre><span class="noop">def baz():
 </span><span class="hit">    c = &#39;c&#39;
 </span><span class="noop">
 </span><span class="hit">def bat():
 </span><span class="miss">    pass
 </span></pre>
-  </div>
-</div>
+      </td>
+    </tr>
+  </tbody>
+</table>
 <h4 id="dummy/dummy3">dummy/dummy3</h4>
-<div class="row">
-  <div class="lineno u-pull-left">
-    <pre>1 +
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 +
 2 +
 </pre>
-  </div>
-  <div class="code u-pull-left">
-    <pre><span class="miss">def foobar():
-</span><span class="miss">    pass
+      </td>
+      <td class="source">
+        <pre><span class="miss">def foobar():
+</span><span class="miss">    pass  # This is a very long comment that was purposefully written so we could test how HTML rendering looks like when the boundaries of the page are reached.
 </span></pre>
-  </div>
-</div>
+      </td>
+    </tr>
+  </tbody>
+</table>
     </div>
   </body>
 </html>"""
