@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.7.1 (2015-04-20)
+
 * prevent misalignment of source code and line numbers, this would happen when
   the source is too long causing it to wrap around.
 
