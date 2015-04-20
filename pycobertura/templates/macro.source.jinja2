@@ -1,18 +1,22 @@
 {% macro render_source(lines) -%}
-<div class="row">
-  <div class="lineno u-pull-left">
-    <pre>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>
 {%- for line in lines -%}
-{{ line.number }} {{ line|line_reason }}
+{{ line.number  }} {{ line|line_reason }}
 {% endfor -%}
-    </pre>
-  </div>
-  <div class="code u-pull-left">
-    <pre>
+        </pre>
+      </td>
+      <td class="source">
+        <pre>
 {%- for line in lines -%}
-<span class="{{ line|line_status }}">{{ line.source|escape }}</span>
+          <span class="{{ line|line_status }}">{{ line.source|escape }}</span>
 {%- endfor -%}
-    </pre>
-  </div>
-</div>
+        </pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
 {%- endmacro %}

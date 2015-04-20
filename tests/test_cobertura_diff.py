@@ -28,7 +28,7 @@ def test_diff_class_source():
         ],
         'dummy/dummy3': [
             Line(1, 'def foobar():\n', False, 'line-edit'),
-            Line(2, '    pass\n', False, 'line-edit')
+            Line(2, '    pass  # This is a very long comment that was purposefully written so we could test how HTML rendering looks like when the boundaries of the page are reached.\n', False, 'line-edit')
         ],
     }
 

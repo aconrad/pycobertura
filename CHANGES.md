@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+* prevent misalignment of source code and line numbers, this would happen when
+  the source is too long causing it to wrap around.
+
 ## 0.7.0 (2015-04-17)
 
 * pycobertura diff now renders colors in terminal with Python 2.x (worked for
