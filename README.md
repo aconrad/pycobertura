@@ -373,8 +373,8 @@ line 4: hit
 ```
 
 The line rate decreased from 80% to 75% but uncovered lines is still at 1. In
-this case, failing the build based on line rate would is inappropriate, thus
-making the line rate the wrong metric to look at when validating coverage.
+this case, failing the build based on line rate is inappropriate, thus making
+the line rate the wrong metric to look at when validating coverage.
 
 The basic idea is that a code base may have technical debt of N uncovered lines
 and you want to prevent N from ever going up.
