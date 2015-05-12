@@ -6,6 +6,7 @@ from pycobertura.utils import (
     extrapolate_coverage,
     reconcile_lines,
     hunkify_lines,
+    memoize,
 )
 
 
@@ -42,10 +43,12 @@ class Cobertura(object):
         self.xml_path = xml_path
         self.xml = ET.parse(xml_path).getroot()
 
+    @memoize
     def _get_element_by_class_name(self, class_name):
         syntax = "./packages/package/classes/class[@name='%s'][1]" % class_name
         return self.xml.xpath(syntax)[0]
 
+    @memoize
     def _get_lines_by_class_name(self, class_name):
         el = self._get_element_by_class_name(class_name)
         return el.xpath('./lines/line')
@@ -79,6 +82,7 @@ class Cobertura(object):
 
         return float(el.attrib['branch-rate'])
 
+    @memoize
     def missed_statements(self, class_name):
         """
         Return a list of uncovered line numbers for each of the missed
@@ -88,6 +92,7 @@ class Cobertura(object):
         lines = el.xpath('./lines/line[@hits=0]')
         return [int(l.attrib['number']) for l in lines]
 
+    @memoize
     def hit_statements(self, class_name):
         """
         Return a list of covered line numbers for each of the hit statements
@@ -123,6 +128,7 @@ class Cobertura(object):
         statuses = extrapolate_coverage(statuses)
         return [lno for lno, status in statuses if status is False]
 
+    @memoize
     def class_source(self, class_name):
         """
         Return a list of namedtuple `Line` for each line of code found in the
@@ -190,6 +196,7 @@ class Cobertura(object):
 
         return total
 
+    @memoize
     def filename(self, class_name):
         """
         Return the filename of the class `class_name` as found in the Cobertura
@@ -209,6 +216,7 @@ class Cobertura(object):
         filepath = os.path.join(self.base_path, filename)
         return filepath
 
+    @memoize
     def classes(self):
         """
         Return the list of available classes in the coverage report.
@@ -223,6 +231,7 @@ class Cobertura(object):
         # FIXME: this will lookup a list which is slow, make it O(1)
         return class_name in self.classes()
 
+    @memoize
     def class_lines(self, class_name):
         """
         Return a list for source lines of class `class_name`.
@@ -230,6 +239,7 @@ class Cobertura(object):
         with open(self.filepath(class_name)) as f:
             return f.readlines()
 
+    @memoize
     def packages(self):
         """
         Return the list of available packages in the coverage report.

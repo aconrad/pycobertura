@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* memoize expensive methods of `Cobertura` (lxml/disk)
+
 ## 0.7.1 (2015-04-20)
 
 * prevent misalignment of source code and line numbers, this would happen when

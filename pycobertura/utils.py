@@ -1,5 +1,30 @@
 import colorama
 import difflib
+import functools
+
+
+# https://gist.github.com/267733/8f5d2e3576b6a6f221f6fb7e2e10d395ad7303f9
+class memoize(object):
+    def __init__(self, func):
+        self.func = func
+        self.memoized = {}
+        self.method_cache = {}
+
+    def __call__(self, *args):
+        return self.cache_get(self.memoized, args, lambda: self.func(*args))
+
+    def __get__(self, obj, objtype):
+        return self.cache_get(
+            self.method_cache, obj,
+            lambda: self.__class__(functools.partial(self.func, obj))
+        )
+
+    def cache_get(self, cache, key, func):
+        try:
+            return cache[key]
+        except KeyError:
+            v = cache[key] = func()
+            return v
 
 
 def colorize(text, color):
