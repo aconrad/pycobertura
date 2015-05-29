@@ -3,6 +3,7 @@
 ## Unreleased
 
 * memoize expensive methods of `Cobertura` (lxml/disk)
+* test CI builds
 
 ## 0.7.1 (2015-04-20)
 
