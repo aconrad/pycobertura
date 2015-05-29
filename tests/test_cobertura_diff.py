@@ -12,23 +12,23 @@ def test_diff_class_source():
     expected_sources = {
         'dummy/__init__': [],
         'dummy/dummy': [
-            Line(1, 'def foo():\n', None, None),
-            Line(2, '    pass\n', None, None),
-            Line(3, '\n', None, None),
-            Line(4, 'def bar():\n', None, None),
-            Line(5, "    a = 'a'\n", True, 'cov-up'),
-            Line(6, "    d = 'd'\n", True, 'line-edit')
+            Line(1, u'def foo():\n', None, None),
+            Line(2, u'    pass\n', None, None),
+            Line(3, u'\n', None, None),
+            Line(4, u'def bar():\n', None, None),
+            Line(5, u"    a = 'a'\n", True, 'cov-up'),
+            Line(6, u"    d = 'd'\n", True, 'line-edit')
         ],
         'dummy/dummy2': [
-            Line(1, 'def baz():\n', None, None),
-            Line(2, "    c = 'c'\n", True, 'line-edit'),
-            Line(3, '\n', None, 'line-edit'),
-            Line(4, 'def bat():\n', True, 'line-edit'),
-            Line(5, '    pass\n', False, 'cov-down')
+            Line(1, u'def baz():\n', None, None),
+            Line(2, u"    c = 'c'\n", True, 'line-edit'),
+            Line(3, u'\n', None, 'line-edit'),
+            Line(4, u'def bat():\n', True, 'line-edit'),
+            Line(5, u'    pass\n', False, 'cov-down')
         ],
         'dummy/dummy3': [
-            Line(1, 'def foobar():\n', False, 'line-edit'),
-            Line(2, '    pass  # This is a very long comment that was purposefully written so we could test how HTML rendering looks like when the boundaries of the page are reached.\n', False, 'line-edit')
+            Line(1, u'def foobar():\n', False, 'line-edit'),
+            Line(2, u'    pass  # This is a very long comment that was purposefully written so we could test how HTML rendering looks like when the boundaries of the page are reached. And here is a non-ascii char: \u015e\n', False, 'line-edit')
         ],
     }
 

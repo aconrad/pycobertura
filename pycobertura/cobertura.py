@@ -1,5 +1,7 @@
+import codecs
 import lxml.etree as ET
 import os
+
 from collections import namedtuple
 
 from pycobertura.utils import (
@@ -139,7 +141,7 @@ class Cobertura(object):
         if not os.path.exists(filename):
             return [Line(0, '%s not found' % filename, None, None)]
 
-        with open(filename) as f:
+        with codecs.open(filename, encoding='utf-8') as f:
             lines = []
             line_statuses = dict(self.line_statuses(class_name))
             for lineno, source in enumerate(f, start=1):
@@ -236,7 +238,7 @@ class Cobertura(object):
         """
         Return a list for source lines of class `class_name`.
         """
-        with open(self.filepath(class_name)) as f:
+        with codecs.open(self.filepath(class_name), encoding='utf-8') as f:
             return f.readlines()
 
     @memoize
