@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.7.2 (2015-05-29)
+
 * memoize expensive methods of `Cobertura` (lxml/disk)
 * assume source code is UTF-8
 
