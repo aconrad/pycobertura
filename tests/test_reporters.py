@@ -327,7 +327,7 @@ def test_html_report_delta():
     assert "normalize.css" in html_output
     assert "Skeleton V2.0" in html_output
 
-    assert remove_style_tag(html_output) == """\
+    assert remove_style_tag(html_output) == u"""\
 <html>
   <head>
     <title>pycobertura report</title>
@@ -445,7 +445,7 @@ def test_html_report_delta():
       </td>
       <td class="source">
         <pre><span class="miss">def foobar():
-</span><span class="miss">    pass  # This is a very long comment that was purposefully written so we could test how HTML rendering looks like when the boundaries of the page are reached.
+</span><span class="miss">    pass  # This is a very long comment that was purposefully written so we could test how HTML rendering looks like when the boundaries of the page are reached. And here is a non-ascii char: \u015e
 </span></pre>
       </td>
     </tr>
