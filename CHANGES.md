@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.7.3 (2015-07-23)
+
 * a non-zero exit code will be returned if not all changes have been
   covered. If `--no-source` is provided then it will only check if coverage
   has worsened which less strict.
