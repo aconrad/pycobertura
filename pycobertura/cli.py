@@ -121,7 +121,14 @@ def diff(
 
     click.echo(report, file=output, nl=isatty, color=color)
 
-    # non-zero exit code if line rate worsened
+    # Compute the non-zero exit code. This is a 2-step process which involves
+    # checking whether code coverage is any better first and then check if all
+    # changes are covered (stricter) which can only be done if the source code
+    # is available (and enabled via the --source option).
     differ = reporter.differ
-    exit_code = not differ.has_all_changes_covered()
+
+    exit_code = 0 if differ.has_better_coverage() else 1
+    if source and exit_code == 0:
+        exit_code = 0 if differ.has_all_changes_covered() else 1
+
     raise SystemExit(exit_code)

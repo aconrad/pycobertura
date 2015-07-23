@@ -26,7 +26,7 @@ Features:
 * output in plain text or HTML
 * compare two cobertura files and show changes in coverage
 * colorized diff output
-* diff exit status of non-zero if coverage worsened
+* diff exit status of non-zero if coverage worsened or if any changes were left uncovered
 * fail based on uncovered lines rather than on decrease of coverage rate
   ([see why](#why-is-the-number-of-uncovered-lines-used-as-the-metric-to-check-if-code-coverage-worsened-rather-than-the-line-rate))
 
