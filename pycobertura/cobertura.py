@@ -257,18 +257,29 @@ class CoberturaDiff(object):
         self.cobertura1 = cobertura1
         self.cobertura2 = cobertura2
 
-    def has_all_changes_covered(self):
+    def has_better_coverage(self):
         """
-        Return `True` if all changes in the diff are covered, `False`
-        otherwise.
+        Return `True` if coverage of has improved, `False` otherwise.
 
-        This goes over every individual classes and checks whether missed
-        statements are present. Looking at the just the total missed statements
-        would be inaccurate since it could still include uncovered lines.
+        This does not ensure that all changes have been covered. If this is
+        what you want, use `CoberturaDiff.has_all_changes_covered()` instead.
         """
         for class_name in self.classes():
             if self.diff_total_misses(class_name) > 0:
                 return False
+        return True
+
+    def has_all_changes_covered(self):
+        """
+        Return `True` if all changes have been covered, `False` otherwise.
+        """
+        for class_name in self.classes():
+            for hunk in self.class_source_hunks(class_name):
+                for line in hunk:
+                    if line.reason is None:
+                        continue  # line untouched
+                    if line.status is False:
+                        return False  # line not covered
         return True
 
     def _diff_attr(self, attr_name, class_name):

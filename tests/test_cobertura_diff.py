@@ -122,3 +122,30 @@ def test_diff_total_hits_by_class():
     for class_name in cobertura2.classes():
         assert differ.diff_total_hits(class_name) == \
             expected_total_hits[class_name]
+
+
+def test_diff__has_all_changes_covered__some_changed_code_is_still_uncovered():
+    from pycobertura.cobertura import Cobertura, CoberturaDiff
+
+    cobertura1 = Cobertura('tests/dummy.zeroexit1/coverage.xml')
+    cobertura2 = Cobertura('tests/dummy.zeroexit2/coverage.xml')
+    differ = CoberturaDiff(cobertura1, cobertura2)
+    assert differ.has_all_changes_covered() is False
+
+
+def test_diff__has_better_coverage():
+    from pycobertura.cobertura import Cobertura, CoberturaDiff
+
+    cobertura1 = Cobertura('tests/dummy.zeroexit1/coverage.xml')
+    cobertura2 = Cobertura('tests/dummy.zeroexit2/coverage.xml')
+    differ = CoberturaDiff(cobertura1, cobertura2)
+    assert differ.has_better_coverage() is True
+
+
+def test_diff__has_not_better_coverage():
+    from pycobertura.cobertura import Cobertura, CoberturaDiff
+
+    cobertura1 = Cobertura('tests/dummy.zeroexit2/coverage.xml')
+    cobertura2 = Cobertura('tests/dummy.zeroexit1/coverage.xml')
+    differ = CoberturaDiff(cobertura1, cobertura2)
+    assert differ.has_better_coverage() is False

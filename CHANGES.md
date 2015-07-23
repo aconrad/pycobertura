@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+* a non-zero exit code will be returned if not all changes have been
+  covered. If `--no-source` is provided then it will only check if coverage
+  has worsened which less strict.
+
 ## 0.7.2 (2015-05-29)
 
 * memoize expensive methods of `Cobertura` (lxml/disk)
