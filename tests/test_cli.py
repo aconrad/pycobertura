@@ -3,6 +3,16 @@ import pytest
 from click.testing import CliRunner
 
 
+def test_exit_codes():
+    # We shouldn't change exit codes so that clients can rely on them
+    from pycobertura.cli import ExitCodes
+
+    assert ExitCodes.OK == 0
+    assert ExitCodes.EXCEPTION == 1
+    assert ExitCodes.COVERAGE_WORSENED == 2
+    assert ExitCodes.NOT_ALL_CHANGES_COVERED == 3
+
+
 def test_show__format_default():
     from pycobertura.cli import show, ExitCodes
 
