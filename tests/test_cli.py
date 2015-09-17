@@ -4,7 +4,7 @@ from click.testing import CliRunner
 
 
 def test_show__format_default():
-    from pycobertura.cli import show
+    from pycobertura.cli import show, ExitCodes
 
     runner = CliRunner()
     result = runner.invoke(
@@ -17,10 +17,11 @@ dummy/__init__        0       0  0.00%
 dummy/dummy           4       2  50.00%   2, 5
 TOTAL                 4       2  50.00%
 """
+    assert result.exit_code == ExitCodes.OK
 
 
 def test_show__format_text():
-    from pycobertura.cli import show
+    from pycobertura.cli import show, ExitCodes
 
     runner = CliRunner()
     for opt in ('-f', '--format'):
@@ -36,10 +37,11 @@ dummy/__init__        0       0  0.00%
 dummy/dummy           4       2  50.00%   2, 5
 TOTAL                 4       2  50.00%
 """
+    assert result.exit_code == ExitCodes.OK
 
 
 def test_show__format_html():
-    from pycobertura.cli import show
+    from pycobertura.cli import show, ExitCodes
 
     runner = CliRunner()
     result = runner.invoke(show, [
@@ -47,10 +49,11 @@ def test_show__format_html():
     ], catch_exceptions=False)
     assert result.output.startswith('<html>')
     assert result.output.endswith('</html>\n')
+    assert result.exit_code == ExitCodes.OK
 
 
 def test_show__output_to_file():
-    from pycobertura.cli import show
+    from pycobertura.cli import show, ExitCodes
 
     runner = CliRunner()
     for opt in ('-o', '--output'):
@@ -69,10 +72,11 @@ search.BinarySearch             12       1  91.67%   24
 search.ISortedArraySearch        0       0  100.00%
 search.LinearSearch              7       2  71.43%   19-24
 TOTAL                           30       3  90.00%"""
+    assert result.exit_code == ExitCodes.OK
 
 
 def test_diff__format_default():
-    from pycobertura.cli import diff
+    from pycobertura.cli import diff, ExitCodes
 
     runner = CliRunner()
     result = runner.invoke(diff, [
@@ -87,10 +91,11 @@ dummy/dummy2  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b
 dummy/dummy3  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
 TOTAL         +4           \x1b[31m+1\x1b[39m  +15.00%
 """
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__format_text():
-    from pycobertura.cli import diff
+    from pycobertura.cli import diff, ExitCodes
 
     runner = CliRunner()
     for opt in ('-f', '--format'):
@@ -107,10 +112,11 @@ dummy/dummy2  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b
 dummy/dummy3  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
 TOTAL         +4           \x1b[31m+1\x1b[39m  +15.00%
 """
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__output_to_file():
-    from pycobertura.cli import diff
+    from pycobertura.cli import diff, ExitCodes
 
     runner = CliRunner()
 
@@ -131,10 +137,11 @@ dummy/dummy   -            -2  +40.00%  -5, -6
 dummy/dummy2  +2           +1  -25.00%  -2, -4, +5
 dummy/dummy3  +2           +2  -        +1, +2
 TOTAL         +4           +1  +15.00%"""
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__output_to_file__force_color():
-    from pycobertura.cli import diff
+    from pycobertura.cli import diff, ExitCodes
 
     runner = CliRunner()
 
@@ -154,10 +161,11 @@ dummy/dummy   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b
 dummy/dummy2  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
 dummy/dummy3  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
 TOTAL         +4           \x1b[31m+1\x1b[39m  +15.00%"""
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__format_text__with_color():
-    from pycobertura.cli import diff
+    from pycobertura.cli import diff, ExitCodes
 
     runner = CliRunner()
     result = runner.invoke(diff, [
@@ -173,10 +181,11 @@ dummy/dummy2  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b
 dummy/dummy3  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
 TOTAL         +4           \x1b[31m+1\x1b[39m  +15.00%
 """
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__format_text__with_no_color():
-    from pycobertura.cli import diff
+    from pycobertura.cli import diff, ExitCodes
 
     runner = CliRunner()
     result = runner.invoke(diff, [
@@ -192,6 +201,7 @@ dummy/dummy2  +2           +1  -25.00%  -2, -4, +5
 dummy/dummy3  +2           +2  -        +1, +2
 TOTAL         +4           +1  +15.00%
 """
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__format_html__no_source_on_disk():
@@ -206,7 +216,7 @@ def test_diff__format_html__no_source_on_disk():
 
 
 def test_diff__format_html__with_source():
-    from pycobertura.cli import diff
+    from pycobertura.cli import diff, ExitCodes
 
     runner = CliRunner()
     result = runner.invoke(diff, [
@@ -218,10 +228,11 @@ def test_diff__format_html__with_source():
     ], catch_exceptions=False)
     assert result.output.startswith('<html>')
     assert result.output.endswith('</html>\n')
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__format_html__source():
-    from pycobertura.cli import diff
+    from pycobertura.cli import diff, ExitCodes
 
     runner = CliRunner()
     result = runner.invoke(diff, [
@@ -233,10 +244,11 @@ def test_diff__format_html__source():
     assert 'Missing' in result.output
     assert result.output.startswith('<html>')
     assert result.output.endswith('</html>\n')
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__format_html__source_is_default():
-    from pycobertura.cli import diff
+    from pycobertura.cli import diff, ExitCodes
 
     runner = CliRunner()
     result = runner.invoke(diff, [
@@ -247,10 +259,11 @@ def test_diff__format_html__source_is_default():
     assert 'Missing' in result.output
     assert result.output.startswith('<html>')
     assert result.output.endswith('</html>\n')
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__format_html__no_source():
-    from pycobertura.cli import diff
+    from pycobertura.cli import diff, ExitCodes
 
     runner = CliRunner()
     result = runner.invoke(diff, [
@@ -262,21 +275,22 @@ def test_diff__format_html__no_source():
     assert 'Missing' not in result.output
     assert result.output.startswith('<html>')
     assert result.output.endswith('</html>\n')
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__same_coverage_has_exit_status_of_zero():
-    from pycobertura.cli import diff
+    from pycobertura.cli import diff, ExitCodes
 
     runner = CliRunner()
     result = runner.invoke(diff, [
         'tests/dummy.source1/coverage.xml',
         'tests/dummy.source1/coverage.xml',
     ], catch_exceptions=False)
-    assert result.exit_code == 0
+    assert result.exit_code == ExitCodes.OK
 
 
 def test_diff__better_coverage_has_exit_status_of_zero():
-    from pycobertura.cli import diff
+    from pycobertura.cli import diff, ExitCodes
 
     runner = CliRunner()
     result = runner.invoke(diff, [
@@ -284,11 +298,11 @@ def test_diff__better_coverage_has_exit_status_of_zero():
         'tests/dummy.original-full-cov.xml',  # has no uncovered lines
         '--no-source',
     ], catch_exceptions=False)
-    assert result.exit_code == 0
+    assert result.exit_code == ExitCodes.OK
 
 
-def test_diff__worse_coverage_has_exit_status_of_one():
-    from pycobertura.cli import diff
+def test_diff__worse_coverage_exit_status():
+    from pycobertura.cli import diff, ExitCodes
 
     runner = CliRunner()
     result = runner.invoke(diff, [
@@ -296,15 +310,15 @@ def test_diff__worse_coverage_has_exit_status_of_one():
         'tests/dummy.with-dummy2-better-and-worse.xml',  # has covered AND uncovered lines
         '--no-source',
     ], catch_exceptions=False)
-    assert result.exit_code == 1
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
-def test_diff__changes_uncovered_but_with_better_coverage_has_exit_status_of_one():
-    from pycobertura.cli import diff
+def test_diff__changes_uncovered_but_with_better_coverage_exit_status():
+    from pycobertura.cli import diff, ExitCodes
 
     runner = CliRunner()
     result = runner.invoke(diff, [
         'tests/dummy.zeroexit1/coverage.xml',
         'tests/dummy.zeroexit2/coverage.xml',  # has uncovered changes
     ], catch_exceptions=False)
-    assert result.exit_code == 1
+    assert result.exit_code == ExitCodes.NOT_ALL_CHANGES_COVERED

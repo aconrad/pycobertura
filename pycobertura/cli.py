@@ -15,6 +15,31 @@ reporters = {
 }
 
 
+class ExitCodes:
+    OK = 0
+    EXCEPTION = 1
+    COVERAGE_WORSENED = 2
+    NOT_ALL_CHANGES_COVERED = 3
+
+
+def get_exit_code(differ, source):
+    # Compute the non-zero exit code. This is a 2-step process which involves
+    # checking whether code coverage is any better first and then check if all
+    # changes are covered (stricter) which can only be done if the source code
+    # is available (and enabled via the --source option).
+
+    if not differ.has_better_coverage():
+        return ExitCodes.COVERAGE_WORSENED
+
+    if source:
+        if differ.has_all_changes_covered():
+            return ExitCodes.OK
+        else:
+            return ExitCodes.NOT_ALL_CHANGES_COVERED
+    else:
+        return ExitCodes.OK
+
+
 @pycobertura.command()
 @click.argument('cobertura_file')
 @click.option(
@@ -121,14 +146,5 @@ def diff(
 
     click.echo(report, file=output, nl=isatty, color=color)
 
-    # Compute the non-zero exit code. This is a 2-step process which involves
-    # checking whether code coverage is any better first and then check if all
-    # changes are covered (stricter) which can only be done if the source code
-    # is available (and enabled via the --source option).
-    differ = reporter.differ
-
-    exit_code = 0 if differ.has_better_coverage() else 2
-    if source and exit_code == 0:
-        exit_code = 0 if differ.has_all_changes_covered() else 3
-
+    exit_code = get_exit_code(reporter.differ, source)
     raise SystemExit(exit_code)
