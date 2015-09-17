@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+* return different exit codes depending on status:
+  0: all is good.
+  1: some exception occurred (likely a bug)
+  2: coverage worsened (implies 3)
+  3: not all changes are covered
+
 ## 0.7.3 (2015-07-23)
 
 * a non-zero exit code will be returned if not all changes have been
