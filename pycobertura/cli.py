@@ -127,8 +127,8 @@ def diff(
     # is available (and enabled via the --source option).
     differ = reporter.differ
 
-    exit_code = 0 if differ.has_better_coverage() else 1
+    exit_code = 0 if differ.has_better_coverage() else 2
     if source and exit_code == 0:
-        exit_code = 0 if differ.has_all_changes_covered() else 1
+        exit_code = 0 if differ.has_all_changes_covered() else 3
 
     raise SystemExit(exit_code)
