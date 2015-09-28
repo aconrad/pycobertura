@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.8.0 (2015-09-28)
+
 * *BACKWARDS INCOMPATIBLE*: return different exit codes depending on `diff`
   status. Thanks Marc Abramowitz.
 
