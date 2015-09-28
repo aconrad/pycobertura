@@ -2,11 +2,8 @@
 
 ## Unreleased
 
-* return different exit codes depending on status:
-  0: all is good.
-  1: some exception occurred (likely a bug)
-  2: coverage worsened (implies 3)
-  3: not all changes are covered
+* *BACKWARDS INCOMPATIBLE*: return different exit codes depending on `diff`
+  status. Thanks Marc Abramowitz.
 
 ## 0.7.3 (2015-07-23)
 

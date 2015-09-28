@@ -109,6 +109,15 @@ pycobertura diff --format html --output coverage.html ./master/coverage.xml ./my
 
 ![](http://i.imgur.com/L5ZUarI.png)
 
+#### `diff` exit codes
+
+Upon exit, the `diff` command may return various exit codes:
+
+* 0: all is good
+* 1: some exception occurred (likely due to inappropriate usage or a bug in pycobertura)
+* 2: coverage worsened (implies 3)
+* 3: not all changes are covered
+
 ## Library usage
 
 Using it as a library in your Python application is easy:
