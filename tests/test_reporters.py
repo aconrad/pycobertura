@@ -17,13 +17,13 @@ def test_text_report():
     report = TextReporter(cobertura)
 
     assert report.generate() == """\
-Name                         Stmts    Miss  Cover    Missing
--------------------------  -------  ------  -------  ---------
-Main                            11       0  100.00%
-search.BinarySearch             12       1  91.67%   24
-search.ISortedArraySearch        0       0  100.00%
-search.LinearSearch              7       2  71.43%   19-24
-TOTAL                           30       3  90.00%"""
+Name                              Stmts    Miss  Cover    Missing
+------------------------------  -------  ------  -------  ---------
+Main.java                            11       0  100.00%
+search/BinarySearch.java             12       1  91.67%   24
+search/ISortedArraySearch.java        0       0  100.00%
+search/LinearSearch.java              7       2  71.43%   19-24
+TOTAL                                30       3  90.00%"""
 
 
 def test_text_report__with_missing_range():
@@ -33,12 +33,12 @@ def test_text_report__with_missing_range():
     report = TextReporter(cobertura)
 
     assert report.generate() == """\
-Name              Stmts    Miss  Cover    Missing
---------------  -------  ------  -------  ---------
-dummy/__init__        0       0  0.00%
-dummy/dummy           4       0  100.00%
-dummy/dummy2          2       2  0.00%    1-2
-TOTAL                 6       2  66.67%"""
+Name                 Stmts    Miss  Cover    Missing
+-----------------  -------  ------  -------  ---------
+dummy/__init__.py        0       0  0.00%
+dummy/dummy.py           4       0  100.00%
+dummy/dummy2.py          2       2  0.00%    1-2
+TOTAL                    6       2  66.67%"""
 
 
 def test_text_report_delta__no_diff():
@@ -64,12 +64,12 @@ def test_text_report_delta__colorize_True():
     report_delta = TextReporterDelta(cobertura1, cobertura2, color=True)
 
     assert report_delta.generate() == """\
-Name          Stmts      Miss  Cover    Missing
-------------  -------  ------  -------  ----------
-dummy/dummy   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
-dummy/dummy2  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
-dummy/dummy3  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
-TOTAL         +4           \x1b[31m+1\x1b[39m  +15.00%"""
+Name             Stmts      Miss  Cover    Missing
+---------------  -------  ------  -------  ----------
+dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
+dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
+dummy/dummy3.py  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
+TOTAL            +4           \x1b[31m+1\x1b[39m  +15.00%"""
 
 
 def test_text_report_delta__colorize_True__with_missing_range():
@@ -81,12 +81,12 @@ def test_text_report_delta__colorize_True__with_missing_range():
     report_delta = TextReporterDelta(cobertura1, cobertura2, color=True)
 
     assert report_delta.generate() == """\
-Name          Stmts      Miss  Cover    Missing
-------------  -------  ------  -------  ----------
-dummy/dummy   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
-dummy/dummy2  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
-dummy/dummy3  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
-TOTAL         +4           \x1b[31m+1\x1b[39m  +15.00%"""
+Name             Stmts      Miss  Cover    Missing
+---------------  -------  ------  -------  ----------
+dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
+dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
+dummy/dummy3.py  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
+TOTAL            +4           \x1b[31m+1\x1b[39m  +15.00%"""
 
 
 def test_text_report_delta__colorize_False():
@@ -98,12 +98,12 @@ def test_text_report_delta__colorize_False():
     report_delta = TextReporterDelta(cobertura1, cobertura2, color=False)
 
     assert report_delta.generate() == """\
-Name          Stmts      Miss  Cover    Missing
-------------  -------  ------  -------  ----------
-dummy/dummy   -            -2  +40.00%  -5, -6
-dummy/dummy2  +2           +1  -25.00%  -2, -4, +5
-dummy/dummy3  +2           +2  -        +1, +2
-TOTAL         +4           +1  +15.00%"""
+Name             Stmts      Miss  Cover    Missing
+---------------  -------  ------  -------  ----------
+dummy/dummy.py   -            -2  +40.00%  -5, -6
+dummy/dummy2.py  +2           +1  -25.00%  -2, -4, +5
+dummy/dummy3.py  +2           +2  -        +1, +2
+TOTAL            +4           +1  +15.00%"""
 
 
 def test_html_report():
@@ -136,28 +136,28 @@ def test_html_report():
         </thead>
         <tbody>
           <tr>
-            <td><a href="#Main">Main</a></td>
+            <td><a href="#Main.java">Main.java</a></td>
             <td>11</td>
             <td>0</td>
             <td>100.00%</td>
             <td></td>
           </tr>
           <tr>
-            <td><a href="#search.BinarySearch">search.BinarySearch</a></td>
+            <td><a href="#search/BinarySearch.java">search/BinarySearch.java</a></td>
             <td>12</td>
             <td>1</td>
             <td>91.67%</td>
             <td>24</td>
           </tr>
           <tr>
-            <td><a href="#search.ISortedArraySearch">search.ISortedArraySearch</a></td>
+            <td><a href="#search/ISortedArraySearch.java">search/ISortedArraySearch.java</a></td>
             <td>0</td>
             <td>0</td>
             <td>100.00%</td>
             <td></td>
           </tr>
           <tr>
-            <td><a href="#search.LinearSearch">search.LinearSearch</a></td>
+            <td><a href="#search/LinearSearch.java">search/LinearSearch.java</a></td>
             <td>7</td>
             <td>2</td>
             <td>71.43%</td>
@@ -174,7 +174,7 @@ def test_html_report():
           </tr>
         </tfoot>
       </table>
-<h4 id="Main">Main</h4>
+<h4 id="Main.java">Main.java</h4>
 <table class="code u-max-full-width">
   <tbody>
     <tr>
@@ -188,7 +188,7 @@ def test_html_report():
     </tr>
   </tbody>
 </table>
-<h4 id="search.BinarySearch">search.BinarySearch</h4>
+<h4 id="search/BinarySearch.java">search/BinarySearch.java</h4>
 <table class="code u-max-full-width">
   <tbody>
     <tr>
@@ -202,7 +202,7 @@ def test_html_report():
     </tr>
   </tbody>
 </table>
-<h4 id="search.ISortedArraySearch">search.ISortedArraySearch</h4>
+<h4 id="search/ISortedArraySearch.java">search/ISortedArraySearch.java</h4>
 <table class="code u-max-full-width">
   <tbody>
     <tr>
@@ -216,7 +216,7 @@ def test_html_report():
     </tr>
   </tbody>
 </table>
-<h4 id="search.LinearSearch">search.LinearSearch</h4>
+<h4 id="search/LinearSearch.java">search/LinearSearch.java</h4>
 <table class="code u-max-full-width">
   <tbody>
     <tr>
@@ -244,12 +244,12 @@ def test_text_report_delta__no_source():
     report_delta = TextReporterDelta(cobertura1, cobertura2, show_source=False)
     output = report_delta.generate()
     assert output == """\
-Name          Stmts      Miss  Cover
-------------  -------  ------  -------
-dummy/dummy   -            -2  +40.00%
-dummy/dummy2  +2           +1  -25.00%
-dummy/dummy3  +2           +2  -
-TOTAL         +4           +1  +15.00%"""
+Name             Stmts      Miss  Cover
+---------------  -------  ------  -------
+dummy/dummy.py   -            -2  +40.00%
+dummy/dummy2.py  +2           +1  -25.00%
+dummy/dummy3.py  +2           +2  -
+TOTAL            +4           +1  +15.00%"""
 
 
 def test_html_report_delta__no_source():
@@ -282,19 +282,19 @@ def test_html_report_delta__no_source():
         </thead>
         <tbody>
           <tr>
-            <td><a href="#dummy/dummy">dummy/dummy</a></td>
+            <td><a href="#dummy/dummy.py">dummy/dummy.py</a></td>
             <td>-</td>
             <td><span class="green">-2</span></td>
             <td>+40.00%</td>
           </tr>
           <tr>
-            <td><a href="#dummy/dummy2">dummy/dummy2</a></td>
+            <td><a href="#dummy/dummy2.py">dummy/dummy2.py</a></td>
             <td>+2</td>
             <td><span class="red">+1</span></td>
             <td>-25.00%</td>
           </tr>
           <tr>
-            <td><a href="#dummy/dummy3">dummy/dummy3</a></td>
+            <td><a href="#dummy/dummy3.py">dummy/dummy3.py</a></td>
             <td>+2</td>
             <td><span class="red">+2</span></td>
             <td>-</td>
@@ -347,7 +347,7 @@ def test_html_report_delta():
         </thead>
         <tbody>
           <tr>
-            <td><a href="#dummy/dummy">dummy/dummy</a></td>
+            <td><a href="#dummy/dummy.py">dummy/dummy.py</a></td>
             <td>-</td>
             <td><span class="green">-2</span></td>
             <td>+40.00%</td>
@@ -355,7 +355,7 @@ def test_html_report_delta():
             </td>
           </tr>
           <tr>
-            <td><a href="#dummy/dummy2">dummy/dummy2</a></td>
+            <td><a href="#dummy/dummy2.py">dummy/dummy2.py</a></td>
             <td>+2</td>
             <td><span class="red">+1</span></td>
             <td>-25.00%</td>
@@ -363,7 +363,7 @@ def test_html_report_delta():
             </td>
           </tr>
           <tr>
-            <td><a href="#dummy/dummy3">dummy/dummy3</a></td>
+            <td><a href="#dummy/dummy3.py">dummy/dummy3.py</a></td>
             <td>+2</td>
             <td><span class="red">+2</span></td>
             <td>-</td>
@@ -388,7 +388,7 @@ def test_html_report_delta():
     <dt><code>+</code></dt><dd>line added or modified</dd>
   </dl>
 </div>
-<h4 id="dummy/dummy">dummy/dummy</h4>
+<h4 id="dummy/dummy.py">dummy/dummy.py</h4>
 <table class="code u-max-full-width">
   <tbody>
     <tr>
@@ -411,7 +411,7 @@ def test_html_report_delta():
     </tr>
   </tbody>
 </table>
-<h4 id="dummy/dummy2">dummy/dummy2</h4>
+<h4 id="dummy/dummy2.py">dummy/dummy2.py</h4>
 <table class="code u-max-full-width">
   <tbody>
     <tr>
@@ -434,7 +434,7 @@ def test_html_report_delta():
     </tr>
   </tbody>
 </table>
-<h4 id="dummy/dummy3">dummy/dummy3</h4>
+<h4 id="dummy/dummy3.py">dummy/dummy3.py</h4>
 <table class="code u-max-full-width">
   <tbody>
     <tr>

@@ -47,7 +47,7 @@ class Cobertura(object):
 
     @memoize
     def _get_element_by_class_name(self, class_name):
-        syntax = "./packages/package/classes/class[@name='%s'][1]" % class_name
+        syntax = "./packages/package/classes/class[@filename='%s'][1]" % class_name
         return self.xml.xpath(syntax)[0]
 
     @memoize
@@ -223,7 +223,7 @@ class Cobertura(object):
         """
         Return the list of available classes in the coverage report.
         """
-        return [el.attrib['name'] for el in self.xml.xpath("//class")]
+        return [el.attrib['filename'] for el in self.xml.xpath("//class")]
 
     def has_class(self, class_name):
         """

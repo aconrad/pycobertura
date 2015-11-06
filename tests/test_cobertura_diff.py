@@ -10,8 +10,8 @@ def test_diff_class_source():
     differ = CoberturaDiff(cobertura1, cobertura2)
 
     expected_sources = {
-        'dummy/__init__': [],
-        'dummy/dummy': [
+        'dummy/__init__.py': [],
+        'dummy/dummy.py': [
             Line(1, u'def foo():\n', None, None),
             Line(2, u'    pass\n', None, None),
             Line(3, u'\n', None, None),
@@ -19,14 +19,14 @@ def test_diff_class_source():
             Line(5, u"    a = 'a'\n", True, 'cov-up'),
             Line(6, u"    d = 'd'\n", True, 'line-edit')
         ],
-        'dummy/dummy2': [
+        'dummy/dummy2.py': [
             Line(1, u'def baz():\n', None, None),
             Line(2, u"    c = 'c'\n", True, 'line-edit'),
             Line(3, u'\n', None, 'line-edit'),
             Line(4, u'def bat():\n', True, 'line-edit'),
             Line(5, u'    pass\n', False, 'cov-down')
         ],
-        'dummy/dummy3': [
+        'dummy/dummy3.py': [
             Line(1, u'def foobar():\n', False, 'line-edit'),
             Line(2, u'    pass  # This is a very long comment that was purposefully written so we could test how HTML rendering looks like when the boundaries of the page are reached. And here is a non-ascii char: \u015e\n', False, 'line-edit')
         ],
@@ -55,10 +55,10 @@ def test_diff_total_misses_by_class():
     differ = CoberturaDiff(cobertura1, cobertura2)
 
     expected_sources = {
-        'dummy/__init__': 0,
-        'dummy/dummy': -2,
-        'dummy/dummy2': 1,
-        'dummy/dummy3': 2,
+        'dummy/__init__.py': 0,
+        'dummy/dummy.py': -2,
+        'dummy/dummy2.py': 1,
+        'dummy/dummy3.py': 2,
     }
 
     for class_name in cobertura2.classes():
@@ -84,10 +84,10 @@ def test_diff_line_rate_by_class():
     differ = CoberturaDiff(cobertura1, cobertura2)
 
     expected_sources = {
-        'dummy/__init__': 0,
-        'dummy/dummy': 0.4,
-        'dummy/dummy2': -0.25,
-        'dummy/dummy3': 0.0,
+        'dummy/__init__.py': 0,
+        'dummy/dummy.py': 0.4,
+        'dummy/dummy2.py': -0.25,
+        'dummy/dummy3.py': 0.0,
     }
 
     for class_name in cobertura2.classes():
@@ -113,10 +113,10 @@ def test_diff_total_hits_by_class():
     differ = CoberturaDiff(cobertura1, cobertura2)
 
     expected_total_hits = {
-        'dummy/__init__': 0,
-        'dummy/dummy': 2,
-        'dummy/dummy2': 1,
-        'dummy/dummy3': 0,
+        'dummy/__init__.py': 0,
+        'dummy/dummy.py': 2,
+        'dummy/dummy2.py': 1,
+        'dummy/dummy3.py': 0,
     }
 
     for class_name in cobertura2.classes():
