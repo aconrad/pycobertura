@@ -21,7 +21,7 @@ def test_show__format_default():
         show, ['tests/dummy.original.xml'], catch_exceptions=False
     )
     assert result.output == """\
-Name                 Stmts    Miss  Cover    Missing
+Filename             Stmts    Miss  Cover    Missing
 -----------------  -------  ------  -------  ---------
 dummy/__init__.py        0       0  0.00%
 dummy/dummy.py           4       2  50.00%   2, 5
@@ -41,7 +41,7 @@ def test_show__format_text():
             catch_exceptions=False
         )
         assert result.output == """\
-Name                 Stmts    Miss  Cover    Missing
+Filename             Stmts    Miss  Cover    Missing
 -----------------  -------  ------  -------  ---------
 dummy/__init__.py        0       0  0.00%
 dummy/dummy.py           4       2  50.00%   2, 5
@@ -75,7 +75,7 @@ def test_show__output_to_file():
         os.remove('report.out')
         assert result.output == ""
         assert report == """\
-Name                              Stmts    Miss  Cover    Missing
+Filename                          Stmts    Miss  Cover    Missing
 ------------------------------  -------  ------  -------  ---------
 Main.java                            11       0  100.00%
 search/BinarySearch.java             12       1  91.67%   24
@@ -94,7 +94,7 @@ def test_diff__format_default():
         'tests/dummy.source2/coverage.xml',
     ], catch_exceptions=False)
     assert result.output == """\
-Name             Stmts      Miss  Cover    Missing
+Filename         Stmts      Miss  Cover    Missing
 ---------------  -------  ------  -------  ----------
 dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
 dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
@@ -115,7 +115,7 @@ def test_diff__format_text():
             'tests/dummy.source2/coverage.xml',
         ], catch_exceptions=False)
         assert result.output == """\
-Name             Stmts      Miss  Cover    Missing
+Filename         Stmts      Miss  Cover    Missing
 ---------------  -------  ------  -------  ----------
 dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
 dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
@@ -141,7 +141,7 @@ def test_diff__output_to_file():
         os.remove('report.out')
         assert result.output == ""
         assert report == """\
-Name             Stmts      Miss  Cover    Missing
+Filename         Stmts      Miss  Cover    Missing
 ---------------  -------  ------  -------  ----------
 dummy/dummy.py   -            -2  +40.00%  -5, -6
 dummy/dummy2.py  +2           +1  -25.00%  -2, -4, +5
@@ -165,7 +165,7 @@ def test_diff__output_to_file__force_color():
     os.remove('report.out')
     assert result.output == ""
     assert report == """\
-Name             Stmts      Miss  Cover    Missing
+Filename         Stmts      Miss  Cover    Missing
 ---------------  -------  ------  -------  ----------
 dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
 dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
@@ -184,7 +184,7 @@ def test_diff__format_text__with_color():
         'tests/dummy.source2/coverage.xml',
     ], catch_exceptions=False)
     assert result.output == """\
-Name             Stmts      Miss  Cover    Missing
+Filename         Stmts      Miss  Cover    Missing
 ---------------  -------  ------  -------  ----------
 dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
 dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
@@ -204,7 +204,7 @@ def test_diff__format_text__with_no_color():
         'tests/dummy.source2/coverage.xml',
     ], catch_exceptions=False)
     assert result.output == """\
-Name             Stmts      Miss  Cover    Missing
+Filename         Stmts      Miss  Cover    Missing
 ---------------  -------  ------  -------  ----------
 dummy/dummy.py   -            -2  +40.00%  -5, -6
 dummy/dummy2.py  +2           +1  -25.00%  -2, -4, +5

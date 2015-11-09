@@ -46,13 +46,15 @@ class Cobertura(object):
         self.xml = ET.parse(xml_path).getroot()
 
     @memoize
-    def _get_element_by_class_name(self, class_name):
-        syntax = "./packages/package/classes/class[@filename='%s'][1]" % class_name
+    def _get_element_by_class_filename(self, class_filename):
+        syntax = "./packages/package/classes/class[@filename='%s'][1]" % (
+            class_filename
+        )
         return self.xml.xpath(syntax)[0]
 
     @memoize
-    def _get_lines_by_class_name(self, class_name):
-        el = self._get_element_by_class_name(class_name)
+    def _get_lines_by_class_filename(self, class_filename):
+        el = self._get_element_by_class_filename(class_filename)
         return el.xpath('./lines/line')
 
     @property
@@ -60,58 +62,58 @@ class Cobertura(object):
         """Return the version number of the coverage report."""
         return self.xml.attrib['version']
 
-    def line_rate(self, class_name=None):
+    def line_rate(self, class_filename=None):
         """
-        Return the global line rate of the coverage report. If the class
-        `class_name` is given, return the line rate of the class.
+        Return the global line rate of the coverage report. If the
+        `class_filename` is given, return the line rate of the class file.
         """
-        if class_name is None:
+        if class_filename is None:
             el = self.xml
         else:
-            el = self._get_element_by_class_name(class_name)
+            el = self._get_element_by_class_filename(class_filename)
 
         return float(el.attrib['line-rate'])
 
-    def branch_rate(self, class_name=None):
+    def branch_rate(self, class_filename=None):
         """
-        Return the global branch rate of the coverage report. If the class
-        `class_name` is given, return the branch rate of the class.
+        Return the global branch rate of the coverage report. If the
+        `class_filename` is given, return the branch rate of the class file.
         """
-        if class_name is None:
+        if class_filename is None:
             el = self.xml
         else:
-            el = self._get_element_by_class_name(class_name)
+            el = self._get_element_by_class_filename(class_filename)
 
         return float(el.attrib['branch-rate'])
 
     @memoize
-    def missed_statements(self, class_name):
+    def missed_statements(self, class_filename):
         """
         Return a list of uncovered line numbers for each of the missed
-        statements found for the class `class_name`.
+        statements found for the class file `class_filename`.
         """
-        el = self._get_element_by_class_name(class_name)
+        el = self._get_element_by_class_filename(class_filename)
         lines = el.xpath('./lines/line[@hits=0]')
         return [int(l.attrib['number']) for l in lines]
 
     @memoize
-    def hit_statements(self, class_name):
+    def hit_statements(self, class_filename):
         """
         Return a list of covered line numbers for each of the hit statements
-        found for the class `class_name`.
+        found for the class file `class_filename`.
         """
-        el = self._get_element_by_class_name(class_name)
+        el = self._get_element_by_class_filename(class_filename)
         lines = el.xpath('./lines/line[@hits>0]')
         return [int(l.attrib['number']) for l in lines]
 
-    def line_statuses(self, class_name):
+    def line_statuses(self, class_filename):
         """
         Return a list of tuples `(lineno, status)` of all the lines found in
-        the Cobertura report where `lineno` is the line number and `status` is
-        coverage status of the line which can be either `True` (line hit) or
-        `False` (line miss).
+        the Cobertura report for the given class file where `lineno` is the
+        line number and `status` is coverage status of the line which can be
+        either `True` (line hit) or `False` (line miss).
         """
-        line_elements = self._get_lines_by_class_name(class_name)
+        line_elements = self._get_lines_by_class_filename(class_filename)
 
         lines_w_status = []
         for line in line_elements:
@@ -121,29 +123,29 @@ class Cobertura(object):
 
         return lines_w_status
 
-    def missed_lines(self, class_name):
+    def missed_lines(self, class_filename):
         """
-        Return a list of extrapolated uncovered line numbers according to
-        `Cobertura.line_statuses`.
+        Return a list of extrapolated uncovered line numbers for the class
+        file `class_filename` according to `Cobertura.line_statuses`.
         """
-        statuses = self.line_statuses(class_name)
+        statuses = self.line_statuses(class_filename)
         statuses = extrapolate_coverage(statuses)
         return [lno for lno, status in statuses if status is False]
 
     @memoize
-    def class_source(self, class_name):
+    def class_file_source(self, class_filename):
         """
         Return a list of namedtuple `Line` for each line of code found in the
-        source file of the class `class_name`.
+        source file with the given `class_filename`.
         """
-        filename = self.filepath(class_name)
+        filename = self.filepath(class_filename)
 
         if not os.path.exists(filename):
             return [Line(0, '%s not found' % filename, None, None)]
 
         with codecs.open(filename, encoding='utf-8') as f:
             lines = []
-            line_statuses = dict(self.line_statuses(class_name))
+            line_statuses = dict(self.line_statuses(class_filename))
             for lineno, source in enumerate(f, start=1):
                 line_status = line_statuses.get(lineno)
                 line = Line(lineno, source, line_status, None)
@@ -151,94 +153,93 @@ class Cobertura(object):
 
         return lines
 
-    def total_misses(self, class_name=None):
+    def total_misses(self, class_filename=None):
         """
-        Return the total number of uncovered statements for the class
-        `class_name`. If `class_name` is not given, return the total number of
-        uncovered statements for all classes.
+        Return the total number of uncovered statements for the class file
+        `class_filename`. If `class_filename` is not given, return the total
+        number of uncovered statements for all class files.
         """
-        if class_name is not None:
-            return len(self.missed_statements(class_name))
+        if class_filename is not None:
+            return len(self.missed_statements(class_filename))
 
         total = 0
-        for class_name in self.classes():
-            total += len(self.missed_statements(class_name))
+        for class_filename in self.class_files():
+            total += len(self.missed_statements(class_filename))
 
         return total
 
-    def total_hits(self, class_name=None):
+    def total_hits(self, class_filename=None):
         """
-        Return the total number of covered statements for the class
-        `class_name`. If `class_name` is not given, return the total number of
-        covered statements for all classes.
+        Return the total number of covered statements for the class file
+        `class_filename`. If `class_filename` is not given, return the total
+        number of covered statements for all class files.
         """
-        if class_name is not None:
-            return len(self.hit_statements(class_name))
+        if class_filename is not None:
+            return len(self.hit_statements(class_filename))
 
         total = 0
-        for class_name in self.classes():
-            total += len(self.hit_statements(class_name))
+        for class_filename in self.class_files():
+            total += len(self.hit_statements(class_filename))
 
         return total
 
-    def total_statements(self, class_name=None):
+    def total_statements(self, class_filename=None):
         """
-        Return the total number of statements for the class `class_name`. If
-        `class_name` is not given, return the total number of statements for
-        all classes.
+        Return the total number of statements for the class file `class_filename`.
+        If `class_filename` is not given, return the total number of statements for
+        all class files.
         """
-        if class_name is not None:
-            statements = self._get_lines_by_class_name(class_name)
+        if class_filename is not None:
+            statements = self._get_lines_by_class_filename(class_filename)
             return len(statements)
 
         total = 0
-        for class_name in self.classes():
-            statements = self._get_lines_by_class_name(class_name)
+        for class_filename in self.class_files():
+            statements = self._get_lines_by_class_filename(class_filename)
             total += len(statements)
 
         return total
 
     @memoize
-    def filename(self, class_name):
+    def filename(self, class_filename):
         """
-        Return the filename of the class `class_name` as found in the Cobertura
-        report.
+        Return the filename of the class file `class_filename` as found in the
+        Cobertura report.
         """
-        el = self._get_element_by_class_name(class_name)
+        el = self._get_element_by_class_filename(class_filename)
         filename = el.attrib['filename']
         return filename
 
-    def filepath(self, class_name):
+    def filepath(self, class_filename):
         """
         Return the filesystem path to the actual class file. It uses the
         `base_path` value initialized in the constructor by prefixing it to the
         class filename using `os.path.join(base_path, filename)`.
         """
-        filename = self.filename(class_name)
-        filepath = os.path.join(self.base_path, filename)
+        filepath = os.path.join(self.base_path, class_filename)
         return filepath
 
     @memoize
-    def classes(self):
+    def class_files(self):
         """
-        Return the list of available classes in the coverage report.
+        Return the list of available class files in the coverage report.
         """
         return [el.attrib['filename'] for el in self.xml.xpath("//class")]
 
-    def has_class(self, class_name):
+    def has_classfile(self, class_filename):
         """
-        Return `True` if the class `class_name` is present in the report,
+        Return `True` if the class file `class_filename` is present in the report,
         return `False` otherwise.
         """
         # FIXME: this will lookup a list which is slow, make it O(1)
-        return class_name in self.classes()
+        return class_filename in self.class_files()
 
     @memoize
-    def class_lines(self, class_name):
+    def source_lines(self, class_filename):
         """
-        Return a list for source lines of class `class_name`.
+        Return a list for source lines of class file `class_filename`.
         """
-        with codecs.open(self.filepath(class_name), encoding='utf-8') as f:
+        with codecs.open(self.filepath(class_filename), encoding='utf-8') as f:
             return f.readlines()
 
     @memoize
@@ -264,8 +265,8 @@ class CoberturaDiff(object):
         This does not ensure that all changes have been covered. If this is
         what you want, use `CoberturaDiff.has_all_changes_covered()` instead.
         """
-        for class_name in self.classes():
-            if self.diff_total_misses(class_name) > 0:
+        for class_filename in self.class_files():
+            if self.diff_total_misses(class_filename) > 0:
                 return False
         return True
 
@@ -273,7 +274,7 @@ class CoberturaDiff(object):
         """
         Return `True` if all changes have been covered, `False` otherwise.
         """
-        for class_name in self.classes():
+        for class_name in self.class_files():
             for hunk in self.class_source_hunks(class_name):
                 for line in hunk:
                     if line.reason is None:
@@ -282,10 +283,10 @@ class CoberturaDiff(object):
                         return False  # line not covered
         return True
 
-    def _diff_attr(self, attr_name, class_name):
+    def _diff_attr(self, attr_name, class_filename):
         """
-        Return the difference between `self.cobertura2.<attr_name>(class_name)`
-        and `self.cobertura1.<attr_name>(class_name)`.
+        Return the difference between `self.cobertura2.<attr_name>(class_filename)`
+        and `self.cobertura1.<attr_name>(class_filename)`.
 
         This generic method is meant to diff the count of methods that return
         counts for a given class name, e.g. `Cobertura.total_statements`,
@@ -293,76 +294,70 @@ class CoberturaDiff(object):
 
         The returned count may be a float.
         """
-        if class_name is not None:
-            classes = [class_name]
+        if class_filename is not None:
+            class_files = [class_filename]
         else:
-            classes = self.classes()
+            class_files = self.class_files()
 
         total_count = 0.0
-        for class_name in classes:
-            if self.cobertura1.has_class(class_name):
+        for class_filename in class_files:
+            if self.cobertura1.has_classfile(class_filename):
                 method = getattr(self.cobertura1, attr_name)
-                count1 = method(class_name)
+                count1 = method(class_filename)
             else:
                 count1 = 0.0
             method = getattr(self.cobertura2, attr_name)
-            count2 = method(class_name)
+            count2 = method(class_filename)
             total_count += count2 - count1
 
         return total_count
 
-    def diff_total_statements(self, class_name=None):
-        return int(self._diff_attr('total_statements', class_name))
+    def diff_total_statements(self, class_filename=None):
+        return int(self._diff_attr('total_statements', class_filename))
 
-    def diff_total_misses(self, class_name=None):
-        return int(self._diff_attr('total_misses', class_name))
+    def diff_total_misses(self, class_filename=None):
+        return int(self._diff_attr('total_misses', class_filename))
 
-    def diff_total_hits(self, class_name=None):
-        return int(self._diff_attr('total_hits', class_name))
+    def diff_total_hits(self, class_filename=None):
+        return int(self._diff_attr('total_hits', class_filename))
 
-    def diff_line_rate(self, class_name=None):
-        return self._diff_attr('line_rate', class_name)
+    def diff_line_rate(self, class_filename=None):
+        return self._diff_attr('line_rate', class_filename)
 
-    def diff_missed_lines(self, class_name):
+    def diff_missed_lines(self, class_filename):
         """
-        Return a list of 2-element tuples `(lineno, is_new)` where `lineno` is
-        a missed line number and `is_new` indicates whether the missed line was
-        introduced (True) or removed (False).
+        Return a list of 2-element tuples `(lineno, is_new)` for the given class
+        file `class_filename` where `lineno` is a missed line number and `is_new`
+        indicates whether the missed line was introduced (True) or removed (False).
         """
         line_changed = []
-        for line in self.class_source(class_name):
+        for line in self.class_file_source(class_filename):
             if line.status is not None:
                 is_new = not line.status
                 line_changed.append((line.number, is_new))
         return line_changed
 
-    def classes(self):
+    def class_files(self):
         """
-        Return `self.cobertura2.classes()`.
+        Return `self.cobertura2.class_files()`.
         """
-        return self.cobertura2.classes()
+        return self.cobertura2.class_files()
 
-    def filename(self, class_name):
-        """
-        Return `self.cobertura2.filename(class_name)`.
-        """
-        return self.cobertura2.filename(class_name)
-
-    def class_source(self, class_name):
+    def class_file_source(self, class_filename):
         """
         Return a list of namedtuple `Line` for each line of code found in the
-        source file of the class `class_name`.
+        given class file `class_filename`.
 
         """
-        if self.cobertura1.has_class(class_name):
-            lines1 = self.cobertura1.class_lines(class_name)
-            line_statuses1 = dict(self.cobertura1.line_statuses(class_name))
+        if self.cobertura1.has_classfile(class_filename):
+            lines1 = self.cobertura1.source_lines(class_filename)
+            line_statuses1 = dict(self.cobertura1.line_statuses(class_filename))
         else:
             lines1 = []
             line_statuses1 = {}
 
-        lines2 = self.cobertura2.class_lines(class_name)
-        line_statuses2 = dict(self.cobertura2.line_statuses(class_name))
+        lines2 = self.cobertura2.source_lines(class_filename)
+        line_statuses2 = dict(self.cobertura2.line_statuses(class_filename))
 
         # Build a dict of lineno2 -> lineno1
         lineno_map = reconcile_lines(lines2, lines1)
@@ -394,12 +389,12 @@ class CoberturaDiff(object):
 
         return lines
 
-    def class_source_hunks(self, class_name):
+    def class_source_hunks(self, class_filename):
         """
-        Like `CoberturaDiff.class_source`, but returns a list of line hunks of
-        the lines that have changed. An empty list means that the class has no
-        lines that have a change in coverage status.
+        Like `CoberturaDiff.class_file_source`, but returns a list of line hunks of
+        the lines that have changed for the given `class_filename`. An empty list
+        means that the class has no lines that have a change in coverage status.
         """
-        lines = self.class_source(class_name)
+        lines = self.class_file_source(class_filename)
         hunks = hunkify_lines(lines)
         return hunks

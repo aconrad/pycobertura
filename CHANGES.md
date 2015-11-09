@@ -1,6 +1,10 @@
 # Release Notes
 
 ## Unreleased
+* The coverage report now displays the class's filename instead of the class's
+  name, the latter being more subject to different interpretations by coverage
+  tools. This change was done to support coverage.py versions 3.x and 4.x.
+* removed `CoberturaDiff.filename()`
 
 ## 0.8.0 (2015-09-28)
 

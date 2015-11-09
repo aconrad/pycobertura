@@ -58,14 +58,14 @@ The `show` command displays the report summary of a coverage file.
 
 ```
 $ pycobertura show coverage.xml
-Name                     Stmts    Miss  Cover    Missing
----------------------  -------  ------  -------  ---------
-pycobertura/__init__         1       0  100.00%
-pycobertura/cli             18       0  100.00%
-pycobertura/cobertura       93       0  100.00%
-pycobertura/reports        129       0  100.00%
-pycobertura/utils           12       0  100.00%
-TOTAL                      253       0  100.00%
+Filename                     Stmts    Miss  Cover    Missing
+-------------------------  -------  ------  -------  ---------
+pycobertura/__init__.py          1       0  100.00%
+pycobertura/cli.py              18       0  100.00%
+pycobertura/cobertura.py        93       0  100.00%
+pycobertura/reporters.py       129       0  100.00%
+pycobertura/utils.py            12       0  100.00%
+TOTAL                          253       0  100.00%
 ```
 
 The following is a screenshot of the HTML version of another coverage file
@@ -87,11 +87,11 @@ source code that was used to generate each of the passed Cobertura reports
 
 ```
 $ pycobertura diff coverage.old.xml coverage.new.xml --source1 old_source/ --source2 new_source/
-Name          Stmts    Miss    Cover     Missing
-------------  -------  ------  --------  ---------
-dummy/dummy   -        -2      +50.00%   -2, -5
-dummy/dummy2  +2       -       +100.00%
-TOTAL         +2       -2      +50.00%
+Filename          Stmts    Miss    Cover     Missing
+----------------  -------  ------  --------  ---------
+dummy/dummy.py    -        -2      +50.00%   -2, -5
+dummy/dummy2.py   +2       -       +100.00%
+TOTAL             +2       -2      +50.00%
 ```
 
 The column `Missing` will show line numbers prefixed with either a plus sign
@@ -126,28 +126,28 @@ Using it as a library in your Python application is easy:
 from pycobertura import Cobertura
 cobertura = Cobertura('coverage.xml')
 
-cobertura.version == '3.7.1'
+cobertura.version == '4.0.2'
 cobertura.line_rate() == 1.0  # 100%
-cobertura.classes() == [
-    'pycobertura/__init__',
-    'pycobertura/cli',
-    'pycobertura/cobertura',
-    'pycobertura/reports',
-    'pycobertura/utils',
+cobertura.class_files() == [
+    'pycobertura/__init__.py',
+    'pycobertura/cli.py',
+    'pycobertura/cobertura.py',
+    'pycobertura/reporters.py',
+    'pycobertura/utils.py',
 ]
-cobertura.line_rate('pycobertura/cli') == 1.0
+cobertura.line_rate('pycobertura/cli.py') == 1.0
 
 from pycobertura import TextReporter
 tr = TextReporter(cobertura)
 tr.generate() == """\
-Name                     Stmts    Miss  Cover    Missing
----------------------  -------  ------  -------  ---------
-pycobertura/__init__         1       0  100.00%
-pycobertura/cli             18       0  100.00%
-pycobertura/cobertura       93       0  100.00%
-pycobertura/reports        129       0  100.00%
-pycobertura/utils           12       0  100.00%
-TOTAL                      253       0  100.00%"""
+Filename                     Stmts    Miss  Cover    Missing
+-------------------------  -------  ------  -------  ---------
+pycobertura/__init__.py          1       0  100.00%
+pycobertura/cli.py              18       0  100.00%
+pycobertura/cobertura.py        93       0  100.00%
+pycobertura/reporters.py       129       0  100.00%
+pycobertura/utils.py            12       0  100.00%
+TOTAL                          253       0  100.00%"""
 
 from pycobertura import TextReporterDelta
 
@@ -155,11 +155,11 @@ coverage1 = Cobertura('coverage1.xml')
 coverage2 = Cobertura('coverage2.xml')
 delta = TextReporterDelta(coverage1, coverage2)
 delta.generate() == """\
-Name          Stmts    Miss    Cover     Missing
-------------  -------  ------  --------  ---------
-dummy/dummy   -        -2      +50.00%   -2, -5
-dummy/dummy2  +2       -       +100.00%
-TOTAL         +2       -2      +50.00%"""
+Filename          Stmts    Miss    Cover     Missing
+----------------  -------  ------  --------  ---------
+dummy/dummy.py    -        -2      +50.00%   -2, -5
+dummy/dummy2.py   +2       -       +100.00%
+TOTAL             +2       -2      +50.00%"""
 ```
 
 ## How to contribute?

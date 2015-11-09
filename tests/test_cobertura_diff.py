@@ -32,9 +32,9 @@ def test_diff_class_source():
         ],
     }
 
-    for class_name in cobertura2.classes():
-        assert differ.class_source(class_name) == \
-            expected_sources[class_name]
+    for class_filename in cobertura2.class_files():
+        assert differ.class_file_source(class_filename) == \
+               expected_sources[class_filename]
 
 
 def test_diff_total_misses():
@@ -47,7 +47,7 @@ def test_diff_total_misses():
     assert differ.diff_total_misses() == 1
 
 
-def test_diff_total_misses_by_class():
+def test_diff_total_misses_by_class_file():
     from pycobertura.cobertura import CoberturaDiff
 
     cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
@@ -61,9 +61,9 @@ def test_diff_total_misses_by_class():
         'dummy/dummy3.py': 2,
     }
 
-    for class_name in cobertura2.classes():
-        assert differ.diff_total_misses(class_name) == \
-            expected_sources[class_name]
+    for class_filename in cobertura2.class_files():
+        assert differ.diff_total_misses(class_filename) == \
+            expected_sources[class_filename]
 
 
 def test_diff_line_rate():
@@ -76,7 +76,7 @@ def test_diff_line_rate():
     assert differ.diff_line_rate() == 0.15000000000000002
 
 
-def test_diff_line_rate_by_class():
+def test_diff_line_rate_by_class_file():
     from pycobertura.cobertura import CoberturaDiff
 
     cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
@@ -90,9 +90,9 @@ def test_diff_line_rate_by_class():
         'dummy/dummy3.py': 0.0,
     }
 
-    for class_name in cobertura2.classes():
-        assert differ.diff_line_rate(class_name) == \
-            expected_sources[class_name]
+    for class_filename in cobertura2.class_files():
+        assert differ.diff_line_rate(class_filename) == \
+            expected_sources[class_filename]
 
 
 def test_diff_total_hits():
@@ -105,7 +105,7 @@ def test_diff_total_hits():
     assert differ.diff_total_hits() == 3
 
 
-def test_diff_total_hits_by_class():
+def test_diff_total_hits_by_class_file():
     from pycobertura.cobertura import CoberturaDiff
 
     cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
@@ -119,9 +119,9 @@ def test_diff_total_hits_by_class():
         'dummy/dummy3.py': 0,
     }
 
-    for class_name in cobertura2.classes():
-        assert differ.diff_total_hits(class_name) == \
-            expected_total_hits[class_name]
+    for class_filename in cobertura2.class_files():
+        assert differ.diff_total_hits(class_filename) == \
+            expected_total_hits[class_filename]
 
 
 def test_diff__has_all_changes_covered__some_changed_code_is_still_uncovered():

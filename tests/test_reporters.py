@@ -17,7 +17,7 @@ def test_text_report():
     report = TextReporter(cobertura)
 
     assert report.generate() == """\
-Name                              Stmts    Miss  Cover    Missing
+Filename                          Stmts    Miss  Cover    Missing
 ------------------------------  -------  ------  -------  ---------
 Main.java                            11       0  100.00%
 search/BinarySearch.java             12       1  91.67%   24
@@ -33,7 +33,7 @@ def test_text_report__with_missing_range():
     report = TextReporter(cobertura)
 
     assert report.generate() == """\
-Name                 Stmts    Miss  Cover    Missing
+Filename             Stmts    Miss  Cover    Missing
 -----------------  -------  ------  -------  ---------
 dummy/__init__.py        0       0  0.00%
 dummy/dummy.py           4       0  100.00%
@@ -50,9 +50,9 @@ def test_text_report_delta__no_diff():
     report_delta = TextReporterDelta(cobertura1, cobertura2)
 
     assert report_delta.generate() == """\
-Name    Stmts    Miss    Cover    Missing
-------  -------  ------  -------  ---------
-TOTAL   -        -       -"""
+Filename    Stmts    Miss    Cover    Missing
+----------  -------  ------  -------  ---------
+TOTAL       -        -       -"""
 
 
 def test_text_report_delta__colorize_True():
@@ -64,7 +64,7 @@ def test_text_report_delta__colorize_True():
     report_delta = TextReporterDelta(cobertura1, cobertura2, color=True)
 
     assert report_delta.generate() == """\
-Name             Stmts      Miss  Cover    Missing
+Filename         Stmts      Miss  Cover    Missing
 ---------------  -------  ------  -------  ----------
 dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
 dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
@@ -81,7 +81,7 @@ def test_text_report_delta__colorize_True__with_missing_range():
     report_delta = TextReporterDelta(cobertura1, cobertura2, color=True)
 
     assert report_delta.generate() == """\
-Name             Stmts      Miss  Cover    Missing
+Filename         Stmts      Miss  Cover    Missing
 ---------------  -------  ------  -------  ----------
 dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
 dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
@@ -98,7 +98,7 @@ def test_text_report_delta__colorize_False():
     report_delta = TextReporterDelta(cobertura1, cobertura2, color=False)
 
     assert report_delta.generate() == """\
-Name             Stmts      Miss  Cover    Missing
+Filename         Stmts      Miss  Cover    Missing
 ---------------  -------  ------  -------  ----------
 dummy/dummy.py   -            -2  +40.00%  -5, -6
 dummy/dummy2.py  +2           +1  -25.00%  -2, -4, +5
@@ -127,7 +127,7 @@ def test_html_report():
       <table class="u-full-width">
         <thead>
           <tr>
-            <th>Name</th>
+            <th>Filename</th>
             <th>Stmts</th>
             <th>Miss</th>
             <th>Cover</th>
@@ -244,7 +244,7 @@ def test_text_report_delta__no_source():
     report_delta = TextReporterDelta(cobertura1, cobertura2, show_source=False)
     output = report_delta.generate()
     assert output == """\
-Name             Stmts      Miss  Cover
+Filename         Stmts      Miss  Cover
 ---------------  -------  ------  -------
 dummy/dummy.py   -            -2  +40.00%
 dummy/dummy2.py  +2           +1  -25.00%
@@ -274,7 +274,7 @@ def test_html_report_delta__no_source():
       <table class="u-full-width">
         <thead>
           <tr>
-            <th>Name</th>
+            <th>Filename</th>
             <th>Stmts</th>
             <th>Miss</th>
             <th>Cover</th>
@@ -338,7 +338,7 @@ def test_html_report_delta():
       <table class="u-full-width">
         <thead>
           <tr>
-            <th>Name</th>
+            <th>Filename</th>
             <th>Stmts</th>
             <th>Miss</th>
             <th>Cover</th>
