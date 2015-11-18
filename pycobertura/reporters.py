@@ -53,7 +53,8 @@ class Reporter(object):
 
 class TextReporter(Reporter):
     def format_row(self, row):
-        class_filename, total_lines, total_misses, line_rate, missed_lines = row
+        class_filename, total_lines, total_misses, line_rate,\
+            missed_lines = row
 
         line_rate = '%.2f%%' % (line_rate * 100)
 

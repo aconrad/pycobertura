@@ -185,9 +185,9 @@ class Cobertura(object):
 
     def total_statements(self, class_filename=None):
         """
-        Return the total number of statements for the class file `class_filename`.
-        If `class_filename` is not given, return the total number of statements for
-        all class files.
+        Return the total number of statements for the class file
+        `class_filename`. If `class_filename` is not given, return the total
+        number of statements for all class files.
         """
         if class_filename is not None:
             statements = self._get_lines_by_class_filename(class_filename)
@@ -228,8 +228,8 @@ class Cobertura(object):
 
     def has_classfile(self, class_filename):
         """
-        Return `True` if the class file `class_filename` is present in the report,
-        return `False` otherwise.
+        Return `True` if the class file `class_filename` is present in the
+        report, return `False` otherwise.
         """
         # FIXME: this will lookup a list which is slow, make it O(1)
         return class_filename in self.class_files()
@@ -285,8 +285,9 @@ class CoberturaDiff(object):
 
     def _diff_attr(self, attr_name, class_filename):
         """
-        Return the difference between `self.cobertura2.<attr_name>(class_filename)`
-        and `self.cobertura1.<attr_name>(class_filename)`.
+        Return the difference between
+        `self.cobertura2.<attr_name>(class_filename)` and
+        `self.cobertura1.<attr_name>(class_filename)`.
 
         This generic method is meant to diff the count of methods that return
         counts for a given class name, e.g. `Cobertura.total_statements`,
@@ -326,9 +327,10 @@ class CoberturaDiff(object):
 
     def diff_missed_lines(self, class_filename):
         """
-        Return a list of 2-element tuples `(lineno, is_new)` for the given class
-        file `class_filename` where `lineno` is a missed line number and `is_new`
-        indicates whether the missed line was introduced (True) or removed (False).
+        Return a list of 2-element tuples `(lineno, is_new)` for the given
+        class file `class_filename` where `lineno` is a missed line number and
+        `is_new` indicates whether the missed line was introduced (True) or
+        removed (False).
         """
         line_changed = []
         for line in self.class_file_source(class_filename):
@@ -351,7 +353,8 @@ class CoberturaDiff(object):
         """
         if self.cobertura1.has_classfile(class_filename):
             lines1 = self.cobertura1.source_lines(class_filename)
-            line_statuses1 = dict(self.cobertura1.line_statuses(class_filename))
+            line_statuses1 = dict(self.cobertura1.line_statuses(
+                class_filename))
         else:
             lines1 = []
             line_statuses1 = {}
@@ -391,9 +394,10 @@ class CoberturaDiff(object):
 
     def class_source_hunks(self, class_filename):
         """
-        Like `CoberturaDiff.class_file_source`, but returns a list of line hunks of
-        the lines that have changed for the given `class_filename`. An empty list
-        means that the class has no lines that have a change in coverage status.
+        Like `CoberturaDiff.class_file_source`, but returns a list of line
+        hunks of the lines that have changed for the given `class_filename`.
+        An empty list means that the class has no lines that have a change in
+        coverage status.
         """
         lines = self.class_file_source(class_filename)
         hunks = hunkify_lines(lines)
