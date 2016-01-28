@@ -16,7 +16,7 @@ pre {line-height: 1.3}
       <table class="u-full-width">
         <thead>
           <tr>
-            <th>Name</th>
+            <th>Filename</th>
             <th>Stmts</th>
             <th>Miss</th>
             <th>Cover</th>
@@ -26,7 +26,7 @@ pre {line-height: 1.3}
         <tbody>
 {%- for line in lines %}
           <tr>
-            <td><a href="#{{ line.class_name }}">{{ line.class_name }}</a></td>
+            <td><a href="#{{ line.class_filename }}">{{ line.class_filename }}</a></td>
             <td>{{ line.total_statements }}</td>
             <td>{{ line.total_misses }}</td>
             <td>{{ line.line_rate }}</td>
@@ -36,7 +36,7 @@ pre {line-height: 1.3}
         </tbody>
         <tfoot>
           <tr>
-            <td>{{ footer.class_name }}</td>
+            <td>{{ footer.class_filename }}</td>
             <td>{{ footer.total_statements }}</td>
             <td>{{ footer.total_misses }}</td>
             <td>{{ footer.line_rate }}</td>
@@ -45,8 +45,8 @@ pre {line-height: 1.3}
         </tfoot>
       </table>
 {%- from 'macro.source.jinja2' import render_source -%}
-{%- for class_name, filename, source in sources %}
-<h4 id="{{class_name}}">{{ class_name }}</h4>
+{%- for class_filename, source in sources %}
+<h4 id="{{class_filename}}">{{ class_filename }}</h4>
 {{ render_source(source) }}
 {%- endfor %}
     </div>

@@ -24,7 +24,7 @@ table.code td.lineno pre {margin-right: 1rem;}
       <table class="u-full-width">
         <thead>
           <tr>
-            <th>Name</th>
+            <th>Filename</th>
             <th>Stmts</th>
             <th>Miss</th>
             <th>Cover</th>
@@ -36,7 +36,7 @@ table.code td.lineno pre {margin-right: 1rem;}
         <tbody>
 {%- for line in lines %}
           <tr>
-            <td><a href="#{{ line.class_name }}">{{ line.class_name }}</a></td>
+            <td><a href="#{{ line.class_filename }}">{{ line.class_filename }}</a></td>
             <td>{{ line.total_statements }}</td>
             <td><span{% if line.total_misses != '-' %} class="{% if line.total_misses[0] == '+' %}red{% else %}green{% endif%}"{% endif %}>{{ line.total_misses }}</span></td>
             <td>{{ line.line_rate }}</td>
@@ -52,7 +52,7 @@ table.code td.lineno pre {margin-right: 1rem;}
         </tbody>
         <tfoot>
           <tr>
-            <td>{{ footer.class_name }}</td>
+            <td>{{ footer.class_filename }}</td>
             <td>{{ footer.total_statements }}</td>
             <td><span{% if footer.total_misses != '-' %} class="{% if footer.total_misses[0] == '+' %}red{% else %}green{% endif%}"{% endif %}>{{ footer.total_misses }}</span></td>
             <td>{{ footer.line_rate }}</td>
@@ -73,8 +73,8 @@ table.code td.lineno pre {margin-right: 1rem;}
   </dl>
 </div>
 
-{%- for class_name, filename, source_hunks in sources %}
-<h4 id="{{class_name}}">{{ class_name }}</h4>
+{%- for class_filename, source_hunks in sources %}
+<h4 id="{{class_filename}}">{{ class_filename }}</h4>
 {%- for hunk in source_hunks %}
 {{ render_source(hunk) }}
 {%- endfor %}
