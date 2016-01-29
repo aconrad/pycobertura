@@ -26,7 +26,7 @@ pre {line-height: 1.3}
         <tbody>
 {%- for line in lines %}
           <tr>
-            <td><a href="#{{ line.class_filename }}">{{ line.class_filename }}</a></td>
+            <td><a href="#{{ line.filename }}">{{ line.filename }}</a></td>
             <td>{{ line.total_statements }}</td>
             <td>{{ line.total_misses }}</td>
             <td>{{ line.line_rate }}</td>
@@ -36,7 +36,7 @@ pre {line-height: 1.3}
         </tbody>
         <tfoot>
           <tr>
-            <td>{{ footer.class_filename }}</td>
+            <td>{{ footer.filename }}</td>
             <td>{{ footer.total_statements }}</td>
             <td>{{ footer.total_misses }}</td>
             <td>{{ footer.line_rate }}</td>
@@ -45,8 +45,8 @@ pre {line-height: 1.3}
         </tfoot>
       </table>
 {%- from 'macro.source.jinja2' import render_source -%}
-{%- for class_filename, source in sources %}
-<h4 id="{{class_filename}}">{{ class_filename }}</h4>
+{%- for filename, source in sources %}
+<h4 id="{{ filename }}">{{ filename }}</h4>
 {{ render_source(source) }}
 {%- endfor %}
     </div>

@@ -4,7 +4,36 @@
 * The coverage report now displays the class's filename instead of the class's
   name, the latter being more subject to different interpretations by coverage
   tools. This change was done to support coverage.py versions 3.x and 4.x.
-* removed `CoberturaDiff.filename()`
+* BACKWARDS INCOMPATIBLE: removed `CoberturaDiff.filename()`
+* BACKWARDS INCOMPATIBLE: removed the term "class" from the API which make it
+  more difficult to reason about. Now preferring "filename":
+
+    - `Cobertura.line_rate(class_name=None)` > `Cobertura.line_rate(filename=None)`
+    - `Cobertura.branch_rate(class_name=None)` > `Cobertura.branch_rate(filename=None)`
+    - `Cobertura.missed_statements(class_name)` > `Cobertura.missed_statements(filename)`
+    - `Cobertura.hit_statements(class_name)` > `Cobertura.hit_statements(filename)`
+    - `Cobertura.line_statuses(class_name)` > `Cobertura.line_statuses(filename)`
+    - `Cobertura.missed_lines(class_name)` > `Cobertura.missed_lines(filename)`
+    - `Cobertura.class_source(class_name)` > `Cobertura.file_source(filename)`
+    - `Cobertura.total_misses(class_name=None)` > `Cobertura.total_misses(filename=None)`
+    - `Cobertura.total_hits(class_name=None)` > `Cobertura.total_hits(filename=None)`
+    - `Cobertura.total_statements(class_name=None)` > `Cobertura.total_statements(filename=None)`
+    - `Cobertura.filepath(class_name)` > `Cobertura.filepath(filename)`
+    - `Cobertura.classes()` > `Cobertura.files()`
+    - `Cobertura.has_classfile(class_name)` > `Cobertura.has_file(filename)`
+    - `Cobertura.class_lines(class_name)` > `Cobertura.source_lines(filename)`
+    - `CoberturaDiff.diff_total_statements(class_name=None)` > `CoberturaDiff.diff_total_statements(filename=None)`
+    - `CoberturaDiff.diff_total_misses(class_name=None)` > `CoberturaDiff.diff_total_misses(filename=None)`
+    - `CoberturaDiff.diff_total_hits(class_name=None)` > `CoberturaDiff.diff_total_hits(filename=None)`
+    - `CoberturaDiff.diff_line_rate(class_name=None)` > `CoberturaDiff.diff_line_rate(filename=None)`
+    - `CoberturaDiff.diff_missed_lines(class_name)` > `CoberturaDiff.diff_missed_lines(filename)`
+    - `CoberturaDiff.classes()` > `CoberturaDiff.files()`
+    - `CoberturaDiff.class_source(class_name)` > `CoberturaDiff.file_source(filename)`
+    - `CoberturaDiff.class_source_hunks(class_name)` > `CoberturaDiff.file_source_hunks(filename)`
+    - `Reporter.get_source(class_name)` > `Reporter.get_source(filename)`
+    - `HtmlReporter.get_class_row(class_name)` > `HtmlReporter.get_class_row(filename)`
+    - `DeltaReporter.get_source_hunks(class_name)` > `DeltaReporter.get_source_hunks(filename)`
+    - `DeltaReporter.get_class_row(class_name)` > `DeltaReporter.get_file_row(filename)`
 
 ## 0.8.0 (2015-09-28)
 

@@ -32,9 +32,9 @@ def test_diff_class_source():
         ],
     }
 
-    for class_filename in cobertura2.class_files():
-        assert differ.class_file_source(class_filename) == \
-               expected_sources[class_filename]
+    for filename in cobertura2.files():
+        assert differ.file_source(filename) == \
+               expected_sources[filename]
 
 
 def test_diff_total_misses():
@@ -61,9 +61,9 @@ def test_diff_total_misses_by_class_file():
         'dummy/dummy3.py': 2,
     }
 
-    for class_filename in cobertura2.class_files():
-        assert differ.diff_total_misses(class_filename) == \
-            expected_sources[class_filename]
+    for filename in cobertura2.files():
+        assert differ.diff_total_misses(filename) == \
+            expected_sources[filename]
 
 
 def test_diff_line_rate():
@@ -90,9 +90,9 @@ def test_diff_line_rate_by_class_file():
         'dummy/dummy3.py': 0.0,
     }
 
-    for class_filename in cobertura2.class_files():
-        assert differ.diff_line_rate(class_filename) == \
-            expected_sources[class_filename]
+    for filename in cobertura2.files():
+        assert differ.diff_line_rate(filename) == \
+            expected_sources[filename]
 
 
 def test_diff_total_hits():
@@ -119,9 +119,9 @@ def test_diff_total_hits_by_class_file():
         'dummy/dummy3.py': 0,
     }
 
-    for class_filename in cobertura2.class_files():
-        assert differ.diff_total_hits(class_filename) == \
-            expected_total_hits[class_filename]
+    for filename in cobertura2.files():
+        assert differ.diff_total_hits(filename) == \
+            expected_total_hits[filename]
 
 
 def test_diff__has_all_changes_covered__some_changed_code_is_still_uncovered():
