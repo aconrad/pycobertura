@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unreleased
+## 0.9.0 (2016-01-29)
 * The coverage report now displays the class's filename instead of the class's
   name, the latter being more subject to different interpretations by coverage
   tools. This change was done to support coverage.py versions 3.x and 4.x.
