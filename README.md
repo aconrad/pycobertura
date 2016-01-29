@@ -128,7 +128,7 @@ cobertura = Cobertura('coverage.xml')
 
 cobertura.version == '4.0.2'
 cobertura.line_rate() == 1.0  # 100%
-cobertura.class_files() == [
+cobertura.files() == [
     'pycobertura/__init__.py',
     'pycobertura/cli.py',
     'pycobertura/cobertura.py',
