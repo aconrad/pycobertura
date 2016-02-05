@@ -216,9 +216,10 @@ TOTAL            +4           +1  +15.00%
 
 def test_diff__format_html__no_source_on_disk():
     from pycobertura.cli import diff
+    from pycobertura.filesystem import FileSystem
 
     runner = CliRunner()
-    pytest.raises(IOError, runner.invoke, diff, [
+    pytest.raises(FileSystem.FileNotFound, runner.invoke, diff, [
         '--format', 'html',
         'tests/dummy.with-dummy2-better-cov.xml',
         'tests/dummy.with-dummy2-better-and-worse.xml',

@@ -173,20 +173,6 @@ def test_total_hits_by_class_file():
             expected_total_misses[filename]
 
 
-def test_filepath():
-    base_path = 'foo/bar/baz'
-    cobertura = make_cobertura(base_path=base_path)
-    expected_filepaths = {
-        'Main.java': 'foo/bar/baz/Main.java',
-        'search/BinarySearch.java': 'foo/bar/baz/search/BinarySearch.java',
-        'search/ISortedArraySearch.java': 'foo/bar/baz/search/ISortedArraySearch.java',
-        'search/LinearSearch.java': 'foo/bar/baz/search/LinearSearch.java',
-    }
-    for filename in cobertura.files():
-        assert cobertura.filepath(filename) == \
-            expected_filepaths[filename]
-
-
 def test_class_file_source__sources_not_found():
     from pycobertura.cobertura import Line
     cobertura = make_cobertura('tests/cobertura.xml')

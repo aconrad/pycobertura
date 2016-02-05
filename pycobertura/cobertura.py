@@ -1,8 +1,9 @@
-import codecs
 import lxml.etree as ET
 import os
 
 from collections import namedtuple
+
+from pycobertura.filesystem import DirectoryFileSystem
 
 from pycobertura.utils import (
     extrapolate_coverage,
@@ -40,8 +41,10 @@ class Cobertura(object):
         """
         if base_path is None:
             base_path = os.path.dirname(xml_path)
+            self.filesystem = DirectoryFileSystem(base_path)
+        else:
+            self.filesystem = DirectoryFileSystem(base_path)
 
-        self.base_path = base_path
         self.xml_path = xml_path
         self.xml = ET.parse(xml_path).getroot()
 
@@ -138,18 +141,19 @@ class Cobertura(object):
         Return a list of namedtuple `Line` for each line of code found in the
         source file with the given `filename`.
         """
-        filepath = self.filepath(filename)
+        lines = []
+        try:
+            with self.filesystem.open(filename) as f:
+                line_statuses = dict(self.line_statuses(filename))
+                for lineno, source in enumerate(f, start=1):
+                    line_status = line_statuses.get(lineno)
+                    line = Line(lineno, source, line_status, None)
+                    lines.append(line)
 
-        if not os.path.exists(filepath):
-            return [Line(0, '%s not found' % filepath, None, None)]
-
-        with codecs.open(filepath, encoding='utf-8') as f:
-            lines = []
-            line_statuses = dict(self.line_statuses(filename))
-            for lineno, source in enumerate(f, start=1):
-                line_status = line_statuses.get(lineno)
-                line = Line(lineno, source, line_status, None)
-                lines.append(line)
+        except self.filesystem.FileNotFound as file_not_found:
+            lines.append(
+                Line(0, '%s not found' % file_not_found.path, None, None)
+            )
 
         return lines
 
@@ -200,15 +204,6 @@ class Cobertura(object):
 
         return total
 
-    def filepath(self, filename):
-        """
-        Return the filesystem path to the actual file `filename`. It uses the
-        `base_path` value initialized in the constructor by prefixing it to the
-        filename using `os.path.join(base_path, filename)`.
-        """
-        filepath = os.path.join(self.base_path, filename)
-        return filepath
-
     @memoize
     def files(self):
         """
@@ -229,7 +224,7 @@ class Cobertura(object):
         """
         Return a list for source lines of file `filename`.
         """
-        with codecs.open(self.filepath(filename), encoding='utf-8') as f:
+        with self.filesystem.open(filename) as f:
             return f.readlines()
 
     @memoize
