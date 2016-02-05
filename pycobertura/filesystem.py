@@ -1,5 +1,6 @@
 import codecs
 import os
+import zipfile
 
 from contextlib import contextmanager
 
@@ -28,3 +29,17 @@ class DirectoryFileSystem(FileSystem):
 
         with codecs.open(filepath, encoding='utf-8') as f:
             yield f
+
+
+class ZipFileSystem(FileSystem):
+    def __init__(self, zip_file):
+        self.zipfile = zipfile.ZipFile(zip_file)
+
+    @contextmanager
+    def open(self, filename):
+        try:
+            f = self.zipfile.open(filename)
+            yield f
+            f.close()
+        except KeyError:
+            raise self.FileNotFound(filename)

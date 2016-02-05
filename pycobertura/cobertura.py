@@ -1,9 +1,14 @@
 import lxml.etree as ET
 import os
+import zipfile
 
 from collections import namedtuple
 
-from pycobertura.filesystem import DirectoryFileSystem
+from pycobertura.filesystem import (
+    DirectoryFileSystem,
+    ZipFileSystem,
+)
+
 
 from pycobertura.utils import (
     extrapolate_coverage,
@@ -37,11 +42,14 @@ class Cobertura(object):
 
         The optional argument `base_path` can be provided to resolve the path
         to the source code. If omitted, `base_path` will be set to
-        `os.path.dirname(xml_source)`.
+        `os.path.dirname(xml_source)`. Additionally, `base_path` can be a path
+        to an archive zip or tarball) that contains the source code.
         """
         if base_path is None:
             base_path = os.path.dirname(xml_path)
             self.filesystem = DirectoryFileSystem(base_path)
+        elif zipfile.is_zipfile(base_path):
+            self.filesystem = ZipFileSystem(base_path)
         else:
             self.filesystem = DirectoryFileSystem(base_path)
 

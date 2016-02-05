@@ -51,8 +51,9 @@ def get_exit_code(differ, source):
     help='Write output to <file> instead of stdout.'
 )
 @click.option(
-    '-s', '--source', metavar='<source-dir>',
-    help='Provide path to source code directory for HTML output.'
+    '-s', '--source', metavar='<source-dir-or-zip>',
+    help='Provide path to source code directory for HTML output. The path can '
+         'also be a zip archive instead of a directory.'
 )
 def show(cobertura_file, format, output, source):
     """show coverage summary of a Cobertura report"""
@@ -83,8 +84,8 @@ generate each of the coverage reports is accessible. By default, the source
 will read from the Cobertura report and resolved relatively from the report's
 location. If the source is not accessible from the report's location, the
 options `--source1` and `--source2` are necessary to point to the source code
-directories. If the source is not available at all, pass `--no-source` but
-missing lines and source code will not be reported.
+directories (or zip archives). If the source is not available at all, pass
+`--no-source` but missing lines and source code will not be reported.
 """)
 @click.argument('cobertura_file1')
 @click.argument('cobertura_file2')
@@ -102,13 +103,13 @@ missing lines and source code will not be reported.
     help='Write output to <file> instead of stdout.'
 )
 @click.option(
-    '-s1', '--source1', metavar='<source-dir1>',
-    help='Provide path to source code directory of first Cobertura report. '
-         'This is necessary if the filename path defined in the report is not '
-         'accessible from the location of the report.'
+    '-s1', '--source1', metavar='<source-dir1-or-zip-archive>',
+    help='Provide path to source code directory or zip archive of first '
+         'Cobertura report. This is necessary if the filename path defined '
+         'in the report is not accessible from the location of the report.'
 )
 @click.option(
-    '-s2', '--source2', metavar='<source-dir2>',
+    '-s2', '--source2', metavar='<source-dir2-or-zip-archive>',
     help='Provide path to source code directory of second Cobertura report. '
          'This is necessary if the filename path defined in the report is not '
          'accessible from the location of the report.'

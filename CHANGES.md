@@ -4,7 +4,8 @@
 * BACKWARDS INCOMPATIBLE: when a source file is not found in disk pycobertura
   will now raise a `pycobertura.filesystem.FileSystem.FileNotFound` exception
   instead of an `IOError`.
-* implement foundations for pluggable filesystems
+* possibility to pass a zip archive containing the source code instead of a
+  directory
 
 ## 0.9.0 (2016-01-29)
 * The coverage report now displays the class's filename instead of the class's

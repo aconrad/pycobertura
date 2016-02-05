@@ -226,14 +226,18 @@ def test_diff__format_html__no_source_on_disk():
     ], catch_exceptions=False)
 
 
-def test_diff__format_html__with_source():
+@pytest.mark.parametrize("source1, source2", [
+    ("tests/dummy", "tests/dummy"),
+    ("tests/dummy/dummy.zip", "tests/dummy/dummy.zip"),
+])
+def test_diff__format_html__with_source(source1, source2):
     from pycobertura.cli import diff, ExitCodes
 
     runner = CliRunner()
     result = runner.invoke(diff, [
         '--format', 'html',
-        '--source1', 'tests/dummy',
-        '--source2', 'tests/dummy',
+        '--source1', source1,
+        '--source2', source2,
         'tests/dummy.with-dummy2-better-cov.xml',
         'tests/dummy.with-dummy2-better-and-worse.xml',
     ], catch_exceptions=False)
