@@ -19,7 +19,7 @@ from pycobertura.utils import (
 
 try:
     basestring
-except NameError:
+except NameError:  # pragma: no cover
     # PY3 basestring
     basestring = (str, bytes)
 
@@ -61,9 +61,6 @@ class Cobertura(object):
             if isinstance(report, basestring):
                 # get the directory in which the coverage file lives
                 source = os.path.dirname(report)
-            else:
-                # fallback on using the current working directory
-                source = "%s/" % os.getcwd()
             self.filesystem = DirectoryFileSystem(
                 source, source_prefix=source_prefix
             )
