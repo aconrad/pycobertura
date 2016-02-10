@@ -1,4 +1,5 @@
 import mock
+import pytest
 
 from .utils import make_cobertura
 
@@ -214,9 +215,13 @@ def test_line_statuses():
             expected_line_statuses[filename]
 
 
-def test_class_file_source__sources_found():
+@pytest.mark.parametrize("report, source, source_prefix", [
+    ("tests/dummy.source1/coverage.xml", None, None),
+    ("tests/dummy.source1/coverage.xml", "tests/", "dummy.source1/"),
+])
+def test_class_file_source__sources_found(report, source, source_prefix):
     from pycobertura.cobertura import Line
-    cobertura = make_cobertura('tests/dummy.source1/coverage.xml')
+    cobertura = make_cobertura(report, source=source, source_prefix=source_prefix)
     expected_sources = {
     'dummy/__init__.py': [],
         'dummy/dummy.py': [
