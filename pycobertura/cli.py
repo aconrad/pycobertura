@@ -55,7 +55,14 @@ def get_exit_code(differ, source):
     help='Provide path to source code directory for HTML output. The path can '
          'also be a zip archive instead of a directory.'
 )
-def show(cobertura_file, format, output, source):
+@click.option(
+    '-p', '--source-prefix', metavar='<dir-prefix>',
+    help='For every file found in the coverage report, it will use this '
+         'prefix to lookup files on disk. This is especially useful when '
+         'the --source is a zip archive and the files were zipped under '
+         'a directory prefix that is not part of the source.',
+)
+def show(cobertura_file, format, output, source, source_prefix):
     """show coverage summary of a Cobertura report"""
     cobertura = Cobertura(cobertura_file, source=source)
     Reporter = reporters[format]
@@ -110,9 +117,18 @@ directories (or zip archives). If the source is not available at all, pass
 )
 @click.option(
     '-s2', '--source2', metavar='<source-dir2-or-zip-archive>',
-    help='Provide path to source code directory of second Cobertura report. '
-         'This is necessary if the filename path defined in the report is not '
-         'accessible from the location of the report.'
+    help='Like --source1 but for the second coverage report of the diff.'
+)
+@click.option(
+    '-p1', '--source-prefix1', metavar='<dir-prefix1>',
+    help='For every file found in the coverage report, it will use this '
+         'prefix to lookup files on disk. This is especially useful when '
+         'the --source1 is a zip archive and the files were zipped under '
+         'a directory prefix that is not part of the source',
+)
+@click.option(
+    '-p2', '--source-prefix2', metavar='<dir-prefix2>',
+    help='Like --source-prefix1, but for applies for --source2.',
 )
 @click.option(
     '--source/--no-source', default=True,
@@ -124,10 +140,19 @@ directories (or zip archives). If the source is not available at all, pass
 )
 def diff(
         cobertura_file1, cobertura_file2,
-        color, format, output, source1, source2, source):
+        color, format, output, source1, source2,
+        source_prefix1, source_prefix2, source):
     """compare coverage of two Cobertura reports"""
-    cobertura1 = Cobertura(cobertura_file1, source=source1)
-    cobertura2 = Cobertura(cobertura_file2, source=source2)
+    cobertura1 = Cobertura(
+        cobertura_file1,
+        source=source1,
+        source_prefix=source_prefix1
+    )
+    cobertura2 = Cobertura(
+        cobertura_file2,
+        source=source2,
+        source_prefix=source_prefix2
+    )
 
     Reporter = delta_reporters[format]
     reporter_args = [cobertura1, cobertura2]
