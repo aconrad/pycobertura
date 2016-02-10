@@ -6,6 +6,8 @@
   instead of an `IOError`.
 * possibility to pass a zip archive containing the source code instead of a
   directory
+* BACKWARDS INCOMPATIBLE: Rename keyword argument `Cobertura(base_path=None)` > `Cobertura(source=None)`
+* Introduce new keyword argument `Cobertura(source_prefix=None)`
 
 ## 0.9.0 (2016-01-29)
 * The coverage report now displays the class's filename instead of the class's

@@ -57,7 +57,7 @@ def get_exit_code(differ, source):
 )
 def show(cobertura_file, format, output, source):
     """show coverage summary of a Cobertura report"""
-    cobertura = Cobertura(cobertura_file, base_path=source)
+    cobertura = Cobertura(cobertura_file, source=source)
     Reporter = reporters[format]
     reporter = Reporter(cobertura)
     report = reporter.generate()
@@ -126,8 +126,8 @@ def diff(
         cobertura_file1, cobertura_file2,
         color, format, output, source1, source2, source):
     """compare coverage of two Cobertura reports"""
-    cobertura1 = Cobertura(cobertura_file1, base_path=source1)
-    cobertura2 = Cobertura(cobertura_file2, base_path=source2)
+    cobertura1 = Cobertura(cobertura_file1, source=source1)
+    cobertura2 = Cobertura(cobertura_file2, source=source2)
 
     Reporter = delta_reporters[format]
     reporter_args = [cobertura1, cobertura2]
