@@ -8,6 +8,9 @@
   directory
 * BACKWARDS INCOMPATIBLE: Rename keyword argument `Cobertura(base_path=None)` > `Cobertura(source=None)`
 * Introduce new keyword argument `Cobertura(source_prefix=None)`
+* Fix an `IOError` / `FileNotFound` error which happens when the same coverage report is provided twice
+  to `pycobertura diff` (diff in degraded mode) but the first code base (`--source1`) is missing a file
+  mentioned in the coverage report.
 
 ## 0.9.0 (2016-01-29)
 * The coverage report now displays the class's filename instead of the class's

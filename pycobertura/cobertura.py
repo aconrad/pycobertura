@@ -364,7 +364,8 @@ class CoberturaDiff(object):
         given file `filename`.
 
         """
-        if self.cobertura1.has_file(filename):
+        if self.cobertura1.has_file(filename) and \
+                self.cobertura1.filesystem.has_file(filename):
             lines1 = self.cobertura1.source_lines(filename)
             line_statuses1 = dict(self.cobertura1.line_statuses(
                 filename))
