@@ -216,23 +216,53 @@ TOTAL            +4           +1  +15.00%
 
 def test_diff__format_html__no_source_on_disk():
     from pycobertura.cli import diff
+    from pycobertura.filesystem import FileSystem
 
     runner = CliRunner()
-    pytest.raises(IOError, runner.invoke, diff, [
+    pytest.raises(FileSystem.FileNotFound, runner.invoke, diff, [
         '--format', 'html',
         'tests/dummy.with-dummy2-better-cov.xml',
         'tests/dummy.with-dummy2-better-and-worse.xml',
     ], catch_exceptions=False)
 
 
-def test_diff__format_html__with_source():
+@pytest.mark.parametrize("source1, source2, prefix1, prefix2", [
+    ("tests/", "tests/dummy", "dummy/", ""),
+    ("tests/dummy", "tests/", "", "dummy/"),
+    ("tests/dummy/dummy.zip", "tests/dummy/dummy.zip", "", ""),
+    ("tests/dummy/dummy-with-prefix.zip", "tests/dummy", "dummy-with-prefix", ""),
+    ("tests/dummy/dummy-with-prefix.zip", "tests/dummy/dummy.zip", "dummy-with-prefix", ""),
+])
+def test_diff__format_html__with_source_prefix(source1, source2, prefix1, prefix2):
     from pycobertura.cli import diff, ExitCodes
 
     runner = CliRunner()
     result = runner.invoke(diff, [
         '--format', 'html',
-        '--source1', 'tests/dummy',
-        '--source2', 'tests/dummy',
+        '--source1', source1,
+        '--source2', source2,
+        '--source-prefix1', prefix1,
+        '--source-prefix2', prefix2,
+        'tests/dummy.with-dummy2-better-cov.xml',
+        'tests/dummy.with-dummy2-better-and-worse.xml',
+    ], catch_exceptions=False)
+    assert result.output.startswith('<html>')
+    assert result.output.endswith('</html>\n')
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
+
+
+@pytest.mark.parametrize("source1, source2", [
+    ("tests/dummy", "tests/dummy"),
+    ("tests/dummy/dummy.zip", "tests/dummy/dummy.zip"),
+])
+def test_diff__format_html__with_source(source1, source2):
+    from pycobertura.cli import diff, ExitCodes
+
+    runner = CliRunner()
+    result = runner.invoke(diff, [
+        '--format', 'html',
+        '--source1', source1,
+        '--source2', source2,
         'tests/dummy.with-dummy2-better-cov.xml',
         'tests/dummy.with-dummy2-better-and-worse.xml',
     ], catch_exceptions=False)

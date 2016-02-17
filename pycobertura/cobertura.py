@@ -1,8 +1,14 @@
-import codecs
 import lxml.etree as ET
 import os
+import zipfile
 
 from collections import namedtuple
+
+from pycobertura.filesystem import (
+    DirectoryFileSystem,
+    ZipFileSystem,
+)
+
 
 from pycobertura.utils import (
     extrapolate_coverage,
@@ -10,6 +16,12 @@ from pycobertura.utils import (
     hunkify_lines,
     memoize,
 )
+
+try:
+    basestring
+except NameError:  # pragma: no cover
+    # PY3 basestring
+    basestring = (str, bytes)
 
 
 class Line(namedtuple('Line', ['number', 'source', 'status', 'reason'])):
@@ -29,21 +41,37 @@ class Cobertura(object):
     """
     An XML Cobertura parser.
     """
-    def __init__(self, xml_path, base_path=None):
+    def __init__(self, report, source=None, source_prefix=None):
         """
-        Initialize a Cobertura report given a path to an XML file `xml_path`
-        that is in the Cobertura format.
+        Initialize a Cobertura report given a coverage report `report`. It can
+        be either a file object or the path to an XML file that is in the
+        Cobertura format.
 
-        The optional argument `base_path` can be provided to resolve the path
-        to the source code. If omitted, `base_path` will be set to
-        `os.path.dirname(xml_source)`.
+        The optional argument `source` is the location of the source code
+        provided as a directory path or a file object zip archive containing
+        the source code.
+
+        The optional argument `source_prefix` will be used to lookup source
+        files if a zip archive is provided and will be prepended to filenames
+        found in the coverage report.
         """
-        if base_path is None:
-            base_path = os.path.dirname(xml_path)
+        self.xml = ET.parse(report).getroot()
 
-        self.base_path = base_path
-        self.xml_path = xml_path
-        self.xml = ET.parse(xml_path).getroot()
+        if source is None:
+            if isinstance(report, basestring):
+                # get the directory in which the coverage file lives
+                source = os.path.dirname(report)
+            self.filesystem = DirectoryFileSystem(
+                source, source_prefix=source_prefix
+            )
+        elif zipfile.is_zipfile(source):
+            self.filesystem = ZipFileSystem(
+                source, source_prefix=source_prefix
+            )
+        else:
+            self.filesystem = DirectoryFileSystem(
+                source, source_prefix=source_prefix
+            )
 
     @memoize
     def _get_class_element_by_filename(self, filename):
@@ -138,18 +166,19 @@ class Cobertura(object):
         Return a list of namedtuple `Line` for each line of code found in the
         source file with the given `filename`.
         """
-        filepath = self.filepath(filename)
+        lines = []
+        try:
+            with self.filesystem.open(filename) as f:
+                line_statuses = dict(self.line_statuses(filename))
+                for lineno, source in enumerate(f, start=1):
+                    line_status = line_statuses.get(lineno)
+                    line = Line(lineno, source, line_status, None)
+                    lines.append(line)
 
-        if not os.path.exists(filepath):
-            return [Line(0, '%s not found' % filepath, None, None)]
-
-        with codecs.open(filepath, encoding='utf-8') as f:
-            lines = []
-            line_statuses = dict(self.line_statuses(filename))
-            for lineno, source in enumerate(f, start=1):
-                line_status = line_statuses.get(lineno)
-                line = Line(lineno, source, line_status, None)
-                lines.append(line)
+        except self.filesystem.FileNotFound as file_not_found:
+            lines.append(
+                Line(0, '%s not found' % file_not_found.path, None, None)
+            )
 
         return lines
 
@@ -200,15 +229,6 @@ class Cobertura(object):
 
         return total
 
-    def filepath(self, filename):
-        """
-        Return the filesystem path to the actual file `filename`. It uses the
-        `base_path` value initialized in the constructor by prefixing it to the
-        filename using `os.path.join(base_path, filename)`.
-        """
-        filepath = os.path.join(self.base_path, filename)
-        return filepath
-
     @memoize
     def files(self):
         """
@@ -229,7 +249,7 @@ class Cobertura(object):
         """
         Return a list for source lines of file `filename`.
         """
-        with codecs.open(self.filepath(filename), encoding='utf-8') as f:
+        with self.filesystem.open(filename) as f:
             return f.readlines()
 
     @memoize
@@ -341,7 +361,8 @@ class CoberturaDiff(object):
         given file `filename`.
 
         """
-        if self.cobertura1.has_file(filename):
+        if self.cobertura1.has_file(filename) and \
+                self.cobertura1.filesystem.has_file(filename):
             lines1 = self.cobertura1.source_lines(filename)
             line_statuses1 = dict(self.cobertura1.line_statuses(
                 filename))
