@@ -397,6 +397,8 @@ class CoberturaDiff(object):
                 elif line_status1 is False and line_status2 is True:
                     status = True  # increased
                     reason = 'cov-up'
+                elif False:
+                    pass
 
             line = Line(lineno, source, status, reason)
             lines.append(line)
