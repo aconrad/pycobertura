@@ -378,7 +378,8 @@ class CoberturaDiff(object):
 
         lines = []
         for lineno, source in enumerate(lines2, start=1):
-
+            status = None
+            reason = None
             if lineno not in lineno_map:
                 # line was added or removed, just use whatever coverage status
                 # is available as there is nothing to compare against.
