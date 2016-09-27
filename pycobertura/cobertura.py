@@ -361,6 +361,7 @@ class CoberturaDiff(object):
         given file `filename`.
 
         """
+        #print "here"
         if self.cobertura1.has_file(filename) and \
                 self.cobertura1.filesystem.has_file(filename):
             lines1 = self.cobertura1.source_lines(filename)
