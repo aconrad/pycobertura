@@ -362,3 +362,14 @@ def test_diff__changes_uncovered_but_with_better_coverage_exit_status():
         'tests/dummy.zeroexit2/coverage.xml',  # has uncovered changes
     ], catch_exceptions=False)
     assert result.exit_code == ExitCodes.NOT_ALL_CHANGES_COVERED
+
+
+def test_diff__line_status():
+    from pycobertura.cli import diff
+
+    runner = CliRunner()
+    runner.invoke(diff, [
+        'tests/dummy.linestatus/test1.xml',
+        'tests/dummy.linestatus/test2.xml',
+    ], catch_exceptions=False)
+    assert True
