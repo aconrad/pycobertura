@@ -1,6 +1,8 @@
 # Release Notes
 
 ## Unreleased
+
+## 0.10.0 (2016-09-27)
 * BACKWARDS INCOMPATIBLE: when a source file is not found in disk pycobertura
   will now raise a `pycobertura.filesystem.FileSystem.FileNotFound` exception
   instead of an `IOError`.
