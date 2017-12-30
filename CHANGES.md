@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Unreleased
+* Fix a `IndexError: list index out of range` error by being less specific about where to find `class` elements in the Cobertura report.
 
 ## 0.10.0 (2016-09-27)
 * BACKWARDS INCOMPATIBLE: when a source file is not found in disk pycobertura
