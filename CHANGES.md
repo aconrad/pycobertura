@@ -1,6 +1,8 @@
 # Release Notes
 
 ## Unreleased
+
+## 0.10.1 (2017-12-30)
 * Drop support for Python 2.6
 * Fix a `IndexError: list index out of range` error by being less specific about where to find `class` elements in the Cobertura report.
 
