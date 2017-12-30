@@ -80,16 +80,22 @@ def test_list_packages():
     assert packages == ['', 'search']
 
 
-def test_list_classes():
-    cobertura = make_cobertura()
-
-    classes = cobertura.files()
-    assert classes == [
+@pytest.mark.parametrize("report, expected", [
+    ('tests/cobertura-generated-by-istanbul-from-coffeescript.xml', [
+        'app.coffee'
+    ]),
+    ('tests/cobertura.xml', [
         'Main.java',
         'search/BinarySearch.java',
         'search/ISortedArraySearch.java',
         'search/LinearSearch.java'
-    ]
+    ])
+])
+def test_list_classes(report, expected):
+    cobertura = make_cobertura(xml=report)
+
+    classes = cobertura.files()
+    assert classes == expected
 
 
 def test_hit_lines__by_iterating_over_classes():
