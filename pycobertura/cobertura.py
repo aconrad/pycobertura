@@ -75,7 +75,7 @@ class Cobertura(object):
 
     @memoize
     def _get_class_element_by_filename(self, filename):
-        syntax = "./packages/package/classes/class[@filename='%s'][1]" % (
+        syntax = "./packages//class[@filename='%s'][1]" % (
             filename
         )
         return self.xml.xpath(syntax)[0]
