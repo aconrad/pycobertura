@@ -234,7 +234,8 @@ class Cobertura(object):
         """
         Return the list of available files in the coverage report.
         """
-        return list(sorted(set([el.attrib['filename'] for el in self.xml.xpath("//class")])))
+        return list(sorted(set(
+            [el.attrib['filename'] for el in self.xml.xpath("//class")])))
 
     def has_file(self, filename):
         """
