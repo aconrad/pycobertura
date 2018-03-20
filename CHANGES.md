@@ -1,6 +1,8 @@
 # Release Notes
 
 ## Unreleased
+
+## 0.10.2 (2018-03-20)
 * Avoid duplicate file names in files() (#82). Some coverage reports include metrics for multiple classes within the same file and redundant rows would be generated for such reports. Thanks James DeFelice! (@jdef)
 
 ## 0.10.1 (2017-12-30)
