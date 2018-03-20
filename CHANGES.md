@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Unreleased
+* Avoid duplicate file names in files() (#82). Some coverage reports include metrics for multiple classes within the same file and redundant rows would be generated for such reports. Thanks James DeFelice! (@jdef)
 
 ## 0.10.1 (2017-12-30)
 * Drop support for Python 2.6
