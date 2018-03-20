@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.10.3 (2018-03-20)
+* Update author/repository info
+* Update release script to use twine
+
 ## 0.10.2 (2018-03-20)
 * Avoid duplicate file names in files() (#82). Some coverage reports include metrics for multiple classes within the same file and redundant rows would be generated for such reports. Thanks James DeFelice! (@jdef)
 
