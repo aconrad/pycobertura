@@ -11,4 +11,4 @@ PKG_VERSION=$(python setup.py --version)
 git tag -am "release v${PKG_VERSION}" v${PKG_VERSION}
 git push --tags
 python setup.py sdist
-twine upload dist/${PKG_NAME}-${PKG_VERSION}
+twine upload dist/${PKG_NAME}-${PKG_VERSION}.tar.gz
