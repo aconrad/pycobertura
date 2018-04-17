@@ -183,45 +183,28 @@ tox
 
 ## FAQ
 
-### Isn't pycobertura the same tool as diff-cover?
+### How does pycobertura work?
 
-[Diff-cover](https://github.com/edx/diff-cover) is a fantastic tool and
-pycobertura was heavily inspired by it. Both tools have similar end-goals
-indeed but each tool takes a different approach to how they work.
+Pycobertura takes two different Cobertura reports and compares them line by
+line. If the coverage status of a line changed from covered to uncovered or
+vice versa, then pycobertura will report it. Sometimes you have no code changes
+at all, the only changes were to add more tests and pycobertura will show you
+the progress.
 
-Diff-cover uses the underlying git repository to find of lines of code that
-have changed (basically `git diff`) and then looks at the Cobertura report to
-check whether the lines in the diff are covered or not. The drawback of this
-approach is that if the changes introduced a coverage drop elsewhere in the
-code base (e.g. a legacy function no longer being called) then it can be very
-hard to hunt down *where* the coverage dropped, especially if there are already
-a lot of legacy uncovered lines in the mix.
+Pycobertura was initially designed as a general purpose Cobertura parser and
+can generate a summary table for a single Cobertura file (the `show` command).
 
-On the other hand, pycobertura takes two different Cobertura reports in their
-entirety and compares them line by line. If the coverage status of a line
-changed from covered to uncovered or vice versa, then pycobertura will report
-it regardless of where your code changes happened. Actually, sometimes you have
-no code changes at all, the only changes were to add more tests and pycobertura
-will show you the progress.
+### I only have one Cobertura report, can I just see my uncovered changes?
 
-Moreover, pycobertura was also designed as a general purpose Cobertura parser
-and can generate a summary table for a single Cobertura file (the `show`
-command).
-
-### I only have one Cobertura report and I just want to see my uncovered changes, can I do this?
-
-Yes, this is what [diff-cover](https://github.com/edx/diff-cover) already
-offers and you can achieve the same result with pycobertura. All you have to do
-is pass your same coverage report twice and provide the path to the two
-different code bases:
+Yes. All you have to do is pass your same coverage report twice and provide the
+path to the two different code bases:
 
 ```bash
 pycobertura diff coverage.xml coverage.xml --source1 master/ --source2 myfeature/
 ```
 
 But keep in mind that this will not show you if your changes have introduced a
-drop in coverage elsewhere in the code base. See the previous question about
-the drawbacks of diff-cover.
+drop in coverage elsewhere in the code base.
 
 ### Why doesn't pycobertura use git to diff the source given revision SHAs rather than passing paths to the source code?
 
