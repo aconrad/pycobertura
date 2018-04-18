@@ -73,7 +73,7 @@ def test_diff_line_rate():
     cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
     differ = CoberturaDiff(cobertura1, cobertura2)
 
-    assert differ.diff_line_rate() == 0.15000000000000002
+    assert differ.diff_line_rate() == 0.31059999999999993
 
 
 def test_diff_line_rate_by_class_file():

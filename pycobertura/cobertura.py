@@ -344,7 +344,9 @@ class CoberturaDiff(object):
         return int(self._diff_attr('total_hits', filename))
 
     def diff_line_rate(self, filename=None):
-        return self._diff_attr('line_rate', filename)
+        if filename is not None:
+            return self._diff_attr('line_rate', filename)
+        return self.cobertura2.line_rate() - self.cobertura1.line_rate()
 
     def diff_missed_lines(self, filename):
         """
