@@ -25,7 +25,7 @@ setup(
     description="A Cobertura coverage parser that can diff reports and "
                 "show coverage progress.",
     license="MIT License",
-    keywords="cobertura coverage parser parse xml",
+    keywords="cobertura coverage diff report parser parse xml",
     url="https://github.com/aconrad/pycobertura",
     zip_safe=False,
     include_package_data=True,
