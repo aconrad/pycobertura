@@ -1,12 +1,14 @@
 # Release Notes
 
 ## Unreleased
-* Calculate the correct line rate for diffs (#83)
-  Previously `CoberturaDiff.diff_line_rate` with no filename argument would
-  total up the different line rate changes from all of the modified files,
-  which is not the correct difference in line rates between all files.  Now
-  the difference in line rate from the two reports objects will be directly
-  used if no argument is passed. (@borgstrom)
+
+## 0.10.4 (2018-04-17)
+* Calculate the correct line rate for diffs (#83). Previously
+  `CoberturaDiff.diff_line_rate` with no filename argument would total up the
+  different line rate changes from all of the modified files, which is not the
+  correct difference in line rates between all files. Now the difference in
+  line rate from the two reports objects will be directly used if no argument
+  is passed. (@borgstrom)
 
 ## 0.10.3 (2018-03-20)
 * Update author/repository info
