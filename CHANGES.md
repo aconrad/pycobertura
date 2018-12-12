@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## 0.10.5 (2018-12-11)
+* Use a different `memoize()` implementation so that cached objects can be freed/garbage collected and prevent from running out of memory when processing a lot of cobertura files. Thanks @kannaiah
+
 ## 0.10.4 (2018-04-17)
 * Calculate the correct line rate for diffs (#83). Previously
   `CoberturaDiff.diff_line_rate` with no filename argument would total up the
