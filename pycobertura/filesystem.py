@@ -13,9 +13,11 @@ class FileSystem(object):
 
 
 class DirectoryFileSystem(FileSystem):
-    def __init__(self, source_dir, source_prefix=None):
+    def __init__(self, source_dir, source_prefix=None, encoding='utf-8', errors='strict'):
         self.source_dir = source_dir
         self.source_prefix = source_prefix
+		self.encoding = encoding
+		self.errors = errors
 
     def real_filename(self, filename):
         if self.source_prefix is not None:
@@ -39,7 +41,7 @@ class DirectoryFileSystem(FileSystem):
         if not os.path.exists(filename):
             raise self.FileNotFound(filename)
 
-        with codecs.open(filename, encoding='utf-8') as f:
+        with codecs.open(filename, encoding=self.encoding, errors=self.errors) as f:
             yield f
 
 
