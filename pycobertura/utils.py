@@ -1,6 +1,8 @@
 import colorama
 import difflib
 from functools import partial
+import logging
+import subprocess
 
 
 # Recipe from https://github.com/ActiveState/
@@ -208,3 +210,15 @@ def hunkify_lines(lines, context=3):
         hunks.append(hunk)
 
     return hunks
+
+
+def get_output(command, working_folder=None):
+    logging.debug("Executing %s in %s", command, working_folder)
+
+    try:
+        output = subprocess.check_output(shlex.split(command), cwd=working_folder)
+        return output.decode("utf-8")
+    except OSError:
+        logging.error("Command being executed: {}".format(command))
+        raise
+

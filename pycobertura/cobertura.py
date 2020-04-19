@@ -7,6 +7,7 @@ from collections import namedtuple
 from pycobertura.filesystem import (
     DirectoryFileSystem,
     ZipFileSystem,
+    GitFileSystem
 )
 
 
@@ -427,3 +428,13 @@ class CoberturaDiff(object):
         lines = self.file_source(filename)
         hunks = hunkify_lines(lines)
         return hunks
+
+
+class VersionedCobertura(Cobertura):
+    def __init__(self, report, source=None, commit_id=None):
+        super().__init__(report, source=source)
+        if source is None:
+            if isinstance(report, str):
+                # get the directory in which the coverage file lives
+                source = os.path.dirname(report)
+        self.filesystem = GitFileSystem(source, commit_id=commit_id)

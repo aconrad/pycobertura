@@ -2,6 +2,7 @@ import codecs
 import os
 import zipfile
 
+from pycobertura.utils import get_output
 from contextlib import contextmanager
 
 
@@ -68,3 +69,52 @@ class ZipFileSystem(FileSystem):
             f.close()
         except KeyError:
             raise self.FileNotFound(filename)
+
+
+def get_root_path(repository_folder):
+    command = "git rev-parse --show-toplevel"
+    return get_output(command, working_folder=repository_folder).rstrip()
+
+
+class GitFileSystem(FileSystem):
+    def __init__(self, repo_folder, commit_id=None):
+        self.repository = repo_folder
+        self.commit_id = commit_id
+        self.repository_root = get_root_path(repo_folder)
+        self.prefix = self.repository.replace(self.repository_root, "").lstrip("/")
+
+    def real_filename(self, filename):
+        prefix = "{}/".format(self.prefix) if self.prefix else ""
+        return "{p.commit_id}:{prefix}{filename}".format(
+            prefix=prefix, p=self, filename=filename
+        )
+
+    def has_file(self, filename):
+        command = "git --no-pager show {}".format(self.real_filename(filename))
+        return_code = subprocess.call(
+            command,
+            cwd=self.repository,
+            shell=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        return not bool(return_code)
+
+    @contextmanager
+    def open(self, filename):
+        """
+        Yield a file-like object for file `filename`.
+
+        This function is a context manager.
+        """
+        filename = self.real_filename(filename)
+
+        try:
+            output = get_output(
+                "git --no-pager show {}".format(filename), self.repository
+            )
+        except Exception:
+            raise self.FileNotFound(filename)
+
+        yield io.StringIO(output)
+
