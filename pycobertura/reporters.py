@@ -95,6 +95,9 @@ class TextReporter(Reporter):
 
 class HtmlReporter(TextReporter):
     def __init__(self, *args, **kwargs):
+        self.title = kwargs.pop("title", "pycobertura report")
+        self.inline_sources = kwargs.pop("inline_sources", True)
+        self.sources_message = kwargs.pop('sources_message', None)
         super(HtmlReporter, self).__init__(*args, **kwargs)
 
     def get_source(self, filename):
@@ -110,15 +113,18 @@ class HtmlReporter(TextReporter):
             formatted_lines.append(formatted_row)
 
         sources = []
-        for filename in self.cobertura.files():
-            source = self.get_source(filename)
-            sources.append((filename, source))
+        if self.inline_sources:
+            for filename in self.cobertura.files():
+                source = self.get_source(filename)
+                sources.append((filename, source))
 
         template = env.get_template('html.jinja2')
         return template.render(
+            title=title,
             lines=formatted_lines[:-1],
             footer=formatted_lines[-1],
-            sources=sources
+            sources=sources,
+            sources_message=self.sources_message
         )
 
 
