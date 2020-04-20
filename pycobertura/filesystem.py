@@ -42,7 +42,7 @@ class DirectoryFileSystem(FileSystem):
         if not os.path.exists(filename):
             raise self.FileNotFound(filename)
 
-        with codecs.open(filename, encoding='utf-8') as f:
+        with codecs.open(filename, encoding="utf-8") as f:
             yield f
 
 
@@ -78,7 +78,11 @@ class GitFileSystem(FileSystem):
         self.repository = repo_folder
         self.ref = ref
         self.repository_root = self._get_root_path(repo_folder)
-        self.prefix = self.repository.replace(self.repository_root, "").lstrip("/")
+        # the report may have been collected in a subfolder of the repository
+        # root. Each file path shall thus be completed by the prefix.
+        self.prefix = self.repository.replace(
+            self.repository_root, ""
+        ).lstrip("/")
 
     def real_filename(self, filename):
         prefix = "{}/".format(self.prefix) if self.prefix else ""
@@ -88,8 +92,9 @@ class GitFileSystem(FileSystem):
 
     def has_file(self, filename):
         command = "git --no-pager show {}".format(self.real_filename(filename))
+        command_tokens = shlex.split(command)
         return_code = subprocess.call(
-            command,
+            command_tokens,
             cwd=self.repository,
             shell=True,
             stdout=subprocess.DEVNULL,
@@ -99,7 +104,17 @@ class GitFileSystem(FileSystem):
 
     def _get_root_path(self, repository_folder):
         command = "git rev-parse --show-toplevel"
-        output = subprocess.check_output(shlex.split(command), cwd=repository_folder)
+        command_tokens = shlex.split(command)
+        try:
+            output = subprocess.check_output(
+                command_tokens, cwd=repository_folder
+            )
+        except (OSError, subprocess.CalledProcessError):
+            raise ValueError(
+                "The folder {} is not "
+                "a valid git repository.".format(repository_folder)
+            )
+
         return output.decode("utf-8").rstrip()
 
     @contextmanager
@@ -112,9 +127,12 @@ class GitFileSystem(FileSystem):
         filename = self.real_filename(filename)
 
         command = "git --no-pager show {}".format(filename)
+        command_tokens = shlex.split(command)
 
         try:
-            output = subprocess.check_output(shlex.split(command), cwd=self.repository)
+            output = subprocess.check_output(
+                command_tokens, cwd=self.repository
+            )
         except (OSError, subprocess.CalledProcessError):
             raise self.FileNotFound(filename)
 
