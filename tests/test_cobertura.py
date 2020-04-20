@@ -9,9 +9,8 @@ def test_parse_path():
 
     xml_path = 'foo.xml'
 
-    with mock.patch('pycobertura.cobertura.os.path.exists', return_value=True):
-        with mock.patch('pycobertura.cobertura.ET.parse') as mock_parse:
-            cobertura = Cobertura(xml_path)
+    with mock.patch('pycobertura.cobertura.ET.parse') as mock_parse:
+        cobertura = Cobertura(xml_path)
 
     assert cobertura.xml is mock_parse.return_value.getroot.return_value
 
