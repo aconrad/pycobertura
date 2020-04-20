@@ -1,8 +1,10 @@
 import codecs
 import os
+import io
 import zipfile
+import subprocess
+import shlex
 
-from pycobertura.utils import get_output
 from contextlib import contextmanager
 
 
@@ -71,22 +73,17 @@ class ZipFileSystem(FileSystem):
             raise self.FileNotFound(filename)
 
 
-def get_root_path(repository_folder):
-    command = "git rev-parse --show-toplevel"
-    return get_output(command, working_folder=repository_folder).rstrip()
-
-
 class GitFileSystem(FileSystem):
-    def __init__(self, repo_folder, commit_id=None):
+    def __init__(self, repo_folder, ref):
         self.repository = repo_folder
-        self.commit_id = commit_id
-        self.repository_root = get_root_path(repo_folder)
+        self.ref = ref
+        self.repository_root = self._get_root_path(repo_folder)
         self.prefix = self.repository.replace(self.repository_root, "").lstrip("/")
 
     def real_filename(self, filename):
         prefix = "{}/".format(self.prefix) if self.prefix else ""
-        return "{p.commit_id}:{prefix}{filename}".format(
-            prefix=prefix, p=self, filename=filename
+        return "{ref}:{prefix}{filename}".format(
+            prefix=prefix, ref=self.ref, filename=filename
         )
 
     def has_file(self, filename):
@@ -100,6 +97,11 @@ class GitFileSystem(FileSystem):
         )
         return not bool(return_code)
 
+    def _get_root_path(self, repository_folder):
+        command = "git rev-parse --show-toplevel"
+        output = subprocess.check_output(shlex.split(command), cwd=repository_folder)
+        return output.decode("utf-8").rstrip()
+
     @contextmanager
     def open(self, filename):
         """
@@ -109,12 +111,12 @@ class GitFileSystem(FileSystem):
         """
         filename = self.real_filename(filename)
 
+        command = "git --no-pager show {}".format(filename)
+
         try:
-            output = get_output(
-                "git --no-pager show {}".format(filename), self.repository
-            )
-        except Exception:
+            output = subprocess.check_output(shlex.split(command), cwd=self.repository)
+        except OSError:
             raise self.FileNotFound(filename)
 
+        output = output.decode("utf-8").rstrip()
         yield io.StringIO(output)
-
