@@ -1,4 +1,4 @@
-import mock
+from unittest.mock import patch, MagicMock
 
 
 def test_filesystem_directory__file_not_found():
@@ -96,3 +96,52 @@ def test_filesystem_zip__with_source_prefix():
     for source_file in source_files_in_zip:
         with fs.open(source_file) as f:
             assert hasattr(f, 'read')
+
+
+def test_filesystem_git():
+    import pycobertura.filesystem as fsm
+    from pycobertura.filesystem import GitFileSystem
+
+    branch, folder, filename = "master", "tests/dummy", "test-file"
+
+    with patch.object(fsm, "subprocess") as subprocess_mock:
+        subprocess_mock.check_output = MagicMock(return_value=b"<file-content>")
+
+        fs = GitFileSystem(folder, branch)
+        git_filename = fs.real_filename(filename)
+
+        with fs.open(filename) as f:
+            assert hasattr(f, 'read')
+
+        assert git_filename.startswith(branch)
+        expected_command = ["git", "--no-pager", "show", git_filename]
+        subprocess_mock.check_output.assert_called_with(expected_command, cwd=folder)
+
+
+def test_filesystem_git_integration():
+    from pycobertura.filesystem import GitFileSystem
+
+    fs = GitFileSystem(".", "d1fe88da6b18340762b24bb1f89067a3439c4041")
+
+    source_files = [
+        'README.md',
+        '.gitignore',
+    ]
+
+    for source_file in source_files:
+        with fs.open(source_file) as f:
+            assert hasattr(f, 'read')
+
+
+def test_filesystem_git_integration__not_found():
+    from pycobertura.filesystem import GitFileSystem
+
+    fs = GitFileSystem(".", "d1fe88da6b18340762b24bb1f89067a3439c4041")
+
+    dummy_source_file = "CHANGES.md"
+
+    try:
+        with fs.open(dummy_source_file) as f:
+            pass
+    except GitFileSystem.FileNotFound as fnf:
+        assert fnf.path == fs.real_filename(dummy_source_file)

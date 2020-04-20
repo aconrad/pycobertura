@@ -115,7 +115,7 @@ class GitFileSystem(FileSystem):
 
         try:
             output = subprocess.check_output(shlex.split(command), cwd=self.repository)
-        except OSError:
+        except (OSError, subprocess.CalledProcessError):
             raise self.FileNotFound(filename)
 
         output = output.decode("utf-8").rstrip()
