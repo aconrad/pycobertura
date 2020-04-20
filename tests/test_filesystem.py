@@ -1,6 +1,9 @@
 from unittest.mock import patch, MagicMock
 
 
+FIRST_PYCOBERTURA_COMMIT_SHA = "d1fe88da6b18340762b24bb1f89067a3439c4041"
+
+
 def test_filesystem_directory__file_not_found():
     from pycobertura.filesystem import DirectoryFileSystem
 
@@ -108,12 +111,14 @@ def test_filesystem_git():
         subprocess_mock.check_output = MagicMock(return_value=b"<file-content>")
 
         fs = GitFileSystem(folder, branch)
-        git_filename = fs.real_filename(filename)
 
         with fs.open(filename) as f:
             assert hasattr(f, 'read')
 
-        assert git_filename.startswith(branch)
+        expected_git_filename = "master:tests/dummy/test-file"
+        git_filename = fs.real_filename(filename)
+        assert git_filename == expected_git_filename 
+
         expected_command = ["git", "--no-pager", "show", git_filename]
         subprocess_mock.check_output.assert_called_with(expected_command, cwd=folder)
 
@@ -121,8 +126,9 @@ def test_filesystem_git():
 def test_filesystem_git_integration():
     from pycobertura.filesystem import GitFileSystem
 
-    fs = GitFileSystem(".", "d1fe88da6b18340762b24bb1f89067a3439c4041")
+    fs = GitFileSystem(".", FIRST_PYCOBERTURA_COMMIT_SHA)
 
+    # Files included in pycobertura's first commit.
     source_files = [
         'README.md',
         '.gitignore',
@@ -136,7 +142,7 @@ def test_filesystem_git_integration():
 def test_filesystem_git_integration__not_found():
     from pycobertura.filesystem import GitFileSystem
 
-    fs = GitFileSystem(".", "d1fe88da6b18340762b24bb1f89067a3439c4041")
+    fs = GitFileSystem(".", FIRST_PYCOBERTURA_COMMIT_SHA)
 
     dummy_source_file = "CHANGES.md"
 

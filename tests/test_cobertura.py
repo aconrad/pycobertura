@@ -182,7 +182,7 @@ def test_total_hits_by_class_file():
 
 def test_class_file_source__sources_not_found():
     from pycobertura.cobertura import Line
-    cobertura = make_cobertura('tests/cobertura.xml')
+    cobertura = make_cobertura()
     expected_sources = {
         'Main.java': [Line(0, 'tests/Main.java not found', None, None)],
         'search/BinarySearch.java': [Line(0, 'tests/search/BinarySearch.java not found', None, None)],
