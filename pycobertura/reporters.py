@@ -123,7 +123,7 @@ class HtmlReporter(TextReporter):
 
         template = env.get_template('html.jinja2')
         return template.render(
-            title=title,
+            title=self.title,
             lines=formatted_lines[:-1],
             footer=formatted_lines[-1],
             sources=sources,
