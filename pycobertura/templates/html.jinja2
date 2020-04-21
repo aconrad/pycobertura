@@ -13,7 +13,7 @@ pre {line-height: 1.3}
   </head>
   <body>
     <div class="container">
-      <h1> {{ title }} </h1>
+      <h1>{{ title }}</h1>
       <table class="u-full-width">
         <thead>
           <tr>
@@ -29,9 +29,9 @@ pre {line-height: 1.3}
           <tr>
             <td>
             {% if sources %}
-                <a href="#{{ line.filename }}">{{ line.filename }}</a>
+              <a href="#{{ line.filename }}">{{ line.filename }}</a>
             {% else %}
-                {{ line.filename }}
+              {{ line.filename }}
             {% endif %}
             </td>
             <td>{{ line.total_statements }}</td>
@@ -58,7 +58,7 @@ pre {line-height: 1.3}
 {{ render_source(source) }}
 {%- endfor %}
 {% else %}
-    {{ sources_message }}
+  <p>{{ no_file_sources_message }}</p>
 {% endif %}
     </div>
   </body>

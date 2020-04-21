@@ -96,8 +96,11 @@ class TextReporter(Reporter):
 class HtmlReporter(TextReporter):
     def __init__(self, *args, **kwargs):
         self.title = kwargs.pop("title", "pycobertura report")
-        self.inline_sources = kwargs.pop("inline_sources", True)
-        self.sources_message = kwargs.pop('sources_message', None)
+        self.render_file_sources = kwargs.pop("render_file_sources", True)
+        self.no_file_sources_message = kwargs.pop(
+            "no_file_sources_message",
+            "Rendering of source files was disabled."
+        )
         super(HtmlReporter, self).__init__(*args, **kwargs)
 
     def get_source(self, filename):
@@ -113,7 +116,7 @@ class HtmlReporter(TextReporter):
             formatted_lines.append(formatted_row)
 
         sources = []
-        if self.inline_sources:
+        if self.render_file_sources:
             for filename in self.cobertura.files():
                 source = self.get_source(filename)
                 sources.append((filename, source))
@@ -124,7 +127,7 @@ class HtmlReporter(TextReporter):
             lines=formatted_lines[:-1],
             footer=formatted_lines[-1],
             sources=sources,
-            sources_message=self.sources_message
+            no_file_sources_message=self.no_file_sources_message
         )
 
 
