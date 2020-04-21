@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Let the caller customize the appearance of the HTML report providing a `title`, omitting the rendering of sources by means of the boolean `render_file_sources` and providing an helpful message to the end-users (in place of the sources) by means of the `no_file_sources_message` parameter. Contributed by @nilleb.
+
 ## 0.10.5 (2018-12-11)
 * Use a different `memoize()` implementation so that cached objects can be freed/garbage collected and prevent from running out of memory when processing a lot of cobertura files. Thanks @kannaiah
 
