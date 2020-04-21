@@ -47,14 +47,12 @@ class Cobertura(object):
         module in order to discover more about filesystems.
         """
         self.xml = ET.parse(report).getroot()
-        self._report = report if isinstance(report, basestring) else None
-        self._filesystem = filesystem
+        report = report if isinstance(report, basestring) else None
 
-    @property
-    def filesystem(self):
-        if not self._filesystem:
-            self._filesystem = filesystem_factory(self._report)
-        return self._filesystem
+        if filesystem:
+            self.filesystem = filesystem
+        else:
+            self.filesystem = filesystem_factory(report)
 
     @memoize
     def _get_class_element_by_filename(self, filename):

@@ -144,7 +144,7 @@ def filesystem_factory(report=None, source=None, source_prefix=None, ref=None):
     """
     The optional argument `report` is the location of the cobertura report.
     It will be used to build the sources path.
- 
+
     The optional argument `source` is the location of the source code
     provided as a directory path or a file object zip archive containing
     the source code.
@@ -153,7 +153,7 @@ def filesystem_factory(report=None, source=None, source_prefix=None, ref=None):
     files if a zip archive is provided and will be prepended to filenames
     found in the coverage report.
 
-    The oprional argument `ref` will be taken into account when
+    The optional argument `ref` will be taken into account when
     instantiating a GitFileSystem, and it shall be a branch name, a commit
     ID or a git ref ID.
     """
@@ -167,10 +167,7 @@ def filesystem_factory(report=None, source=None, source_prefix=None, ref=None):
             source, source_prefix=source_prefix
         )
 
-    if os.path.isfile(source):
-        source = os.path.dirname(source)
-
     if ref:
         return GitFileSystem(source, ref)
-    else:
-        return DirectoryFileSystem(source, source_prefix=source_prefix)
+
+    return DirectoryFileSystem(source, source_prefix=source_prefix)

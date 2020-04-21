@@ -3,7 +3,7 @@
 ## Unreleased
 
 * Let the caller customize the appearance of the HTML report providing a `title`, omitting the rendering of sources by means of the boolean `render_file_sources` and providing an helpful message to the end-users (in place of the sources) by means of the `no_file_sources_message` parameter. Contributed by @nilleb.
-* Add a GitFilesystem, allowing the consumer to retrieve the sources from a git commit.
+* Add a `GitFilesystem` to allow pycobertura to access source files at different revisions from a git repository. Thanks @nilleb.
 * [BREAKING] Change the signature of the Cobertura object in order to accept a filesystem.
 
 ## 0.10.5 (2018-12-11)

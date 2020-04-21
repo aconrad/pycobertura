@@ -103,14 +103,13 @@ def test_filesystem_zip__with_source_prefix():
 
 def test_filesystem_git():
     import pycobertura.filesystem as fsm
-    from pycobertura.filesystem import GitFileSystem
 
     branch, folder, filename = "master", "tests/dummy", "test-file"
 
     with patch.object(fsm, "subprocess") as subprocess_mock:
         subprocess_mock.check_output = MagicMock(return_value=b"<file-content>")
 
-        fs = GitFileSystem(folder, branch)
+        fs = fsm.GitFileSystem(folder, branch)
 
         with fs.open(filename) as f:
             assert hasattr(f, 'read')
