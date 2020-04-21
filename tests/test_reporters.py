@@ -124,6 +124,7 @@ def test_html_report():
   </head>
   <body>
     <div class="container">
+      <h1>pycobertura report</h1>
       <table class="u-full-width">
         <thead>
           <tr>
@@ -230,6 +231,82 @@ def test_html_report():
     </tr>
   </tbody>
 </table>
+
+    </div>
+  </body>
+</html>"""
+
+
+def test_html_report__no_source_files_message():
+    from pycobertura.reporters import HtmlReporter
+
+    cobertura = make_cobertura()
+    report = HtmlReporter(cobertura, title="test report", render_file_sources=False)
+    html_output = report.generate()
+
+    assert "normalize.css" in html_output
+    assert "Skeleton V2.0" in html_output
+
+    assert remove_style_tag(html_output) == """\
+<html>
+  <head>
+    <title>test report</title>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <div class="container">
+      <h1>test report</h1>
+      <table class="u-full-width">
+        <thead>
+          <tr>
+            <th>Filename</th>
+            <th>Stmts</th>
+            <th>Miss</th>
+            <th>Cover</th>
+            <th>Missing</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Main.java</td>
+            <td>11</td>
+            <td>0</td>
+            <td>100.00%</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>search/BinarySearch.java</td>
+            <td>12</td>
+            <td>1</td>
+            <td>91.67%</td>
+            <td>24</td>
+          </tr>
+          <tr>
+            <td>search/ISortedArraySearch.java</td>
+            <td>0</td>
+            <td>0</td>
+            <td>100.00%</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>search/LinearSearch.java</td>
+            <td>7</td>
+            <td>2</td>
+            <td>71.43%</td>
+            <td>19-24</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>TOTAL</td>
+            <td>30</td>
+            <td>3</td>
+            <td>90.00%</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+<p>Rendering of source files was disabled.</p>
     </div>
   </body>
 </html>"""
