@@ -92,9 +92,8 @@ class GitFileSystem(FileSystem):
 
     def has_file(self, filename):
         command = "git --no-pager show {}".format(self.real_filename(filename))
-        command_tokens = shlex.split(command)
         return_code = subprocess.call(
-            command_tokens,
+            command,
             cwd=self.repository,
             shell=True,
             stdout=subprocess.DEVNULL,

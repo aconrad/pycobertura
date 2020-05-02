@@ -1,3 +1,4 @@
+import subprocess
 from unittest.mock import patch, MagicMock
 
 
@@ -150,3 +151,81 @@ def test_filesystem_git_integration__not_found():
             pass
     except GitFileSystem.FileNotFound as fnf:
         assert fnf.path == fs.real_filename(dummy_source_file)
+
+
+def test_filesystem_git__git_not_found():
+    import pycobertura.filesystem as fsm
+
+    branch, folder, filename = "master", "tests/dummy", "test-file"
+
+    error = subprocess.CalledProcessError
+    with patch.object(fsm, "subprocess") as subprocess_mock:
+        subprocess_mock.check_output = MagicMock(side_effect=OSError)
+        subprocess_mock.CalledProcessError = error
+
+        try:
+            fs = fsm.GitFileSystem(folder, branch)
+        except ValueError as e:
+            assert folder in str(e)
+
+
+def test_filesystem_git_integration():
+    from pycobertura.filesystem import GitFileSystem
+
+    fs = GitFileSystem(".", FIRST_PYCOBERTURA_COMMIT_SHA)
+
+    # Files included in pycobertura's first commit.
+    source_files = [
+        "README.md",
+        ".gitignore",
+    ]
+
+    for source_file in source_files:
+        with fs.open(source_file) as f:
+            assert hasattr(f, "read")
+
+
+def test_filesystem_git_has_file_integration():
+    from pycobertura.filesystem import GitFileSystem
+
+    fs = GitFileSystem(".", FIRST_PYCOBERTURA_COMMIT_SHA)
+
+    # Files included in pycobertura's first commit.
+    source_files = [
+        "README.md",
+        ".gitignore",
+    ]
+
+    for source_file in source_files:
+        assert fs.has_file(source_file), source_file
+
+
+def test_filesystem_git_integration__not_found():
+    from pycobertura.filesystem import GitFileSystem
+
+    fs = GitFileSystem(".", FIRST_PYCOBERTURA_COMMIT_SHA)
+
+    dummy_source_file = "CHANGES.md"
+
+    try:
+        with fs.open(dummy_source_file) as f:
+            pass
+    except GitFileSystem.FileNotFound as fnf:
+        assert fnf.path == fs.real_filename(dummy_source_file)
+
+
+def test_filesystem_git_has_file_integration__not_found():
+    from pycobertura.filesystem import GitFileSystem
+
+    fs = GitFileSystem(".", FIRST_PYCOBERTURA_COMMIT_SHA)
+
+    dummy_source_file = "CHANGES.md"
+
+    assert not fs.has_file(dummy_source_file)
+
+
+def test_filesystem_factory():
+    from pycobertura.filesystem import filesystem_factory, GitFileSystem
+
+    fs = filesystem_factory(source=".", ref=FIRST_PYCOBERTURA_COMMIT_SHA)
+    assert isinstance(fs, GitFileSystem)
