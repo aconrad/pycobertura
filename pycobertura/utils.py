@@ -47,15 +47,15 @@ class memoize(object):
 
 def colorize(text, color):
     color_code = getattr(colorama.Fore, color.upper())
-    return '%s%s%s' % (color_code, text, colorama.Fore.RESET)
+    return "%s%s%s" % (color_code, text, colorama.Fore.RESET)
 
 
 def red(text):
-    return colorize(text, 'red')
+    return colorize(text, "red")
 
 
 def green(text):
-    return colorize(text, 'green')
+    return colorize(text, "green")
 
 
 def rangify(number_list):
@@ -130,10 +130,10 @@ def reconcile_lines(lines1, lines2):
     differ = difflib.Differ()
     diff = differ.compare(lines1, lines2)
 
-    SAME = '  '
-    ADDED = '+ '
-    REMOVED = '- '
-    INFO = '? '
+    SAME = "  "
+    ADDED = "+ "
+    REMOVED = "- "
+    INFO = "? "
 
     lineno_map = {}  # {lineno1: lineno2, ...}
     lineno1_offset = 0

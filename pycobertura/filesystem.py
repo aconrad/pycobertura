@@ -80,9 +80,7 @@ class GitFileSystem(FileSystem):
         self.repository_root = self._get_root_path(repo_folder)
         # the report may have been collected in a subfolder of the repository
         # root. Each file path shall thus be completed by the prefix.
-        self.prefix = self.repository.replace(
-            self.repository_root, ""
-        ).lstrip("/")
+        self.prefix = self.repository.replace(self.repository_root, "").lstrip("/")
 
     def real_filename(self, filename):
         prefix = "{}/".format(self.prefix) if self.prefix else ""
@@ -105,9 +103,7 @@ class GitFileSystem(FileSystem):
         command = "git rev-parse --show-toplevel"
         command_tokens = shlex.split(command)
         try:
-            output = subprocess.check_output(
-                command_tokens, cwd=repository_folder
-            )
+            output = subprocess.check_output(command_tokens, cwd=repository_folder)
         except (OSError, subprocess.CalledProcessError):
             raise ValueError(
                 "The folder {} is not "
@@ -129,9 +125,7 @@ class GitFileSystem(FileSystem):
         command_tokens = shlex.split(command)
 
         try:
-            output = subprocess.check_output(
-                command_tokens, cwd=self.repository
-            )
+            output = subprocess.check_output(command_tokens, cwd=self.repository)
         except (OSError, subprocess.CalledProcessError):
             raise self.FileNotFound(filename)
 
@@ -162,9 +156,7 @@ def filesystem_factory(report=None, source=None, source_prefix=None, ref=None):
             source = os.path.dirname(report)
 
     if zipfile.is_zipfile(source):
-        return ZipFileSystem(
-            source, source_prefix=source_prefix
-        )
+        return ZipFileSystem(source, source_prefix=source_prefix)
 
     if ref:
         return GitFileSystem(source, ref)
