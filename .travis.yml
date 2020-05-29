@@ -2,8 +2,9 @@ language: python
 
 sudo: false
 env:
-    - TOXENV=py27
-    - TOXENV=py34
+    - TOXENV=py35
+    - TOXENV=py36
+    - TOXENV=py37
     - TOXENV=pep8
 
 install:
