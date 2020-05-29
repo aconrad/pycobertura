@@ -8,7 +8,7 @@ install:
     - pip install tox-travis
 
 # Because the tests access the first git commit, we need to fetch the whole
-# repository without using a git --depth parameter. See
+# pycobertura repository without using a git --depth parameter. See
 # https://docs.travis-ci.com/user/customizing-the-build#git-clone-depth
 git:
   depth: false
