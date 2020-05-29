@@ -9,9 +9,8 @@ def test_parse_path():
 
     xml_path = 'foo.xml'
 
-    with mock.patch('pycobertura.cobertura.os.path.exists', return_value=True):
-        with mock.patch('pycobertura.cobertura.ET.parse') as mock_parse:
-            cobertura = Cobertura(xml_path)
+    with mock.patch('pycobertura.cobertura.ET.parse') as mock_parse:
+        cobertura = Cobertura(xml_path)
 
     assert cobertura.xml is mock_parse.return_value.getroot.return_value
 
@@ -182,7 +181,7 @@ def test_total_hits_by_class_file():
 
 def test_class_file_source__sources_not_found():
     from pycobertura.cobertura import Line
-    cobertura = make_cobertura('tests/cobertura.xml')
+    cobertura = make_cobertura()
     expected_sources = {
         'Main.java': [Line(0, 'tests/Main.java not found', None, None)],
         'search/BinarySearch.java': [Line(0, 'tests/search/BinarySearch.java not found', None, None)],

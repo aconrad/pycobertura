@@ -1,13 +1,8 @@
 import lxml.etree as ET
-import os
-import zipfile
 
 from collections import namedtuple
 
-from pycobertura.filesystem import (
-    DirectoryFileSystem,
-    ZipFileSystem,
-)
+from pycobertura.filesystem import filesystem_factory
 
 
 from pycobertura.utils import (
@@ -41,37 +36,23 @@ class Cobertura(object):
     """
     An XML Cobertura parser.
     """
-    def __init__(self, report, source=None, source_prefix=None):
+    def __init__(self, report, filesystem=None):
         """
         Initialize a Cobertura report given a coverage report `report`. It can
         be either a file object or the path to an XML file that is in the
         Cobertura format.
 
-        The optional argument `source` is the location of the source code
-        provided as a directory path or a file object zip archive containing
-        the source code.
-
-        The optional argument `source_prefix` will be used to lookup source
-        files if a zip archive is provided and will be prepended to filenames
-        found in the coverage report.
+        The optional argument `filesystem` describes how to retrieve the source
+        files referenced in the report. Please check the pycobertura.filesystem
+        module in order to discover more about filesystems.
         """
         self.xml = ET.parse(report).getroot()
+        report = report if isinstance(report, basestring) else None
 
-        if source is None:
-            if isinstance(report, basestring):
-                # get the directory in which the coverage file lives
-                source = os.path.dirname(report)
-            self.filesystem = DirectoryFileSystem(
-                source, source_prefix=source_prefix
-            )
-        elif zipfile.is_zipfile(source):
-            self.filesystem = ZipFileSystem(
-                source, source_prefix=source_prefix
-            )
+        if filesystem:
+            self.filesystem = filesystem
         else:
-            self.filesystem = DirectoryFileSystem(
-                source, source_prefix=source_prefix
-            )
+            self.filesystem = filesystem_factory(report)
 
     @memoize
     def _get_class_element_by_filename(self, filename):

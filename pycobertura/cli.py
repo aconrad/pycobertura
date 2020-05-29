@@ -4,7 +4,7 @@ from pycobertura.cobertura import Cobertura
 from pycobertura.reporters import (
     HtmlReporter, TextReporter, HtmlReporterDelta, TextReporterDelta
 )
-
+from pycobertura.filesystem import filesystem_factory
 
 pycobertura = click.Group()
 
@@ -64,7 +64,8 @@ def get_exit_code(differ, source):
 )
 def show(cobertura_file, format, output, source, source_prefix):
     """show coverage summary of a Cobertura report"""
-    cobertura = Cobertura(cobertura_file, source=source)
+    fs = filesystem_factory(cobertura_file, source=source)
+    cobertura = Cobertura(cobertura_file, filesystem=fs)
     Reporter = reporters[format]
     reporter = Reporter(cobertura)
     report = reporter.generate()
@@ -143,16 +144,14 @@ def diff(
         color, format, output, source1, source2,
         source_prefix1, source_prefix2, source):
     """compare coverage of two Cobertura reports"""
-    cobertura1 = Cobertura(
-        cobertura_file1,
-        source=source1,
-        source_prefix=source_prefix1
+    fs1 = filesystem_factory(
+        report=cobertura_file1, source=source1, source_prefix=source_prefix1
     )
-    cobertura2 = Cobertura(
-        cobertura_file2,
-        source=source2,
-        source_prefix=source_prefix2
+    fs2 = filesystem_factory(
+        report=cobertura_file2, source=source2, source_prefix=source_prefix2
     )
+    cobertura1 = Cobertura(cobertura_file1, filesystem=fs1)
+    cobertura2 = Cobertura(cobertura_file2, filesystem=fs2)
 
     Reporter = delta_reporters[format]
     reporter_args = [cobertura1, cobertura2]

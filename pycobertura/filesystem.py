@@ -1,6 +1,9 @@
 import codecs
 import os
+import io
 import zipfile
+import subprocess
+import shlex
 
 from contextlib import contextmanager
 
@@ -39,7 +42,7 @@ class DirectoryFileSystem(FileSystem):
         if not os.path.exists(filename):
             raise self.FileNotFound(filename)
 
-        with codecs.open(filename, encoding='utf-8') as f:
+        with codecs.open(filename, encoding="utf-8") as f:
             yield f
 
 
@@ -68,3 +71,102 @@ class ZipFileSystem(FileSystem):
             f.close()
         except KeyError:
             raise self.FileNotFound(filename)
+
+
+class GitFileSystem(FileSystem):
+    def __init__(self, repo_folder, ref):
+        self.repository = repo_folder
+        self.ref = ref
+        self.repository_root = self._get_root_path(repo_folder)
+        # the report may have been collected in a subfolder of the repository
+        # root. Each file path shall thus be completed by the prefix.
+        self.prefix = self.repository.replace(
+            self.repository_root, ""
+        ).lstrip("/")
+
+    def real_filename(self, filename):
+        prefix = "{}/".format(self.prefix) if self.prefix else ""
+        return "{ref}:{prefix}{filename}".format(
+            prefix=prefix, ref=self.ref, filename=filename
+        )
+
+    def has_file(self, filename):
+        command = "git --no-pager show {}".format(self.real_filename(filename))
+        return_code = subprocess.call(
+            command,
+            cwd=self.repository,
+            shell=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        return not bool(return_code)
+
+    def _get_root_path(self, repository_folder):
+        command = "git rev-parse --show-toplevel"
+        command_tokens = shlex.split(command)
+        try:
+            output = subprocess.check_output(
+                command_tokens, cwd=repository_folder
+            )
+        except (OSError, subprocess.CalledProcessError):
+            raise ValueError(
+                "The folder {} is not "
+                "a valid git repository.".format(repository_folder)
+            )
+
+        return output.decode("utf-8").rstrip()
+
+    @contextmanager
+    def open(self, filename):
+        """
+        Yield a file-like object for file `filename`.
+
+        This function is a context manager.
+        """
+        filename = self.real_filename(filename)
+
+        command = "git --no-pager show {}".format(filename)
+        command_tokens = shlex.split(command)
+
+        try:
+            output = subprocess.check_output(
+                command_tokens, cwd=self.repository
+            )
+        except (OSError, subprocess.CalledProcessError):
+            raise self.FileNotFound(filename)
+
+        output = output.decode("utf-8").rstrip()
+        yield io.StringIO(output)
+
+
+def filesystem_factory(report=None, source=None, source_prefix=None, ref=None):
+    """
+    The optional argument `report` is the location of the cobertura report.
+    It will be used to build the sources path.
+
+    The optional argument `source` is the location of the source code
+    provided as a directory path or a file object zip archive containing
+    the source code.
+
+    The optional argument `source_prefix` will be used to lookup source
+    files if a zip archive is provided and will be prepended to filenames
+    found in the coverage report.
+
+    The optional argument `ref` will be taken into account when
+    instantiating a GitFileSystem, and it shall be a branch name, a commit
+    ID or a git ref ID.
+    """
+    if source is None:
+        if isinstance(report, str):
+            # get the directory in which the coverage file lives
+            source = os.path.dirname(report)
+
+    if zipfile.is_zipfile(source):
+        return ZipFileSystem(
+            source, source_prefix=source_prefix
+        )
+
+    if ref:
+        return GitFileSystem(source, ref)
+
+    return DirectoryFileSystem(source, source_prefix=source_prefix)
