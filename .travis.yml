@@ -7,6 +7,9 @@ python:
 install:
     - pip install tox-travis
 
+git:
+  depth: false
+
 script:
     - tox
 
