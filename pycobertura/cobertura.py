@@ -103,7 +103,7 @@ class Cobertura(object):
         """
         el = self._get_class_element_by_filename(filename)
         lines = el.xpath('./lines/line[@hits=0]')
-        return [int(l.attrib['number']) for l in lines]
+        return [int(line.attrib['number']) for line in lines]
 
     @memoize
     def hit_statements(self, filename):
@@ -113,7 +113,7 @@ class Cobertura(object):
         """
         el = self._get_class_element_by_filename(filename)
         lines = el.xpath('./lines/line[@hits>0]')
-        return [int(l.attrib['number']) for l in lines]
+        return [int(line.attrib['number']) for line in lines]
 
     def line_statuses(self, filename):
         """

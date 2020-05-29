@@ -2,31 +2,43 @@
 
 ## Unreleased
 
-* Let the caller customize the appearance of the HTML report providing a `title`, omitting the rendering of sources by means of the boolean `render_file_sources` and providing an helpful message to the end-users (in place of the sources) by means of the `no_file_sources_message` parameter. Contributed by @nilleb.
-* Add a `GitFilesystem` to allow pycobertura to access source files at different revisions from a git repository. Thanks @nilleb.
-* [BREAKING] Change the signature of the Cobertura object in order to accept a filesystem.
+* Let the caller customize the appearance of the HTML report providing a
+  `title`, omitting the rendering of sources by means of the boolean
+  `render_file_sources` and providing an helpful message to the end-users (in
+  place of the sources) by means of the `no_file_sources_message` parameter.
+  Contributed by @nilleb.
+* Add a `GitFilesystem` to allow pycobertura to access source files at different
+  revisions from a git repository. Thanks @nilleb.
+* BACKWARDS INCOMPATIBLE: Change the signature of the Cobertura object in order
+  to accept a filesystem.
+* BACKWARDS INCOMPATIBLE: Drop support for Python 2.
 
 ## 0.10.5 (2018-12-11)
-* Use a different `memoize()` implementation so that cached objects can be freed/garbage collected and prevent from running out of memory when processing a lot of cobertura files. Thanks @kannaiah
+* Use a different `memoize()` implementation so that cached objects can be
+  freed/garbage collected and prevent from running out of memory when processing
+  a lot of cobertura files. Thanks @kannaiah
 
 ## 0.10.4 (2018-04-17)
 * Calculate the correct line rate for diffs (#83). Previously
   `CoberturaDiff.diff_line_rate` with no filename argument would total up the
   different line rate changes from all of the modified files, which is not the
-  correct difference in line rates between all files. Now the difference in
-  line rate from the two reports objects will be directly used if no argument
-  is passed. (@borgstrom)
+  correct difference in line rates between all files. Now the difference in line
+  rate from the two reports objects will be directly used if no argument is
+  passed. (@borgstrom)
 
 ## 0.10.3 (2018-03-20)
 * Update author/repository info
 * Update release script to use twine
 
 ## 0.10.2 (2018-03-20)
-* Avoid duplicate file names in files() (#82). Some coverage reports include metrics for multiple classes within the same file and redundant rows would be generated for such reports. Thanks James DeFelice! (@jdef)
+* Avoid duplicate file names in files() (#82). Some coverage reports include
+  metrics for multiple classes within the same file and redundant rows would be
+  generated for such reports. Thanks James DeFelice! (@jdef)
 
 ## 0.10.1 (2017-12-30)
 * Drop support for Python 2.6
-* Fix a `IndexError: list index out of range` error by being less specific about where to find `class` elements in the Cobertura report.
+* Fix a `IndexError: list index out of range` error by being less specific about
+  where to find `class` elements in the Cobertura report.
 
 ## 0.10.0 (2016-09-27)
 * BACKWARDS INCOMPATIBLE: when a source file is not found in disk pycobertura
@@ -34,12 +46,15 @@
   instead of an `IOError`.
 * possibility to pass a zip archive containing the source code instead of a
   directory
-* BACKWARDS INCOMPATIBLE: Rename keyword argument `Cobertura(base_path=None)` > `Cobertura(source=None)`
+* BACKWARDS INCOMPATIBLE: Rename keyword argument `Cobertura(base_path=None)` >
+  `Cobertura(source=None)`
 * Introduce new keyword argument `Cobertura(source_prefix=None)`
-* Fix an `IOError` / `FileNotFound` error which happens when the same coverage report is provided twice
-  to `pycobertura diff` (diff in degraded mode) but the first code base (`--source1`) is missing a file
-  mentioned in the coverage report.
-* Fix a rare bug when diffing coverage xml where one file goes from zero lines to non-zero lines.
+* Fix an `IOError` / `FileNotFound` error which happens when the same coverage
+  report is provided twice to `pycobertura diff` (diff in degraded mode) but the
+  first code base (`--source1`) is missing a file mentioned in the coverage
+  report.
+* Fix a rare bug when diffing coverage xml where one file goes from zero lines
+  to non-zero lines.
 
 ## 0.9.0 (2016-01-29)
 * The coverage report now displays the class's filename instead of the class's
@@ -83,9 +98,9 @@
 
 ## 0.7.3 (2015-07-23)
 
-* a non-zero exit code will be returned if not all changes have been
-  covered. If `--no-source` is provided then it will only check if coverage
-  has worsened, which is less strict.
+* a non-zero exit code will be returned if not all changes have been covered. If
+  `--no-source` is provided then it will only check if coverage has worsened,
+  which is less strict.
 
 ## 0.7.2 (2015-05-29)
 
@@ -134,8 +149,8 @@
 
 * `pycobertura diff` HTML output now only includes hunks of lines that have
   coverage changes and skips unchanged classes
-* handle asymmetric presence of classes in the reports (regression
-  introduced in 0.4.0)
+* handle asymmetric presence of classes in the reports (regression introduced in
+  0.4.0)
 * introduce `CoberturaDiff.diff_missed_lines()`
 * introduce `CoberturaDiff.classes()`
 * introduce `CoberturaDiff.filename()`
@@ -151,8 +166,8 @@
   objects or XML strings.
 * Rename `Cobertura.source` -> `Cobertura.xml_path`
 * `pycobertura diff` now takes options `--missed` (default) or `--no-missed` to
-  show missed line numbers. If `--missed` is given, the paths to the source
-  code must be accessible.
+  show missed line numbers. If `--missed` is given, the paths to the source code
+  must be accessible.
 
 ## 0.4.1 (2015-01-05)
 
@@ -164,16 +179,16 @@
 * rename `Cobertura.total_lines()` -> `Cobertura.total_statements()`
 * rename `Cobertura.line_hits()` -> `Cobertura.hit_statements()`
 * introduce `Cobertura.missed_statements()`
-* introduce `Cobertura.line_statuses()` which returns line numbers for a
-  given class name with hit/miss statuses
-* introduce `Cobertura.class_source()` which returns the source code for a
-  given class along with hit/miss status
+* introduce `Cobertura.line_statuses()` which returns line numbers for a given
+  class name with hit/miss statuses
+* introduce `Cobertura.class_source()` which returns the source code for a given
+  class along with hit/miss status
 * `pycobertura show` now includes HTML source
 * `pycobertura show` now accepts `--source` which indicates where the source
   code directory is located
-* `Cobertura()` now takes an optional `base_path` argument which will be used
-  to resolve the path to the source code by joining the `base_path` value to
-  the path found in the Cobertura report.
+* `Cobertura()` now takes an optional `base_path` argument which will be used to
+  resolve the path to the source code by joining the `base_path` value to the
+  path found in the Cobertura report.
 * an error is now raised if `Cobertura` is passed a non-existent XML file path
 * `pycobertura diff` now includes HTML source
 * `pycobertura diff` now accepts `--source1` and `--source2` which indicates
@@ -189,8 +204,8 @@
 * pep8-ify
 * add pep8 tasks for tox and travis
 * diff command returns non-zero exit code if coverage worsened
-* `Cobertura.branch_rate` is now a method that can take an optional
-  `class_name` argument
+* `Cobertura.branch_rate` is now a method that can take an optional `class_name`
+  argument
 * refactor internals for improved readability
 * show classes that contain no lines, e.g. `__init__.py`
 * add `Cobertura.filename(class_name)` to retrieve the filename of a class
