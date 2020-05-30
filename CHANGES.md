@@ -12,6 +12,9 @@
 * BACKWARDS INCOMPATIBLE: Change the signature of the Cobertura object in order
   to accept a filesystem.
 * BACKWARDS INCOMPATIBLE: Drop support for Python 2.
+* Added tox task `black`, to use the the uncompromising Python code formatter.
+  See https://black.readthedocs.io/en/stable/ to learn more about black. Thanks
+  @nilleb.
 
 ## 0.10.5 (2018-12-11)
 * Use a different `memoize()` implementation so that cached objects can be
