@@ -19,7 +19,7 @@ except NameError:  # pragma: no cover
     basestring = (str, bytes)
 
 
-class Line(namedtuple('Line', ['number', 'source', 'status', 'reason'])):
+class Line(namedtuple("Line", ["number", "source", "status", "reason"])):
     """
     A namedtuple object representing a line of source code.
 
@@ -36,6 +36,7 @@ class Cobertura(object):
     """
     An XML Cobertura parser.
     """
+
     def __init__(self, report, filesystem=None):
         """
         Initialize a Cobertura report given a coverage report `report`. It can
@@ -56,20 +57,18 @@ class Cobertura(object):
 
     @memoize
     def _get_class_element_by_filename(self, filename):
-        syntax = "./packages//class[@filename='%s'][1]" % (
-            filename
-        )
+        syntax = "./packages//class[@filename='%s'][1]" % (filename)
         return self.xml.xpath(syntax)[0]
 
     @memoize
     def _get_lines_by_filename(self, filename):
         el = self._get_class_element_by_filename(filename)
-        return el.xpath('./lines/line')
+        return el.xpath("./lines/line")
 
     @property
     def version(self):
         """Return the version number of the coverage report."""
-        return self.xml.attrib['version']
+        return self.xml.attrib["version"]
 
     def line_rate(self, filename=None):
         """
@@ -81,7 +80,7 @@ class Cobertura(object):
         else:
             el = self._get_class_element_by_filename(filename)
 
-        return float(el.attrib['line-rate'])
+        return float(el.attrib["line-rate"])
 
     def branch_rate(self, filename=None):
         """
@@ -93,7 +92,7 @@ class Cobertura(object):
         else:
             el = self._get_class_element_by_filename(filename)
 
-        return float(el.attrib['branch-rate'])
+        return float(el.attrib["branch-rate"])
 
     @memoize
     def missed_statements(self, filename):
@@ -102,8 +101,8 @@ class Cobertura(object):
         statements found for the file `filename`.
         """
         el = self._get_class_element_by_filename(filename)
-        lines = el.xpath('./lines/line[@hits=0]')
-        return [int(line.attrib['number']) for line in lines]
+        lines = el.xpath("./lines/line[@hits=0]")
+        return [int(l.attrib["number"]) for l in lines]
 
     @memoize
     def hit_statements(self, filename):
@@ -112,8 +111,8 @@ class Cobertura(object):
         found for the file `filename`.
         """
         el = self._get_class_element_by_filename(filename)
-        lines = el.xpath('./lines/line[@hits>0]')
-        return [int(line.attrib['number']) for line in lines]
+        lines = el.xpath("./lines/line[@hits>0]")
+        return [int(line.attrib["number"]) for line in lines]
 
     def line_statuses(self, filename):
         """
@@ -126,8 +125,8 @@ class Cobertura(object):
 
         lines_w_status = []
         for line in line_elements:
-            lineno = int(line.attrib['number'])
-            status = line.attrib['hits'] != '0'
+            lineno = int(line.attrib["number"])
+            status = line.attrib["hits"] != "0"
             lines_w_status.append((lineno, status))
 
         return lines_w_status
@@ -157,9 +156,7 @@ class Cobertura(object):
                     lines.append(line)
 
         except self.filesystem.FileNotFound as file_not_found:
-            lines.append(
-                Line(0, '%s not found' % file_not_found.path, None, None)
-            )
+            lines.append(Line(0, "%s not found" % file_not_found.path, None, None))
 
         return lines
 
@@ -220,7 +217,7 @@ class Cobertura(object):
         filenames = []
 
         for el in self.xml.xpath("//class"):
-            filename = el.attrib['filename']
+            filename = el.attrib["filename"]
             if filename in already_seen:
                 continue
             already_seen.add(filename)
@@ -249,13 +246,14 @@ class Cobertura(object):
         """
         Return the list of available packages in the coverage report.
         """
-        return [el.attrib['name'] for el in self.xml.xpath("//package")]
+        return [el.attrib["name"] for el in self.xml.xpath("//package")]
 
 
 class CoberturaDiff(object):
     """
     Diff Cobertura objects.
     """
+
     def __init__(self, cobertura1, cobertura2):
         self.cobertura1 = cobertura1
         self.cobertura2 = cobertura2
@@ -316,17 +314,17 @@ class CoberturaDiff(object):
         return total_count
 
     def diff_total_statements(self, filename=None):
-        return int(self._diff_attr('total_statements', filename))
+        return int(self._diff_attr("total_statements", filename))
 
     def diff_total_misses(self, filename=None):
-        return int(self._diff_attr('total_misses', filename))
+        return int(self._diff_attr("total_misses", filename))
 
     def diff_total_hits(self, filename=None):
-        return int(self._diff_attr('total_hits', filename))
+        return int(self._diff_attr("total_hits", filename))
 
     def diff_line_rate(self, filename=None):
         if filename is not None:
-            return self._diff_attr('line_rate', filename)
+            return self._diff_attr("line_rate", filename)
         return self.cobertura2.line_rate() - self.cobertura1.line_rate()
 
     def diff_missed_lines(self, filename):
@@ -355,11 +353,11 @@ class CoberturaDiff(object):
         given file `filename`.
 
         """
-        if self.cobertura1.has_file(filename) and \
-                self.cobertura1.filesystem.has_file(filename):
+        if self.cobertura1.has_file(filename) and self.cobertura1.filesystem.has_file(
+            filename
+        ):
             lines1 = self.cobertura1.source_lines(filename)
-            line_statuses1 = dict(self.cobertura1.line_statuses(
-                filename))
+            line_statuses1 = dict(self.cobertura1.line_statuses(filename))
         else:
             lines1 = []
             line_statuses1 = {}
@@ -378,7 +376,7 @@ class CoberturaDiff(object):
                 # line was added or removed, just use whatever coverage status
                 # is available as there is nothing to compare against.
                 status = line_statuses2.get(lineno)
-                reason = 'line-edit'
+                reason = "line-edit"
             else:
                 other_lineno = lineno_map[lineno]
                 line_status1 = line_statuses1.get(other_lineno)
@@ -388,10 +386,10 @@ class CoberturaDiff(object):
                     reason = None
                 elif line_status1 is True and line_status2 is False:
                     status = False  # decreased
-                    reason = 'cov-down'
+                    reason = "cov-down"
                 elif line_status1 is False and line_status2 is True:
                     status = True  # increased
-                    reason = 'cov-up'
+                    reason = "cov-up"
 
             line = Line(lineno, source, status, reason)
             lines.append(line)

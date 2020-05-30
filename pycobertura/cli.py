@@ -2,7 +2,10 @@ import click
 
 from pycobertura.cobertura import Cobertura
 from pycobertura.reporters import (
-    HtmlReporter, TextReporter, HtmlReporterDelta, TextReporterDelta
+    HtmlReporter,
+    TextReporter,
+    HtmlReporterDelta,
+    TextReporterDelta,
 )
 from pycobertura.filesystem import filesystem_factory
 
@@ -10,8 +13,8 @@ pycobertura = click.Group()
 
 
 reporters = {
-    'html': HtmlReporter,
-    'text': TextReporter,
+    "html": HtmlReporter,
+    "text": TextReporter,
 }
 
 
@@ -41,26 +44,30 @@ def get_exit_code(differ, source):
 
 
 @pycobertura.command()
-@click.argument('cobertura_file')
+@click.argument("cobertura_file")
+@click.option("-f", "--format", default="text", type=click.Choice(list(reporters)))
 @click.option(
-    '-f', '--format', default='text',
-    type=click.Choice(list(reporters))
+    "-o",
+    "--output",
+    metavar="<file>",
+    type=click.File("wb"),
+    help="Write output to <file> instead of stdout.",
 )
 @click.option(
-    '-o', '--output', metavar='<file>', type=click.File('wb'),
-    help='Write output to <file> instead of stdout.'
+    "-s",
+    "--source",
+    metavar="<source-dir-or-zip>",
+    help="Provide path to source code directory for HTML output. The path can "
+    "also be a zip archive instead of a directory.",
 )
 @click.option(
-    '-s', '--source', metavar='<source-dir-or-zip>',
-    help='Provide path to source code directory for HTML output. The path can '
-         'also be a zip archive instead of a directory.'
-)
-@click.option(
-    '-p', '--source-prefix', metavar='<dir-prefix>',
-    help='For every file found in the coverage report, it will use this '
-         'prefix to lookup files on disk. This is especially useful when '
-         'the --source is a zip archive and the files were zipped under '
-         'a directory prefix that is not part of the source.',
+    "-p",
+    "--source-prefix",
+    metavar="<dir-prefix>",
+    help="For every file found in the coverage report, it will use this "
+    "prefix to lookup files on disk. This is especially useful when "
+    "the --source is a zip archive and the files were zipped under "
+    "a directory prefix that is not part of the source.",
 )
 def show(cobertura_file, format, output, source, source_prefix):
     """show coverage summary of a Cobertura report"""
@@ -71,19 +78,20 @@ def show(cobertura_file, format, output, source, source_prefix):
     report = reporter.generate()
 
     if not isinstance(report, bytes):
-        report = report.encode('utf-8')
+        report = report.encode("utf-8")
 
     isatty = True if output is None else output.isatty()
     click.echo(report, file=output, nl=isatty)
 
 
 delta_reporters = {
-    'text': TextReporterDelta,
-    'html': HtmlReporterDelta,
+    "text": TextReporterDelta,
+    "html": HtmlReporterDelta,
 }
 
 
-@pycobertura.command(help="""\
+@pycobertura.command(
+    help="""\
 The diff command compares and shows the changes between two Cobertura reports.
 
 NOTE: Reporting missing lines or showing the source code with the diff command
@@ -94,55 +102,77 @@ location. If the source is not accessible from the report's location, the
 options `--source1` and `--source2` are necessary to point to the source code
 directories (or zip archives). If the source is not available at all, pass
 `--no-source` but missing lines and source code will not be reported.
-""")
-@click.argument('cobertura_file1')
-@click.argument('cobertura_file2')
+"""
+)
+@click.argument("cobertura_file1")
+@click.argument("cobertura_file2")
 @click.option(
-    '--color/--no-color', default=None,
-    help='Colorize the output. By default, pycobertura emits color codes only '
-         'when standard output is connected to a terminal. This has no effect '
-         'with the HTML output format.')
-@click.option(
-    '-f', '--format', default='text',
-    type=click.Choice(list(delta_reporters))
+    "--color/--no-color",
+    default=None,
+    help="Colorize the output. By default, pycobertura emits color codes only "
+    "when standard output is connected to a terminal. This has no effect "
+    "with the HTML output format.",
 )
 @click.option(
-    '-o', '--output', metavar='<file>', type=click.File('wb'),
-    help='Write output to <file> instead of stdout.'
+    "-f", "--format", default="text", type=click.Choice(list(delta_reporters))
 )
 @click.option(
-    '-s1', '--source1', metavar='<source-dir1-or-zip-archive>',
-    help='Provide path to source code directory or zip archive of first '
-         'Cobertura report. This is necessary if the filename path defined '
-         'in the report is not accessible from the location of the report.'
+    "-o",
+    "--output",
+    metavar="<file>",
+    type=click.File("wb"),
+    help="Write output to <file> instead of stdout.",
 )
 @click.option(
-    '-s2', '--source2', metavar='<source-dir2-or-zip-archive>',
-    help='Like --source1 but for the second coverage report of the diff.'
+    "-s1",
+    "--source1",
+    metavar="<source-dir1-or-zip-archive>",
+    help="Provide path to source code directory or zip archive of first "
+    "Cobertura report. This is necessary if the filename path defined "
+    "in the report is not accessible from the location of the report.",
 )
 @click.option(
-    '-p1', '--source-prefix1', metavar='<dir-prefix1>',
-    help='For every file found in the coverage report, it will use this '
-         'prefix to lookup files on disk. This is especially useful when '
-         'the --source1 is a zip archive and the files were zipped under '
-         'a directory prefix that is not part of the source',
+    "-s2",
+    "--source2",
+    metavar="<source-dir2-or-zip-archive>",
+    help="Like --source1 but for the second coverage report of the diff.",
 )
 @click.option(
-    '-p2', '--source-prefix2', metavar='<dir-prefix2>',
-    help='Like --source-prefix1, but for applies for --source2.',
+    "-p1",
+    "--source-prefix1",
+    metavar="<dir-prefix1>",
+    help="For every file found in the coverage report, it will use this "
+    "prefix to lookup files on disk. This is especially useful when "
+    "the --source1 is a zip archive and the files were zipped under "
+    "a directory prefix that is not part of the source",
 )
 @click.option(
-    '--source/--no-source', default=True,
-    help='Show missing lines and source code. When enabled (default), this '
-         'option requires access to the source code that was used to generate '
-         'both Cobertura reports (see --source1 and --source2). When '
-         '`--no-source` is passed, missing lines and the source code will '
-         'not be displayed.'
+    "-p2",
+    "--source-prefix2",
+    metavar="<dir-prefix2>",
+    help="Like --source-prefix1, but for applies for --source2.",
+)
+@click.option(
+    "--source/--no-source",
+    default=True,
+    help="Show missing lines and source code. When enabled (default), this "
+    "option requires access to the source code that was used to generate "
+    "both Cobertura reports (see --source1 and --source2). When "
+    "`--no-source` is passed, missing lines and the source code will "
+    "not be displayed.",
 )
 def diff(
-        cobertura_file1, cobertura_file2,
-        color, format, output, source1, source2,
-        source_prefix1, source_prefix2, source):
+    cobertura_file1,
+    cobertura_file2,
+    color,
+    format,
+    output,
+    source1,
+    source2,
+    source_prefix1,
+    source_prefix2,
+    source,
+):
     """compare coverage of two Cobertura reports"""
     fs1 = filesystem_factory(
         report=cobertura_file1, source=source1, source_prefix=source_prefix1
@@ -155,19 +185,19 @@ def diff(
 
     Reporter = delta_reporters[format]
     reporter_args = [cobertura1, cobertura2]
-    reporter_kwargs = {'show_source': source}
+    reporter_kwargs = {"show_source": source}
 
     isatty = True if output is None else output.isatty()
 
-    if format == 'text':
+    if format == "text":
         color = isatty if color is None else color is True
-        reporter_kwargs['color'] = color
+        reporter_kwargs["color"] = color
 
     reporter = Reporter(*reporter_args, **reporter_kwargs)
     report = reporter.generate()
 
     if not isinstance(report, bytes):
-        report = report.encode('utf-8')
+        report = report.encode("utf-8")
 
     click.echo(report, file=output, nl=isatty, color=color)
 
