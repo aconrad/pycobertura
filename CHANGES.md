@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.0 (2020-06-21)
+
 * Let the caller customize the appearance of the HTML report providing a
   `title`, omitting the rendering of sources by means of the boolean
   `render_file_sources` and providing an helpful message to the end-users (in
