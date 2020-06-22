@@ -9,8 +9,8 @@ version = '0.10.5'
 
 try:
     import pypandoc
-    README = pypandoc.convert('README.md', 'rst')
-    CHANGES = pypandoc.convert('CHANGES.md', 'rst')
+    README = pypandoc.convert_file('README.md', 'rst')
+    CHANGES = pypandoc.convert_file('CHANGES.md', 'rst')
 except:
     README = read('README.md')
     CHANGES = read('CHANGES.md')
