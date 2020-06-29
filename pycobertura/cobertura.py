@@ -48,12 +48,15 @@ class Cobertura(object):
         module in order to discover more about filesystems.
         """
         self.xml = ET.parse(report).getroot()
-        report = report if isinstance(report, basestring) else None
+        self.report = report if isinstance(report, basestring) else None
 
         if filesystem:
             self.filesystem = filesystem
         else:
-            self.filesystem = filesystem_factory(report)
+            self.filesystem = filesystem_factory(self.report)
+
+    def __eq__(self, other):
+        return self.report and other.report and self.report == other.report
 
     @memoize
     def _get_class_element_by_filename(self, filename):
@@ -367,6 +370,14 @@ class CoberturaDiff(object):
 
         # Build a dict of lineno2 -> lineno1
         lineno_map = reconcile_lines(lines2, lines1)
+
+        # when we are using the same coverage file for both sides, we need to
+        # translate the coverage of lines1 so that it corresponds to its
+        # real lines.
+        if self.cobertura1 == self.cobertura2:
+            line_statuses1 = {}
+            for l2, l1 in lineno_map.items():
+                line_statuses1[l1] = line_statuses2.get(l2)
 
         lines = []
         for lineno, source in enumerate(lines2, start=1):
