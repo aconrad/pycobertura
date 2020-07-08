@@ -95,6 +95,16 @@ def test_diff_line_rate_by_class_file():
             expected_sources[filename]
 
 
+def test_diff_same_report_different_source_dirs():
+    from pycobertura.cobertura import CoberturaDiff
+
+    cobertura1 = make_cobertura('tests/dummy.uncovered.addcode/coverage.xml', source='tests/dummy.uncovered/dummy/')
+    cobertura2 = make_cobertura('tests/dummy.uncovered.addcode/coverage.xml', source='tests/dummy.uncovered.addcode/dummy/')
+    differ = CoberturaDiff(cobertura1, cobertura2)
+
+    assert differ.diff_missed_lines('dummy.py') == [(2, False), (3, True)]
+
+
 def test_diff_total_hits():
     from pycobertura.cobertura import CoberturaDiff
 
