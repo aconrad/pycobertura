@@ -2,11 +2,11 @@
 
 ## Unreleased
 
-* Fix misreported coverage in single coverage file, two source directories
-  scenario where differences are matched, but statuses were not adjusted.
-  `pycobertura diff` now recognizes when the same coverage report is passed
-  for both source directories, and adjusts the `line_status` for `source1`
-  accounting for the changes between `source1` and `source2`. (@bastih)
+## 1.0.1 (2020-07-08)
+
+* Fix misreported coverage when a single coverage file is used with
+  `pycobertura diff` to overlay covered and uncovered changes between two
+  different sources. Thanks @bastih
 
 ## 1.0.0 (2020-06-21)
 

@@ -371,9 +371,8 @@ class CoberturaDiff(object):
         # Build a dict of lineno2 -> lineno1
         lineno_map = reconcile_lines(lines2, lines1)
 
-        # when we are using the same coverage file for both sides, we need to
-        # translate the coverage of lines1 so that it corresponds to its
-        # real lines.
+        # if we are using a single coverage file, we need to translate the
+        # coverage of lines1 so that it corresponds to its real lines.
         if self.cobertura1 == self.cobertura2:
             line_statuses1 = {}
             for l2, l1 in lineno_map.items():
