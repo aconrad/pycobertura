@@ -15,6 +15,18 @@ def test_parse_path():
     assert cobertura.xml is mock_parse.return_value.getroot.return_value
 
 
+def test_parse_string():
+    from pycobertura import Cobertura
+
+    xml_path = 'foo.xml'
+    with open(xml_path) as f:
+        xml_string = f.read()
+
+    with mock.patch('pycobertura.cobertura.ET.parse') as mock_parse:
+        cobertura = Cobertura(xml_string)
+    assert cobertura.xml is mock_parse.return_value.getroot.return_value
+
+
 def test_version():
     cobertura = make_cobertura()
     assert cobertura.version == '1.9'

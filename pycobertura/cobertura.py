@@ -1,4 +1,6 @@
 import lxml.etree as ET
+import lxml
+import os
 
 from collections import namedtuple
 
@@ -47,7 +49,15 @@ class Cobertura(object):
         files referenced in the report. Please check the pycobertura.filesystem
         module in order to discover more about filesystems.
         """
-        self.xml = ET.parse(report).getroot()
+        try:
+            self.xml = ET.fromstring(report).getroot()
+        except lxml.etree.XMLSyntaxError:
+            # it's not a xml-string, so it should be a path.
+            # is it existed?
+            if not os.path.isfile(report):
+                raise FileNotFoundError("file not existed: {}".format(report))
+            # it is an existed file.
+            self.xml = ET.parse(report).getroot()
         self.report = report if isinstance(report, basestring) else None
 
         if filesystem:
