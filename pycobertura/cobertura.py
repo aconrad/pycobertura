@@ -1,11 +1,9 @@
 import lxml.etree as ET
-import lxml
 import os
 
 from collections import namedtuple
 
 from pycobertura.filesystem import filesystem_factory
-
 
 from pycobertura.utils import (
     extrapolate_coverage,
@@ -39,6 +37,9 @@ class Cobertura(object):
     An XML Cobertura parser.
     """
 
+    class InvalidCoverageReport(Exception):
+        pass
+
     def __init__(self, report, filesystem=None):
         """
         Initialize a Cobertura report given a coverage report `report`. It can
@@ -50,14 +51,10 @@ class Cobertura(object):
         module in order to discover more about filesystems.
         """
         try:
-            self.xml = ET.fromstring(report).getroot()
-        except lxml.etree.XMLSyntaxError:
-            # it's not a xml-string, so it should be a path.
-            # is it existed?
-            if not os.path.isfile(report):
-                raise FileNotFoundError("file not existed: {}".format(report))
-            # it is an existed file.
-            self.xml = ET.parse(report).getroot()
+            self.xml = self._load_from_string(report)
+        except ET.XMLSyntaxError:
+            self.xml = self._load_from_path(report)
+
         self.report = report if isinstance(report, basestring) else None
 
         if filesystem:
@@ -67,6 +64,14 @@ class Cobertura(object):
 
     def __eq__(self, other):
         return self.report and other.report and self.report == other.report
+
+    def _load_from_path(self, report_path):
+        if not os.path.isfile(report_path):
+            raise self.InvalidCoverageReport("Invalid coverage file: {}".format(report_path))
+        return ET.parse(report_path).getroot()
+
+    def _load_from_string(self, s):
+        return ET.fromstring(s)
 
     @memoize
     def _get_class_element_by_filename(self, filename):
