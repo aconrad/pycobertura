@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Support loading Cobertura reports from an XML string. Thanks @williamfzc
+
 ## 1.0.1 (2020-07-08)
 
 * Fix misreported coverage when a single coverage file is used with

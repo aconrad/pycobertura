@@ -1,5 +1,6 @@
 import mock
 import pytest
+import lxml.etree as ET
 
 from .utils import make_cobertura
 
@@ -7,12 +8,21 @@ from .utils import make_cobertura
 def test_parse_path():
     from pycobertura import Cobertura
 
-    xml_path = 'foo.xml'
+    xml_path = 'tests/cobertura.xml'
 
     with mock.patch('pycobertura.cobertura.ET.parse') as mock_parse:
         cobertura = Cobertura(xml_path)
 
     assert cobertura.xml is mock_parse.return_value.getroot.return_value
+
+
+def test_parse_string():
+    from pycobertura import Cobertura
+
+    xml_path = 'tests/cobertura.xml'
+    with open(xml_path) as f:
+        xml_string = f.read()
+    assert ET.tostring(Cobertura(xml_path).xml) == ET.tostring(Cobertura(xml_string).xml)
 
 
 def test_version():
