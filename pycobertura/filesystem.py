@@ -151,7 +151,9 @@ def filesystem_factory(report=None, source=None, source_prefix=None, ref=None):
     ID or a git ref ID.
     """
     if source is None:
-        if isinstance(report, str):
+        if isinstance(report, io.IOBase):
+            source = os.path.dirname(report.name)
+        elif isinstance(report, str):
             # get the directory in which the coverage file lives
             source = os.path.dirname(report)
 

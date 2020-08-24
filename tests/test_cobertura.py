@@ -9,9 +9,18 @@ def test_parse_path():
     from pycobertura import Cobertura
 
     xml_path = 'tests/cobertura.xml'
-
     with mock.patch('pycobertura.cobertura.ET.parse') as mock_parse:
         cobertura = Cobertura(xml_path)
+
+    assert cobertura.xml is mock_parse.return_value.getroot.return_value
+
+
+def test_parse_file_object():
+    from pycobertura import Cobertura
+
+    xml_path = 'tests/cobertura.xml'
+    with mock.patch('pycobertura.cobertura.ET.parse') as mock_parse:
+        cobertura = Cobertura(open(xml_path))
 
     assert cobertura.xml is mock_parse.return_value.getroot.return_value
 
@@ -23,6 +32,13 @@ def test_parse_string():
     with open(xml_path) as f:
         xml_string = f.read()
     assert ET.tostring(Cobertura(xml_path).xml) == ET.tostring(Cobertura(xml_string).xml)
+
+
+def test_invalid_coverage_report():
+    from pycobertura import Cobertura
+
+    xml_path = 'non-existent.xml'
+    pytest.raises(Cobertura.InvalidCoverageReport, Cobertura, xml_path)
 
 
 def test_version():

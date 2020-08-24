@@ -3,6 +3,7 @@
 ## Unreleased
 
 * Support loading Cobertura reports from an XML string. Thanks @williamfzc
+* Fix (or add?!) support for providing file objects to `Cobertura`.
 
 ## 1.0.1 (2020-07-08)
 
