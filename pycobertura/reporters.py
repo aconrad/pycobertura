@@ -60,7 +60,11 @@ class TextReporter(Reporter):
         formatted_missed_lines = ", ".join(formatted_missed_lines)
 
         row = file_row_missed(
-            filename, total_lines, total_misses, line_rate, formatted_missed_lines,
+            filename,
+            total_lines,
+            total_misses,
+            line_rate,
+            formatted_missed_lines,
         )
 
         return row
