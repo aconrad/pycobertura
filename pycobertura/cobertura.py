@@ -1,5 +1,4 @@
 import lxml.etree as ET
-import os
 
 from collections import namedtuple
 
@@ -42,33 +41,37 @@ class Cobertura(object):
 
     def __init__(self, report, filesystem=None):
         """
-        Initialize a Cobertura report given a coverage report `report`. It can
-        be either a file object or the path to an XML file that is in the
-        Cobertura format.
+        Initialize a Cobertura report given a coverage report `report` that is
+        an XML file in the Cobertura format. It can represented as either:
 
-        The optional argument `filesystem` describes how to retrieve the source
-        files referenced in the report. Please check the pycobertura.filesystem
-        module in order to discover more about filesystems.
+            - a file object
+            - a file path
+            - an XML string
+
+        The optional keyword argument `filesystem` describes how to retrieve the
+        source files referenced in the report. Please check the
+        `pycobertura.filesystem` module to learn more about filesystems.
         """
-        try:
-            self.xml = self._load_from_string(report)
-        except ET.XMLSyntaxError:
-            self.xml = self._load_from_path(report)
-
-        self.report = report if isinstance(report, basestring) else None
-
-        if filesystem:
-            self.filesystem = filesystem
+        for load_func in [
+            self._load_from_file,
+            self._load_from_string,
+        ]:
+            try:
+                self.xml = load_func(report)
+                break
+            except BaseException:
+                pass
         else:
-            self.filesystem = filesystem_factory(self.report)
+            raise self.InvalidCoverageReport("Invalid coverage file: {}".format(report))
+
+        self.filesystem = filesystem or filesystem_factory(report)
+        self.report = report
 
     def __eq__(self, other):
         return self.report and other.report and self.report == other.report
 
-    def _load_from_path(self, report_path):
-        if not os.path.isfile(report_path):
-            raise self.InvalidCoverageReport("Invalid coverage file: {}".format(report_path))
-        return ET.parse(report_path).getroot()
+    def _load_from_file(self, report_file):
+        return ET.parse(report_file).getroot()
 
     def _load_from_string(self, s):
         return ET.fromstring(s)
@@ -120,7 +123,7 @@ class Cobertura(object):
         """
         el = self._get_class_element_by_filename(filename)
         lines = el.xpath("./lines/line[@hits=0]")
-        return [int(l.attrib["number"]) for l in lines]
+        return [int(line.attrib["number"]) for line in lines]
 
     @memoize
     def hit_statements(self, filename):

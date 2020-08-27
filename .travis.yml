@@ -1,11 +1,17 @@
 language: python
-python:
-  - "3.5"
-  - "3.6"      # current default Python on Travis CI
-  - "3.7"
+jobs:
+  include:
+    - python: 3.5
+      env: TOXENV=py35
+    - python: 3.6
+      env: TOXENV=py36
+    - python: 3.7
+      env: TOXENV=py37
+    - env: TOXENV=pep8
+    - env: TOXENV=black
 
 install:
-    - pip install tox-travis
+  - pip install tox
 
 # Because the tests access the first git commit, we need to fetch the whole
 # pycobertura repository without using a git --depth parameter. See
@@ -14,7 +20,7 @@ git:
   depth: false
 
 script:
-    - tox
+  - tox
 
 after_success:
   - |
