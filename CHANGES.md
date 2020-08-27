@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+* BACKWARD INCOMPATIBLE: The class `Cobertura` no longer instantiates a default
+  `FileSystem` object if none is provided in the constructor
+  `Cobertura.__init__(filesystem=...)`. If the content of files is accessed
+  (e.g. to render a full coverage report) then a `FileSystem` instance must be
+  provided.
+* The class `Cobertura` will raise `FileSystemMissingForSource` if no
+  `FileSystem` object was provided via the keyword argument
+  `Cobertura(filesystem=...)`. It will only be raised when calling methods that
+  attempt to read the content of files, e.g. `Cobertura.file_source(...)` or
+  `Cobertura.source_lines(...)`.
+
 ## 1.1.0 (2020-08-26)
 
 * Support loading Cobertura reports from an XML string. Thanks @williamfzc

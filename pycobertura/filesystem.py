@@ -133,30 +133,17 @@ class GitFileSystem(FileSystem):
         yield io.StringIO(output)
 
 
-def filesystem_factory(report=None, source=None, source_prefix=None, ref=None):
+def filesystem_factory(source, source_prefix=None, ref=None):
     """
-    The optional argument `report` is the location of the cobertura report.
-    It will be used to build the sources path.
+    The argument `source` is the location of the source code provided as a
+    directory path or a file object zip archive containing the source code.
 
-    The optional argument `source` is the location of the source code
-    provided as a directory path or a file object zip archive containing
-    the source code.
+    The optional argument `source` is the location of the source code provided
+    as a directory path or a file object zip archive containing the source code.
 
-    The optional argument `source_prefix` will be used to lookup source
-    files if a zip archive is provided and will be prepended to filenames
-    found in the coverage report.
-
-    The optional argument `ref` will be taken into account when
-    instantiating a GitFileSystem, and it shall be a branch name, a commit
-    ID or a git ref ID.
+    The optional argument `ref` will be taken into account when instantiating a
+    GitFileSystem, and it shall be a branch name, a commit ID or a git ref ID.
     """
-    if source is None:
-        if isinstance(report, io.IOBase):
-            source = os.path.dirname(report.name)
-        elif isinstance(report, str):
-            # get the directory in which the coverage file lives
-            source = os.path.dirname(report)
-
     if zipfile.is_zipfile(source):
         return ZipFileSystem(source, source_prefix=source_prefix)
 
