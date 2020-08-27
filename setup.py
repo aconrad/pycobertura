@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
-version = '1.0.1'
+version = '1.1.0'
 
 try:
     import pypandoc
