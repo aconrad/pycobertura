@@ -137,8 +137,9 @@ def test_diff_total_hits_by_class_file():
 def test_diff__has_all_changes_covered__some_changed_code_is_still_uncovered():
     from pycobertura.cobertura import Cobertura, CoberturaDiff
 
-    cobertura1 = Cobertura('tests/dummy.zeroexit1/coverage.xml')
-    cobertura2 = Cobertura('tests/dummy.zeroexit2/coverage.xml')
+    cobertura1 = make_cobertura('tests/dummy.zeroexit1/coverage.xml')
+    cobertura2 = make_cobertura('tests/dummy.zeroexit2/coverage.xml')
+
     differ = CoberturaDiff(cobertura1, cobertura2)
     assert differ.has_all_changes_covered() is False
 

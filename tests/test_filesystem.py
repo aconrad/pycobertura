@@ -117,7 +117,7 @@ def test_filesystem_git():
 
         expected_git_filename = "master:tests/dummy/test-file"
         git_filename = fs.real_filename(filename)
-        assert git_filename == expected_git_filename 
+        assert git_filename == expected_git_filename
 
         expected_command = ["git", "--no-pager", "show", git_filename]
         subprocess_mock.check_output.assert_called_with(expected_command, cwd=folder)

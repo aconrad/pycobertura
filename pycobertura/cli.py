@@ -8,6 +8,7 @@ from pycobertura.reporters import (
     TextReporterDelta,
 )
 from pycobertura.filesystem import filesystem_factory
+from pycobertura.utils import get_dir_from_file_path
 
 pycobertura = click.Group()
 
@@ -71,8 +72,13 @@ def get_exit_code(differ, source):
 )
 def show(cobertura_file, format, output, source, source_prefix):
     """show coverage summary of a Cobertura report"""
-    fs = filesystem_factory(cobertura_file, source=source)
-    cobertura = Cobertura(cobertura_file, filesystem=fs)
+    if not source:
+        source = get_dir_from_file_path(cobertura_file)
+
+    cobertura = Cobertura(
+        cobertura_file,
+        filesystem=filesystem_factory(source, source_prefix=source_prefix),
+    )
     Reporter = reporters[format]
     reporter = Reporter(cobertura)
     report = reporter.generate()
@@ -174,14 +180,19 @@ def diff(
     source,
 ):
     """compare coverage of two Cobertura reports"""
-    fs1 = filesystem_factory(
-        report=cobertura_file1, source=source1, source_prefix=source_prefix1
-    )
-    fs2 = filesystem_factory(
-        report=cobertura_file2, source=source2, source_prefix=source_prefix2
-    )
-    cobertura1 = Cobertura(cobertura_file1, filesystem=fs1)
-    cobertura2 = Cobertura(cobertura_file2, filesystem=fs2)
+    # Assume that the source is located in the same directory as the provided
+    # coverage files if no source directories are provided.
+    if not source1:
+        source1 = get_dir_from_file_path(cobertura_file1)
+
+    if not source2:
+        source2 = get_dir_from_file_path(cobertura_file2)
+
+    filesystem1 = filesystem_factory(source1, source_prefix=source_prefix1)
+    cobertura1 = Cobertura(cobertura_file1, filesystem=filesystem1)
+
+    filesystem2 = filesystem_factory(source2, source_prefix=source_prefix2)
+    cobertura2 = Cobertura(cobertura_file2, filesystem=filesystem2)
 
     Reporter = delta_reporters[format]
     reporter_args = [cobertura1, cobertura2]

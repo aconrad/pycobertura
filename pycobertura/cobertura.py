@@ -2,8 +2,6 @@ import lxml.etree as ET
 
 from collections import namedtuple
 
-from pycobertura.filesystem import filesystem_factory
-
 from pycobertura.utils import (
     extrapolate_coverage,
     reconcile_lines,
@@ -39,6 +37,9 @@ class Cobertura(object):
     class InvalidCoverageReport(Exception):
         pass
 
+    class FileSystemMissingForSource(Exception):
+        pass
+
     def __init__(self, report, filesystem=None):
         """
         Initialize a Cobertura report given a coverage report `report` that is
@@ -64,7 +65,7 @@ class Cobertura(object):
         else:
             raise self.InvalidCoverageReport("Invalid coverage file: {}".format(report))
 
-        self.filesystem = filesystem or filesystem_factory(report)
+        self.filesystem = filesystem
         self.report = report
 
     def __eq__(self, other):
@@ -161,12 +162,23 @@ class Cobertura(object):
         statuses = extrapolate_coverage(statuses)
         return [lno for lno, status in statuses if status is False]
 
+    def _raise_FileSystemMissingForSource(self, filename):
+        raise self.FileSystemMissingForSource(
+            "Unable to read file: {filename}. "
+            "A FileSystem instance must be provided via "
+            "Cobertura(filesystem=...) to locate and read the source "
+            "content of the file.".format(filename=filename)
+        )
+
     @memoize
     def file_source(self, filename):
         """
         Return a list of namedtuple `Line` for each line of code found in the
         source file with the given `filename`.
         """
+        if self.filesystem is None:
+            self._raise_FileSystemMissingForSource(filename)
+
         lines = []
         try:
             with self.filesystem.open(filename) as f:
@@ -259,6 +271,9 @@ class Cobertura(object):
         """
         Return a list for source lines of file `filename`.
         """
+        if self.filesystem is None:
+            self._raise_FileSystemMissingForSource(filename)
+
         with self.filesystem.open(filename) as f:
             return f.readlines()
 

@@ -1,5 +1,7 @@
 import colorama
 import difflib
+import os
+
 from functools import partial
 
 
@@ -208,3 +210,7 @@ def hunkify_lines(lines, context=3):
         hunks.append(hunk)
 
     return hunks
+
+
+def get_dir_from_file_path(file_path):
+    return os.path.dirname(file_path) or "."

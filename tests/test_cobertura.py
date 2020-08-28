@@ -279,3 +279,24 @@ def test_class_file_source__sources_found(report, source, source_prefix):
     for filename in cobertura.files():
         assert cobertura.file_source(filename) == \
                expected_sources[filename]
+
+
+def test_class_file_source__raises_when_no_filesystem():
+    from pycobertura.cobertura import Cobertura
+    cobertura = Cobertura('tests/cobertura.xml')
+    for filename in cobertura.files():
+        pytest.raises(
+            Cobertura.FileSystemMissingForSource,
+            cobertura.file_source,
+            filename
+        )
+
+def test_class_source_lines__raises_when_no_filesystem():
+    from pycobertura.cobertura import Cobertura
+    cobertura = Cobertura('tests/cobertura.xml')
+    for filename in cobertura.files():
+        pytest.raises(
+            Cobertura.FileSystemMissingForSource,
+            cobertura.source_lines,
+            filename
+        )
