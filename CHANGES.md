@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unreleased
+## 2.0.0 (2020-09-03)
 
 * BACKWARD INCOMPATIBLE: The class `Cobertura` no longer instantiates a default
   `FileSystem` object if none is provided in the constructor
