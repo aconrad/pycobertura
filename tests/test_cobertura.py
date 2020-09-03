@@ -286,7 +286,7 @@ def test_class_file_source__raises_when_no_filesystem():
     cobertura = Cobertura('tests/cobertura.xml')
     for filename in cobertura.files():
         pytest.raises(
-            Cobertura.FileSystemMissingForSource,
+            Cobertura.MissingFileSystem,
             cobertura.file_source,
             filename
         )
@@ -296,7 +296,7 @@ def test_class_source_lines__raises_when_no_filesystem():
     cobertura = Cobertura('tests/cobertura.xml')
     for filename in cobertura.files():
         pytest.raises(
-            Cobertura.FileSystemMissingForSource,
+            Cobertura.MissingFileSystem,
             cobertura.source_lines,
             filename
         )
