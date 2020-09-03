@@ -4,6 +4,7 @@
 # - install twine: pip install twine
 # - bump package version in setup.py
 # - update the package version in the CHANGES file
+# - commit the changes to master and push
 
 PKG_NAME=$(python setup.py --name)
 PKG_VERSION=$(python setup.py --version)
