@@ -37,7 +37,7 @@ class Cobertura(object):
     class InvalidCoverageReport(Exception):
         pass
 
-    class FileSystemMissingForSource(Exception):
+    class MissingFileSystem(Exception):
         pass
 
     def __init__(self, report, filesystem=None):
@@ -162,8 +162,8 @@ class Cobertura(object):
         statuses = extrapolate_coverage(statuses)
         return [lno for lno, status in statuses if status is False]
 
-    def _raise_FileSystemMissingForSource(self, filename):
-        raise self.FileSystemMissingForSource(
+    def _raise_MissingFileSystem(self, filename):
+        raise self.MissingFileSystem(
             "Unable to read file: {filename}. "
             "A FileSystem instance must be provided via "
             "Cobertura(filesystem=...) to locate and read the source "
@@ -177,7 +177,7 @@ class Cobertura(object):
         source file with the given `filename`.
         """
         if self.filesystem is None:
-            self._raise_FileSystemMissingForSource(filename)
+            self._raise_MissingFileSystem(filename)
 
         lines = []
         try:
@@ -272,7 +272,7 @@ class Cobertura(object):
         Return a list for source lines of file `filename`.
         """
         if self.filesystem is None:
-            self._raise_FileSystemMissingForSource(filename)
+            self._raise_MissingFileSystem(filename)
 
         with self.filesystem.open(filename) as f:
             return f.readlines()
