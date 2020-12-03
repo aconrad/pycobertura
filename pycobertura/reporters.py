@@ -71,6 +71,8 @@ class TextReporter(Reporter):
         return row
 
     def generate(self):
+        lines = self.get_report_lines()
+
         formatted_lines = []
         for row in lines:
             formatted_row = self.format_row(row)

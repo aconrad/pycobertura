@@ -48,7 +48,7 @@ def get_exit_code(differ, source):
 
 @pycobertura.command()
 @click.argument("cobertura_file")
-@click.option("-f", "--format", default="textdir", type=click.Choice(list(reporters)))
+@click.option("-f", "--format", default="text", type=click.Choice(list(reporters)))
 @click.option(
     "-o",
     "--output",
