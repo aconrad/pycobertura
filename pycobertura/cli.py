@@ -4,6 +4,7 @@ from pycobertura.cobertura import Cobertura
 from pycobertura.reporters import (
     HtmlReporter,
     TextReporter,
+    TextDirectorySummaryReporter,
     HtmlReporterDelta,
     TextReporterDelta,
 )
@@ -16,6 +17,7 @@ pycobertura = click.Group()
 reporters = {
     "html": HtmlReporter,
     "text": TextReporter,
+    "textdir": TextDirectorySummaryReporter
 }
 
 
@@ -46,7 +48,7 @@ def get_exit_code(differ, source):
 
 @pycobertura.command()
 @click.argument("cobertura_file")
-@click.option("-f", "--format", default="text", type=click.Choice(list(reporters)))
+@click.option("-f", "--format", default="textdir", type=click.Choice(list(reporters)))
 @click.option(
     "-o",
     "--output",
@@ -180,6 +182,8 @@ def diff(
     source,
 ):
     """compare coverage of two Cobertura reports"""
+    print("diffsnaotehusanotehusaontehu")
+
     # Assume that the source is located in the same directory as the provided
     # coverage files if no source directories are provided.
     if not source1:
