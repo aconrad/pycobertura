@@ -182,8 +182,6 @@ def diff(
     source,
 ):
     """compare coverage of two Cobertura reports"""
-    print("diffsnaotehusanotehusaontehu")
-
     # Assume that the source is located in the same directory as the provided
     # coverage files if no source directories are provided.
     if not source1:

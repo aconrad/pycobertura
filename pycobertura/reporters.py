@@ -104,7 +104,7 @@ class TextDirectorySummaryReporter(Reporter):
         reverseset = {}
         resultgroup = {}
         lines = self.get_report_lines()
-        with open("/home/willi/src/pycobertura/pycobertura/groups.yml") as fileh:
+        with open("pycobertura/groups.yml") as fileh:
             fileset = yaml.load(fileh, Loader=yaml.Loader)
         for key in fileset.keys():
             for directory in fileset[key].split(' '):
