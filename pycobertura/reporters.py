@@ -141,8 +141,8 @@ class TextDirectorySummaryReporter(Reporter):
                 else:
                     print('path not covered in config: ' + strpath)
                 last_path = path
-                dir_total_lines = 0
-                dir_total_missed = 0
+                dir_total_lines = total_lines
+                dir_total_missed = total_misses
             else:
                 dir_total_lines += total_lines
                 dir_total_missed += total_misses
