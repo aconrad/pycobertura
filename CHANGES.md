@@ -1,5 +1,9 @@
 # Release Notes
 
+## Unreleased
+
+* Drop the `colorama` dependency in favor of hardcoded ANSI escape codes
+
 ## 2.0.0 (2020-09-03)
 
 * BACKWARD INCOMPATIBLE: The class `Cobertura` no longer instantiates a default
