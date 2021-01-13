@@ -32,7 +32,7 @@ setup(
     packages=find_packages(exclude=['tests']),
     long_description='%s\n\n%s' % (README, CHANGES),
     setup_requires=['setuptools_git'],
-    install_requires=['click>=4.0', 'colorama', 'jinja2', 'lxml', 'tabulate'],
+    install_requires=['click>=4.0', 'jinja2', 'lxml', 'tabulate'],
     classifiers=[
         "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: OSI Approved :: MIT License",

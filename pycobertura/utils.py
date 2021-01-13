@@ -1,8 +1,13 @@
-import colorama
 import difflib
 import os
 
 from functools import partial
+
+ANSI_ESCAPE_CODES = {
+    "green": "\x1b[32m",
+    "red": "\x1b[31m",
+    "reset": "\x1b[39m",
+}
 
 
 # Recipe from https://github.com/ActiveState/
@@ -48,8 +53,8 @@ class memoize(object):
 
 
 def colorize(text, color):
-    color_code = getattr(colorama.Fore, color.upper())
-    return "%s%s%s" % (color_code, text, colorama.Fore.RESET)
+    color_code = ANSI_ESCAPE_CODES[color]
+    return "%s%s%s" % (color_code, text, ANSI_ESCAPE_CODES["reset"])
 
 
 def red(text):
