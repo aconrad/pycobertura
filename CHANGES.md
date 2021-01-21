@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.1 (2021-01-20)
+
 * Drop the `colorama` dependency in favor of hardcoded ANSI escape codes.
   Thanks @luislew
 
