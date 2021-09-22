@@ -531,3 +531,133 @@ def test_html_report_delta():
     </div>
   </body>
 </html>"""
+
+
+def test_html_report_delta__show_missing_False():
+    from pycobertura.reporters import HtmlReporterDelta
+
+    cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
+    cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
+
+    report_delta = HtmlReporterDelta(cobertura1, cobertura2, show_missing=False)
+    html_output = report_delta.generate()
+
+    assert remove_style_tag(html_output) == u"""\
+<html>
+  <head>
+    <title>pycobertura report</title>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <div class="container">
+      <table class="u-full-width">
+        <thead>
+          <tr>
+            <th>Filename</th>
+            <th>Stmts</th>
+            <th>Miss</th>
+            <th>Cover</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="#dummy/dummy.py">dummy/dummy.py</a></td>
+            <td>-</td>
+            <td><span class="green">-2</span></td>
+            <td>+40.00%</td>
+          </tr>
+          <tr>
+            <td><a href="#dummy/dummy2.py">dummy/dummy2.py</a></td>
+            <td>+2</td>
+            <td><span class="red">+1</span></td>
+            <td>-25.00%</td>
+          </tr>
+          <tr>
+            <td><a href="#dummy/dummy3.py">dummy/dummy3.py</a></td>
+            <td>+2</td>
+            <td><span class="red">+2</span></td>
+            <td>-</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>TOTAL</td>
+            <td>+4</td>
+            <td><span class="red">+1</span></td>
+            <td>+31.06%</td>
+          </tr>
+        </tfoot>
+      </table><div class="legend">
+  <dl>
+    <dt><code>code</code></dt><dd>coverage unchanged</dd>
+    <dt class="hit"><code>code</code></dt><dd>coverage increased</dd>
+    <dt class="miss"><code>code</code></dt><dd>coverage decreased</dd>
+    <dt><code>+</code></dt><dd>line added or modified</dd>
+  </dl>
+</div>
+<h4 id="dummy/dummy.py">dummy/dummy.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>2 &nbsp;
+3 &nbsp;
+4 &nbsp;
+5 &nbsp;
+6 +
+</pre>
+      </td>
+      <td class="source">
+        <pre><span class="noop">    pass
+</span><span class="noop">
+</span><span class="noop">def bar():
+</span><span class="hit">    a = &#39;a&#39;
+</span><span class="hit">    d = &#39;d&#39;
+</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h4 id="dummy/dummy2.py">dummy/dummy2.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 &nbsp;
+2 +
+3 &nbsp;
+4 +
+5 &nbsp;
+</pre>
+      </td>
+      <td class="source">
+        <pre><span class="noop">def baz():
+</span><span class="hit">    c = &#39;c&#39;
+</span><span class="noop">
+</span><span class="hit">def bat():
+</span><span class="miss">    pass
+</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h4 id="dummy/dummy3.py">dummy/dummy3.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 +
+2 +
+</pre>
+      </td>
+      <td class="source">
+        <pre><span class="miss">def foobar():
+</span><span class="miss">    pass  # This is a very long comment that was purposefully written so we could test how HTML rendering looks like when the boundaries of the page are reached. And here is a non-ascii char: \u015e
+</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+  </body>
+</html>"""
