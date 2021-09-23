@@ -239,6 +239,16 @@ class TextReporterDelta(DeltaReporter):
 
 
 class HtmlReporterDelta(TextReporterDelta):
+    def __init__(self, *args, **kwargs):
+        """
+        Takes the same arguments as `TextReporterDelta` but also takes the keyword
+        argument `show_missing` which can be set to True or False to set whether
+        or not the generated report should contain a listing of missing lines in
+        the summary table.
+        """
+        self.show_missing = kwargs.pop("show_missing", True)
+        super(HtmlReporterDelta, self).__init__(*args, **kwargs)
+
     def get_source_hunks(self, filename):
         hunks = self.differ.file_source_hunks(filename)
         return hunks
@@ -248,7 +258,7 @@ class HtmlReporterDelta(TextReporterDelta):
         total_misses = "%+d" % row.total_misses if row.total_misses else "-"
         line_rate = "%+.2f%%" % (row.line_rate * 100) if row.line_rate else "-"
 
-        if self.show_source is True:
+        if self.show_source is True and self.show_missing is True:
             missed_lines = [
                 "%s%d" % (["-", "+"][is_new], lno) for lno, is_new in row.missed_lines
             ]
@@ -260,7 +270,7 @@ class HtmlReporterDelta(TextReporterDelta):
             line_rate,
         ]
 
-        if self.show_source is True:
+        if self.show_source is True and self.show_missing is True:
             row_values.append(missed_lines)
             row = file_row_missed(*row_values)
         else:
@@ -289,6 +299,7 @@ class HtmlReporterDelta(TextReporterDelta):
         render_kwargs = {
             "lines": formatted_lines[:-1],
             "footer": formatted_lines[-1],
+            "show_missing": self.show_missing,
             "show_source": self.show_source,
         }
 

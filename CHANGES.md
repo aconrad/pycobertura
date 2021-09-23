@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+* Added the option `show_missing` to `HtmlReporterDelta`, which specifies
+  whether or not the "Missing" column is displayed in the generated
+  summary table.
+
 ## 2.0.1 (2021-01-20)
 
 * Drop the `colorama` dependency in favor of hardcoded ANSI escape codes.

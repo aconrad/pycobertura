@@ -28,7 +28,7 @@ table.code td.lineno pre {margin-right: 1rem;}
             <th>Stmts</th>
             <th>Miss</th>
             <th>Cover</th>
-{%- if show_source %}
+{%- if show_source and show_missing %}
             <th>Missing</th>
 {%- endif %}
           </tr>
@@ -40,7 +40,7 @@ table.code td.lineno pre {margin-right: 1rem;}
             <td>{{ line.total_statements }}</td>
             <td><span{% if line.total_misses != '-' %} class="{% if line.total_misses[0] == '+' %}red{% else %}green{% endif%}"{% endif %}>{{ line.total_misses }}</span></td>
             <td>{{ line.line_rate }}</td>
-{%- if show_source %}
+{%- if show_source and show_missing %}
             <td>
 {%- for missed_line in line.missed_lines %}
             {%- if not loop.first %}, {% endif %}<span class="{% if missed_line[0] == '+' %}red{% else %}green{% endif %}">{{ missed_line }}</span>
@@ -56,7 +56,7 @@ table.code td.lineno pre {margin-right: 1rem;}
             <td>{{ footer.total_statements }}</td>
             <td><span{% if footer.total_misses != '-' %} class="{% if footer.total_misses[0] == '+' %}red{% else %}green{% endif%}"{% endif %}>{{ footer.total_misses }}</span></td>
             <td>{{ footer.line_rate }}</td>
-{%- if show_source %}
+{%- if show_source and show_missing %}
             <td></td>
 {%- endif %}
           </tr>
