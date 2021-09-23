@@ -2,9 +2,11 @@
 
 ## Unreleased
 
+## 2.1.0 (2021-09-23)
+
 * Added the option `show_missing` to `HtmlReporterDelta`, which specifies
   whether or not the "Missing" column is displayed in the generated
-  summary table.
+  summary table. Thanks @loganharbour
 
 ## 2.0.1 (2021-01-20)
 
