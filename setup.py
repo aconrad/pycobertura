@@ -7,13 +7,10 @@ def read(fname):
 
 version = '2.1.0'
 
-try:
-    import pypandoc
-    README = pypandoc.convert_file('README.md', 'rst')
-    CHANGES = pypandoc.convert_file('CHANGES.md', 'rst')
-except:
-    README = read('README.md')
-    CHANGES = read('CHANGES.md')
+# According to https://packaging.python.org/en/latest/guides/making-a-pypi-friendly-readme/ .md is supported 
+# -> no pypandoc needed anymore to generate reStructuredText
+
+long_description = read('README.md') + '\n' + read('CHANGES.md') + '\n'
 
 setup(
     name="pycobertura",
@@ -30,7 +27,8 @@ setup(
     zip_safe=False,
     include_package_data=True,
     packages=find_packages(exclude=['tests']),
-    long_description='%s\n\n%s' % (README, CHANGES),
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     setup_requires=['setuptools_git'],
     install_requires=['click>=4.0', 'jinja2', 'lxml', 'tabulate'],
     classifiers=[
