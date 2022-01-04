@@ -169,9 +169,9 @@ class TextReporterDelta(DeltaReporter):
         super(TextReporterDelta, self).__init__(*args, **kwargs)
 
     def format_row(self, row):
-        total_statements = "%+d" % row.total_statements if row.total_statements else "-"
-        line_rate = "%+.2f%%" % (row.line_rate * 100) if row.line_rate else "-"
-        total_misses = "%+d" % row.total_misses if row.total_misses else "-"
+        total_statements = f"{row.total_statements:+d}"  if row.total_statements else "-"
+        line_rate = f"{row.line_rate:+.2%}" if row.line_rate else "-"
+        total_misses = f"{row.total_misses:+d}" if row.total_misses else "-"
 
         if self.color is True and total_misses != "-":
             colorize = [green, red][total_misses[0] == "+"]
@@ -179,7 +179,7 @@ class TextReporterDelta(DeltaReporter):
 
         if self.show_source is True:
             missed_lines = [
-                "%s%d" % (["-", "+"][is_new], lno) for lno, is_new in row.missed_lines
+                f"{}{}".format(["-", "+"][is_new], lno) for lno, is_new in row.missed_lines
             ]
 
             if self.color is True:
