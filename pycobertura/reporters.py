@@ -179,7 +179,7 @@ class TextReporterDelta(DeltaReporter):
 
         if self.show_source is True:
             missed_lines = [
-                f"{}{}".format(["-", "+"][is_new], lno) for lno, is_new in row.missed_lines
+                "{}{}".format(["-", "+"][is_new], lno) for lno, is_new in row.missed_lines
             ]
 
             if self.color is True:
