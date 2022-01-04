@@ -178,9 +178,7 @@ class TextReporterDelta(DeltaReporter):
             total_misses = colorize(total_misses)
 
         if self.show_source is True:
-            missed_lines = [
-                "{}{}".format(["-", "+"][is_new], lno) for lno, is_new in row.missed_lines
-            ]
+            missed_lines = [f"+{lno:d}" if is_new else f"-{lno:d}" for lno, is_new in row.missed_lines]
 
             if self.color is True:
                 missed_lines_colored = []
@@ -208,10 +206,7 @@ class TextReporterDelta(DeltaReporter):
     def generate(self):
         lines = self.get_report_lines()
 
-        formatted_lines = []
-        for row in lines:
-            formatted_row = self.format_row(row)
-            formatted_lines.append(formatted_row)
+        formatted_lines = [self.format_row(row) for row in lines]
 
         headers = ["Filename", "Stmts", "Miss", "Cover"]
 
@@ -239,14 +234,13 @@ class HtmlReporterDelta(TextReporterDelta):
         return hunks
 
     def format_row(self, row):
-        total_statements = "%+d" % row.total_statements if row.total_statements else "-"
-        total_misses = "%+d" % row.total_misses if row.total_misses else "-"
-        line_rate = "%+.2f%%" % (row.line_rate * 100) if row.line_rate else "-"
+        total_statements = f"{row.total_statements:+d}"  if row.total_statements else "-"
+        line_rate = f"{row.line_rate:+.2%}" if row.line_rate else "-"
+        total_misses = f"{row.total_misses:+d}" if row.total_misses else "-"
 
         if self.show_source is True and self.show_missing is True:
-            missed_lines = [
-                "%s%d" % (["-", "+"][is_new], lno) for lno, is_new in row.missed_lines
-            ]
+            missed_lines = [f"+{lno:d}" if is_new else f"-{lno:d}" for lno, is_new in row.missed_lines]
+
 
         row_values = [
             row.filename,
@@ -266,10 +260,7 @@ class HtmlReporterDelta(TextReporterDelta):
     def generate(self):
         lines = self.get_report_lines()
 
-        formatted_lines = []
-        for row in lines:
-            formatted_row = self.format_row(row)
-            formatted_lines.append(formatted_row)
+        formatted_lines = [self.format_row(row) for row in lines]
 
         if self.show_source is True:
             sources = []
