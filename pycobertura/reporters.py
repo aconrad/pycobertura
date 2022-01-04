@@ -51,10 +51,7 @@ class TextReporter(Reporter):
 
         line_rate = f"{line_rate:.2%}"
 
-        formatted_missed_lines = []
-        for line_start, line_stop in rangify(missed_lines):
-            line_range = f"{line_start}" if line_start == line_stop else f"{line_start}-{line_stop}"
-            formatted_missed_lines.append(line_range)
+        formatted_missed_lines = [f"{line_start}" if line_start == line_stop else f"{line_start}-{line_stop}" for line_start, line_stop in rangify(missed_lines)]
         formatted_missed_lines = ", ".join(formatted_missed_lines)
 
         row = file_row_missed(
