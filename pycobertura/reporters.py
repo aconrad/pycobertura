@@ -69,12 +69,7 @@ class TextReporter(Reporter):
 
     def generate(self):
         lines = self.get_report_lines()
-
-        #formatted_lines = lines
-        formatted_lines = []
-        for row in lines:
-            formatted_row = self.format_row(row)
-            formatted_lines.append(formatted_row)
+        formatted_lines = [self.format_row(row) for row in lines]
 
         report = tabulate(
             formatted_lines, headers=["Filename", "Stmts", "Miss", "Cover", "Missing"]
