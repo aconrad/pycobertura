@@ -20,17 +20,14 @@ class Reporter(object):
         self.cobertura = cobertura
 
     def get_report_lines(self):
-        lines = []
 
-        for filename in self.cobertura.files():
-            row = file_row_missed(
+        rows = [file_row_missed(
                 filename,
                 self.cobertura.total_statements(filename),
                 self.cobertura.total_misses(filename),
                 self.cobertura.line_rate(filename),
                 self.cobertura.missed_lines(filename),
-            )
-            lines.append(row)
+            ) for filename in self.cobertura.files()]
 
         footer = file_row_missed(
             "TOTAL",
@@ -39,9 +36,9 @@ class Reporter(object):
             self.cobertura.line_rate(),
             [],  # dummy missed lines
         )
-        lines.append(footer)
+        rows.append(footer)
 
-        return lines
+        return rows
 
 
 class TextReporter(Reporter):
