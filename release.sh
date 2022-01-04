@@ -6,6 +6,7 @@
 # - update the package version in the CHANGES file
 # - commit the changes to master and push
 
+# TODO: update with setup.cfg configparser read metadata
 PKG_NAME=$(python setup.py --name)
 PKG_VERSION=$(python setup.py --version)
 
