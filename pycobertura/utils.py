@@ -54,7 +54,7 @@ class memoize(object):
 
 def colorize(text, color):
     color_code = ANSI_ESCAPE_CODES[color]
-    return "%s%s%s" % (color_code, text, ANSI_ESCAPE_CODES["reset"])
+    return f'{color_code}{text}{ANSI_ESCAPE_CODES["reset"]}'
 
 
 def red(text):

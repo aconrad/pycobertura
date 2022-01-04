@@ -14,6 +14,9 @@ row_attributes = ["filename", "total_statements", "total_misses", "line_rate"]
 file_row = namedtuple("FileRow", row_attributes)
 file_row_missed = namedtuple("FileRowMissed", row_attributes + ["missed_lines"])
 
+headers_without_missing = ["Filename", "Stmts", "Miss", "Cover"]
+headers_missing = ["Filename", "Stmts", "Miss", "Cover", "Missing"]
+
 
 class Reporter(object):
     def __init__(self, cobertura):
@@ -71,7 +74,7 @@ class TextReporter(Reporter):
         lines = self.get_report_lines()
         formatted_lines = [self.format_row(row) for row in lines]
 
-        return  tabulate(formatted_lines, headers=["Filename", "Stmts", "Miss", "Cover", "Missing"])
+        return  tabulate(formatted_lines, headers=headers_missing)
 
 
 class HtmlReporter(TextReporter):
@@ -89,7 +92,6 @@ class HtmlReporter(TextReporter):
 
     def generate(self):
         lines = self.get_report_lines()
-
         formatted_lines = [self.format_row(row) for row in lines]
 
         sources = []
@@ -145,13 +147,7 @@ class DeltaReporter(object):
         return footer
 
     def get_report_lines(self):
-        lines = []
-
-        for filename in self.differ.files():
-            file_row = self.get_file_row(filename)
-            if any(file_row[1:]):  # don't report unchanged class files
-                lines.append(file_row)
-
+        lines = [self.get_file_row(filename) for filename in self.differ.files() if any(self.get_file_row(filename)[1:])]
         footer = self.get_footer_row()
         lines.append(footer)
 
@@ -205,17 +201,11 @@ class TextReporterDelta(DeltaReporter):
 
     def generate(self):
         lines = self.get_report_lines()
-
         formatted_lines = [self.format_row(row) for row in lines]
 
-        headers = ["Filename", "Stmts", "Miss", "Cover"]
+        headers = headers_missing if self.show_source is True else headers_without_missing
 
-        if self.show_source is True:
-            headers.append("Missing")
-
-        report = tabulate(formatted_lines, headers=headers)
-
-        return report
+        return tabulate(formatted_lines, headers=headers)
 
 
 class HtmlReporterDelta(TextReporterDelta):
@@ -235,12 +225,8 @@ class HtmlReporterDelta(TextReporterDelta):
 
     def format_row(self, row):
         total_statements = f"{row.total_statements:+d}"  if row.total_statements else "-"
-        line_rate = f"{row.line_rate:+.2%}" if row.line_rate else "-"
         total_misses = f"{row.total_misses:+d}" if row.total_misses else "-"
-
-        if self.show_source is True and self.show_missing is True:
-            missed_lines = [f"+{lno:d}" if is_new else f"-{lno:d}" for lno, is_new in row.missed_lines]
-
+        line_rate = f"{row.line_rate:+.2%}" if row.line_rate else "-"
 
         row_values = [
             row.filename,
@@ -250,6 +236,7 @@ class HtmlReporterDelta(TextReporterDelta):
         ]
 
         if self.show_source is True and self.show_missing is True:
+            missed_lines = [f"+{lno:d}" if is_new else f"-{lno:d}" for lno, is_new in row.missed_lines]
             row_values.append(missed_lines)
             row = file_row_missed(*row_values)
         else:
@@ -263,12 +250,7 @@ class HtmlReporterDelta(TextReporterDelta):
         formatted_lines = [self.format_row(row) for row in lines]
 
         if self.show_source is True:
-            sources = []
-            for filename in self.differ.files():
-                source_hunks = self.get_source_hunks(filename)
-                if not source_hunks:
-                    continue
-                sources.append((filename, source_hunks))
+            sources = [(filename, self.get_source_hunks(filename)) for filename in self.differ.files() if self.get_source_hunks(filename)]
 
         template = env.get_template("html-delta.jinja2")
 
