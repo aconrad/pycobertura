@@ -19,13 +19,19 @@ class Reporter(object):
     def __init__(self, cobertura):
         self.cobertura = cobertura
 
+    def format_line_rate(self, line_rate):
+        return f"{line_rate:.2%}"
+
+    def format_missed_lines(self, missed_lines):
+        return ", ".join([f"{line_start}" if line_start == line_stop else f"{line_start}-{line_stop}" for line_start, line_stop in rangify(missed_lines)])
+
     def get_report_lines(self):
         rows = tuple(
             (
                 filename,
                 self.cobertura.total_statements(filename),
                 self.cobertura.total_misses(filename),
-                self.cobertura.line_rate(filename),
+                self.format_line_rate(self.cobertura.line_rate(filename)),
                 self.cobertura.missed_lines(filename)
             )
             for filename in self.cobertura.files()
@@ -35,7 +41,7 @@ class Reporter(object):
             "TOTAL",
             self.cobertura.total_statements(),
             self.cobertura.total_misses(),
-            self.cobertura.line_rate(),
+            self.format_line_rate(self.cobertura.line_rate()),
             [],  # dummy missed lines
         ),
         )
@@ -49,10 +55,7 @@ class TextReporter(Reporter):
     def format_row(self, row):
         filename, total_lines, total_misses, line_rate, missed_lines = row
 
-        line_rate = f"{line_rate:.2%}"
-
-        formatted_missed_lines = [f"{line_start}" if line_start == line_stop else f"{line_start}-{line_stop}" for line_start, line_stop in rangify(missed_lines)]
-        formatted_missed_lines = ", ".join(formatted_missed_lines)
+        formatted_missed_lines = self.format_missed_lines(missed_lines)
 
         row = file_row_missed(
             filename,
@@ -67,6 +70,7 @@ class TextReporter(Reporter):
     def generate(self):
         lines = self.get_report_lines()
 
+        #formatted_lines = lines
         formatted_lines = []
         for row in lines:
             formatted_row = self.format_row(row)
