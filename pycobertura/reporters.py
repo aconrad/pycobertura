@@ -71,11 +71,7 @@ class TextReporter(Reporter):
         lines = self.get_report_lines()
         formatted_lines = [self.format_row(row) for row in lines]
 
-        report = tabulate(
-            formatted_lines, headers=["Filename", "Stmts", "Miss", "Cover", "Missing"]
-        )
-
-        return report
+        return  tabulate(formatted_lines, headers=["Filename", "Stmts", "Miss", "Cover", "Missing"])
 
 
 class HtmlReporter(TextReporter):
@@ -94,16 +90,11 @@ class HtmlReporter(TextReporter):
     def generate(self):
         lines = self.get_report_lines()
 
-        formatted_lines = []
-        for row in lines:
-            formatted_row = self.format_row(row)
-            formatted_lines.append(formatted_row)
+        formatted_lines = [self.format_row(row) for row in lines]
 
         sources = []
         if self.render_file_sources:
-            for filename in self.cobertura.files():
-                source = self.get_source(filename)
-                sources.append((filename, source))
+            sources = [(filename, self.get_source(filename)) for filename in self.cobertura.files()]
 
         template = env.get_template("html.jinja2")
         return template.render(
