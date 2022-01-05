@@ -140,21 +140,22 @@ class TextReporterDelta(DeltaReporter):
         self.color = kwargs.pop("color", False)
         super(TextReporterDelta, self).__init__(*args, **kwargs)
 
+    def color_row(self, row):
+        if self.color is True:
+            return red(row) if row[0] == "+" else green(row)
+        return row
+
     def format_row(self, row):
         total_statements = f"{row.total_statements:+d}"  if row.total_statements else "-"
         line_rate = f"{row.line_rate:+.2%}" if row.line_rate else "-"
-        total_misses = f"{row.total_misses:+d}" if row.total_misses else "-"
-
-        if self.color is True and total_misses != "-":
-            total_misses = red(total_misses) if total_misses[0] == "+" else green(total_misses)
+        total_misses = self.color_row(f"{row.total_misses:+d}") if row.total_misses else "-"
 
         if self.show_source is True:
             missed_lines = [f"+{lno:d}" if is_new else f"-{lno:d}" for lno, is_new in row.missed_lines]
             
             missed_lines_colored = missed_lines
 
-            if self.color is True:
-                missed_lines_colored = [red(line) if line[0] == "+" else green(line) for line in missed_lines]
+            missed_lines_colored = [self.color_row(line) for line in missed_lines]
 
             missed_lines = ", ".join(missed_lines_colored)
 
