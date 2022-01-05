@@ -1,7 +1,7 @@
 from collections import namedtuple
 from jinja2 import Environment, PackageLoader
 from pycobertura.cobertura import CoberturaDiff
-from pycobertura.utils import green, rangify, red
+from pycobertura.utils import green, red, stringify
 from pycobertura.templates import filters
 from tabulate import tabulate
 
@@ -22,11 +22,9 @@ class Reporter(object):
     def __init__(self, cobertura):
         self.cobertura = cobertura
 
-    def format_line_rate(self, line_rate):
+    @staticmethod
+    def format_line_rate(line_rate):
         return f"{line_rate:.2%}"
-
-    def format_missed_lines(self, missed_lines):
-        return ", ".join([f"{line_start}" if line_start == line_stop else f"{line_start}-{line_stop}" for line_start, line_stop in rangify(missed_lines)])
 
     def get_report_lines(self):
         rows = tuple(
@@ -35,7 +33,7 @@ class Reporter(object):
                 self.cobertura.total_statements(filename),
                 self.cobertura.total_misses(filename),
                 self.format_line_rate(self.cobertura.line_rate(filename)),
-                self.cobertura.missed_lines(filename)
+                stringify(self.cobertura.missed_lines(filename))
             )
             for filename in self.cobertura.files()
         )
@@ -45,7 +43,7 @@ class Reporter(object):
             self.cobertura.total_statements(),
             self.cobertura.total_misses(),
             self.format_line_rate(self.cobertura.line_rate()),
-            [],  # dummy missed lines
+            '',  # stringify([]); dummy missed lines
         ),
         )
 
@@ -55,26 +53,9 @@ class Reporter(object):
 
 
 class TextReporter(Reporter):
-    def format_row(self, row):
-        filename, total_lines, total_misses, line_rate, missed_lines = row
-
-        formatted_missed_lines = self.format_missed_lines(missed_lines)
-
-        row = file_row_missed(
-            filename,
-            total_lines,
-            total_misses,
-            line_rate,
-            formatted_missed_lines,
-        )
-
-        return row
-
     def generate(self):
         lines = self.get_report_lines()
-        formatted_lines = [self.format_row(row) for row in lines]
-
-        return  tabulate(formatted_lines, headers=headers_missing)
+        return  tabulate(lines, headers=headers_missing)
 
 
 class HtmlReporter(TextReporter):
@@ -86,23 +67,18 @@ class HtmlReporter(TextReporter):
         )
         super(HtmlReporter, self).__init__(*args, **kwargs)
 
-    def get_source(self, filename):
-        lines = self.cobertura.file_source(filename)
-        return lines
-
     def generate(self):
         lines = self.get_report_lines()
-        formatted_lines = [self.format_row(row) for row in lines]
 
         sources = []
         if self.render_file_sources:
-            sources = [(filename, self.get_source(filename)) for filename in self.cobertura.files()]
+            sources = [(filename, self.cobertura.file_source(filename)) for filename in self.cobertura.files()]
 
         template = env.get_template("html.jinja2")
         return template.render(
             title=self.title,
-            lines=formatted_lines[:-1],
-            footer=formatted_lines[-1],
+            lines=lines[:-1],
+            footer=lines[-1],
             sources=sources,
             no_file_sources_message=self.no_file_sources_message,
         )
@@ -170,20 +146,15 @@ class TextReporterDelta(DeltaReporter):
         total_misses = f"{row.total_misses:+d}" if row.total_misses else "-"
 
         if self.color is True and total_misses != "-":
-            colorize = [green, red][total_misses[0] == "+"]
-            total_misses = colorize(total_misses)
+            total_misses = red(total_misses) if total_misses[0] == "+" else green(total_misses)
 
         if self.show_source is True:
             missed_lines = [f"+{lno:d}" if is_new else f"-{lno:d}" for lno, is_new in row.missed_lines]
+            
+            missed_lines_colored = missed_lines
 
             if self.color is True:
-                missed_lines_colored = []
-                for line in missed_lines:
-                    colorize = [green, red][line[0] == "+"]
-                    colored_line = colorize(line)
-                    missed_lines_colored.append(colored_line)
-            else:
-                missed_lines_colored = missed_lines
+                missed_lines_colored = [red(line) if line[0] == "+" else green(line) for line in missed_lines]
 
             missed_lines = ", ".join(missed_lines_colored)
 
