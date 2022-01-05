@@ -147,19 +147,10 @@ class TextReporterDelta(DeltaReporter):
 
     def format_row(self, row):
         total_statements = f"{row.total_statements:+d}"  if row.total_statements else "-"
-        line_rate = f"{row.line_rate:+.2%}" if row.line_rate else "-"
         total_misses = self.color_row(f"{row.total_misses:+d}") if row.total_misses else "-"
+        line_rate = f"{row.line_rate:+.2%}" if row.line_rate else "-"
 
-        if self.show_source is True:
-            missed_lines = [f"+{lno:d}" if is_new else f"-{lno:d}" for lno, is_new in row.missed_lines]
-            
-            missed_lines_colored = missed_lines
-
-            missed_lines_colored = [self.color_row(line) for line in missed_lines]
-
-            missed_lines = ", ".join(missed_lines_colored)
-
-        row = [
+        row_values = [
             row.filename,
             total_statements,
             total_misses,
@@ -167,9 +158,11 @@ class TextReporterDelta(DeltaReporter):
         ]
 
         if self.show_source is True:
-            row.append(missed_lines)
+            missed_lines = [f"+{lno:d}" if is_new else f"-{lno:d}" for lno, is_new in row.missed_lines]
+            missed_lines_colored = ", ".join([self.color_row(line) for line in missed_lines])
+            row_values.append(missed_lines_colored)
 
-        return row
+        return row_values
 
     def generate(self):
         lines = self.get_report_lines()
