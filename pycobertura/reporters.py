@@ -58,7 +58,7 @@ class TextReporter(Reporter):
         return tabulate(lines, headers=headers_missing)
 
 
-class HtmlReporter(TextReporter):
+class HtmlReporter(Reporter):
     def __init__(self, *args, **kwargs):
         self.title = kwargs.pop("title", "pycobertura report")
         self.render_file_sources = kwargs.pop("render_file_sources", True)
@@ -127,14 +127,6 @@ class DeltaReporter(object):
 
         return lines
 
-    def get_row_values(self, row):
-        return [
-            row.filename,
-            f"{row.total_statements:+d}" if row.total_statements else "-",
-            self.color_row(f"{row.total_misses:+d}") if row.total_misses else "-",
-            f"{row.line_rate:+.2%}" if row.line_rate else "-",
-        ]
-
 
 class TextReporterDelta(DeltaReporter):
     def __init__(self, *args, **kwargs):
@@ -150,6 +142,14 @@ class TextReporterDelta(DeltaReporter):
         if self.color is True:
             return red(row) if row[0] == "+" else green(row)
         return row
+
+    def get_row_values(self, row):
+        return [
+            row.filename,
+            f"{row.total_statements:+d}" if row.total_statements else "-",
+            self.color_row(f"{row.total_misses:+d}") if row.total_misses else "-",
+            f"{row.line_rate:+.2%}" if row.line_rate else "-",
+        ]
 
     def format_row(self, row):
         row_values = self.get_row_values(row)
