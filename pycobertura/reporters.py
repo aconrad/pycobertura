@@ -90,42 +90,63 @@ class DeltaReporter(object):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
         self.show_source = show_source
 
-    def get_file_row(self, filename):
-        row_values = [
-            filename,
-            self.differ.diff_total_statements(filename),
-            self.differ.diff_total_misses(filename),
-            self.differ.diff_line_rate(filename),
-        ]
-
-        if self.show_source is True:
-            missed_lines = self.differ.diff_missed_lines(filename)
-            row_values.append(missed_lines)
-            return file_row_missed(*row_values)
-
-        return file_row(*row_values)
-
-    def get_footer_row(self):
-        footer_values = [
-            "TOTAL",
-            self.differ.diff_total_statements(),
-            self.differ.diff_total_misses(),
-            self.differ.diff_line_rate(),
-        ]
-
-        if self.show_source:
-            footer_values.append([])  # dummy missed lines
-            return file_row_missed(*footer_values)
-
-        return file_row(*footer_values)
-
     def get_report_lines(self):
-        lines = [self.get_file_row(filename) for filename in self.differ.files() if any(
-            self.get_file_row(filename)[1:])]
-        footer = self.get_footer_row()
-        lines.append(footer)
+        if not self.show_source:
+            row_values = tuple(
+                (
+                    filename,
+                    self.differ.diff_total_statements(filename),
+                    self.differ.diff_total_misses(filename),
+                    self.differ.diff_line_rate(filename),
+                )
+                    for filename in self.differ.files() if any(
+                    (
+                    self.differ.diff_total_statements(filename),
+                    self.differ.diff_total_misses(filename),
+                    self.differ.diff_line_rate(filename),
+                    )
+                )
+            )
 
-        return lines
+            footer_values = (
+                (
+                "TOTAL",
+                self.differ.diff_total_statements(),
+                self.differ.diff_total_misses(),
+                self.differ.diff_line_rate(),
+                ),
+            )
+            row_values += footer_values
+            return tuple(file_row(*row) for row in row_values)
+        else:
+            row_values = tuple(
+                (
+                    filename,
+                    self.differ.diff_total_statements(filename),
+                    self.differ.diff_total_misses(filename),
+                    self.differ.diff_line_rate(filename),
+                    self.differ.diff_missed_lines(filename),
+                )
+                for filename in self.differ.files() if any(
+                    (
+                    self.differ.diff_total_statements(filename),
+                    self.differ.diff_total_misses(filename),
+                    self.differ.diff_line_rate(filename),
+                    self.differ.diff_missed_lines(filename),
+                    )
+                )
+            )
+            footer_values = (
+                (
+                "TOTAL",
+                self.differ.diff_total_statements(),
+                self.differ.diff_total_misses(),
+                self.differ.diff_line_rate(),
+                [],
+                ),
+            )
+            row_values += footer_values
+            return tuple(file_row_missed(*row) for row in row_values)
 
 
 class TextReporterDelta(DeltaReporter):
