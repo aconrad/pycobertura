@@ -96,14 +96,22 @@ class DeltaReporter(object):
             return red(row) if row[0] == "+" else green(row)
         return row
 
+    @staticmethod
+    def format_line_rate(line_rate):
+        return f"{line_rate:+.2%}" if line_rate else "-"
+
+    @staticmethod
+    def format_total_statements(total_statements):
+        return f"{total_statements:+d}" if total_statements else "-"
+
     def get_report_lines(self):
         if not self.show_source:
             row_values = tuple(
                 (
                     filename,
-                    self.differ.diff_total_statements(filename),
+                    self.format_total_statements(self.differ.diff_total_statements(filename)),
                     self.differ.diff_total_misses(filename),
-                    self.differ.diff_line_rate(filename),
+                    self.format_line_rate(self.differ.diff_line_rate(filename)),
                 )
                     for filename in self.differ.files() if any(
                     (
@@ -117,9 +125,9 @@ class DeltaReporter(object):
             footer_values = (
                 (
                 "TOTAL",
-                self.differ.diff_total_statements(),
+                self.format_total_statements(self.differ.diff_total_statements()),
                 self.differ.diff_total_misses(),
-                self.differ.diff_line_rate(),
+                self.format_line_rate(self.differ.diff_line_rate()),
                 ),
             )
             row_values += footer_values
@@ -128,9 +136,9 @@ class DeltaReporter(object):
             row_values = tuple(
                 (
                     filename,
-                    self.differ.diff_total_statements(filename),
+                    self.format_total_statements(self.differ.diff_total_statements(filename)),
                     self.differ.diff_total_misses(filename),
-                    self.differ.diff_line_rate(filename),
+                    self.format_line_rate(self.differ.diff_line_rate(filename)),
                     self.differ.diff_missed_lines(filename),
                 )
                 for filename in self.differ.files() if any(
@@ -145,9 +153,9 @@ class DeltaReporter(object):
             footer_values = (
                 (
                 "TOTAL",
-                self.differ.diff_total_statements(),
+                self.format_total_statements(self.differ.diff_total_statements()),
                 self.differ.diff_total_misses(),
-                self.differ.diff_line_rate(),
+                self.format_line_rate(self.differ.diff_line_rate()),
                 [],
                 ),
             )
@@ -162,13 +170,15 @@ class TextReporterDelta(DeltaReporter):
     def get_row_values(self, row):
         return [
             row.filename,
-            f"{row.total_statements:+d}" if row.total_statements else "-",
+            row.total_statements,
             self.color_row(f"{row.total_misses:+d}") if row.total_misses else "-",
-            f"{row.line_rate:+.2%}" if row.line_rate else "-",
+            row.line_rate #f"{row.line_rate:+.2%}" if row.line_rate else "-",
         ]
 
     def format_row(self, row):
+        #print(f"---row={row}")
         row_values = self.get_row_values(row)
+        #print(f"---row_values={row_values}")
 
         if self.show_source is True:
             missed_lines = [
