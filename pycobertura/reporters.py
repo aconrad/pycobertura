@@ -120,21 +120,21 @@ class DeltaReporter(object):
                     self.format_total_misses(self.differ.diff_total_misses(filename)),
                     self.format_line_rate(self.differ.diff_line_rate(filename)),
                 )
-                    for filename in self.differ.files() if any(
+                for filename in self.differ.files() if any(
                     (
-                    self.differ.diff_total_statements(filename),
-                    self.differ.diff_total_misses(filename),
-                    self.differ.diff_line_rate(filename),
+                        self.differ.diff_total_statements(filename),
+                        self.differ.diff_total_misses(filename),
+                        self.differ.diff_line_rate(filename),
                     )
                 )
             )
 
             footer_values = (
                 (
-                "TOTAL",
-                self.format_total_statements(self.differ.diff_total_statements()),
-                self.format_total_misses(self.differ.diff_total_misses()),
-                self.format_line_rate(self.differ.diff_line_rate()),
+                    "TOTAL",
+                    self.format_total_statements(self.differ.diff_total_statements()),
+                    self.format_total_misses(self.differ.diff_total_misses()),
+                    self.format_line_rate(self.differ.diff_line_rate()),
                 ),
             )
             row_values += footer_values
@@ -150,20 +150,20 @@ class DeltaReporter(object):
                 )
                 for filename in self.differ.files() if any(
                     (
-                    self.differ.diff_total_statements(filename),
-                    self.differ.diff_total_misses(filename),
-                    self.differ.diff_line_rate(filename),
-                    self.differ.diff_missed_lines(filename),
+                        self.differ.diff_total_statements(filename),
+                        self.differ.diff_total_misses(filename),
+                        self.differ.diff_line_rate(filename),
+                        self.differ.diff_missed_lines(filename),
                     )
                 )
             )
             footer_values = (
                 (
-                "TOTAL",
-                self.format_total_statements(self.differ.diff_total_statements()),
-                self.format_total_misses(self.differ.diff_total_misses()),
-                self.format_line_rate(self.differ.diff_line_rate()),
-                [],
+                    "TOTAL",
+                    self.format_total_statements(self.differ.diff_total_statements()),
+                    self.format_total_misses(self.differ.diff_total_misses()),
+                    self.format_line_rate(self.differ.diff_line_rate()),
+                    [],
                 ),
             )
             row_values += footer_values
@@ -174,22 +174,22 @@ class TextReporterDelta(DeltaReporter):
     def __init__(self, *args, **kwargs):
         super(TextReporterDelta, self).__init__(*args, **kwargs)
 
-    def format_row(self, row):
-        row_values = row[:4]
-
-        if self.show_source is True:
-            missed_lines_colored = ", ".join([self.color_row(line) for line in row.missed_lines])
-            row_values+=(missed_lines_colored,)
-
+    def format_row_if_show_source(self, row):
+        missed_lines_colored = ", ".join([self.color_row(line) for line in row.missed_lines])
+        row_values = row[:-1]
+        row_values += (missed_lines_colored,)
         return row_values
 
     def generate(self):
         lines = self.get_report_lines()
-        formatted_lines = [self.format_row(row) for row in lines]
+
+        if self.show_source:
+            formatted_lines = [self.format_row_if_show_source(row) for row in lines]
+            lines = formatted_lines
 
         headers = headers_missing if self.show_source is True else headers_without_missing
 
-        return tabulate(formatted_lines, headers=headers)
+        return tabulate(lines, headers=headers)
 
 
 class HtmlReporterDelta(DeltaReporter):
@@ -202,9 +202,6 @@ class HtmlReporterDelta(DeltaReporter):
         """
         self.show_missing = kwargs.pop("show_missing", True)
         super(HtmlReporterDelta, self).__init__(*args, **kwargs)
-
-    def get_source_hunks(self, filename):
-        return self.differ.file_source_hunks(filename)
 
     def generate(self):
         lines = self.get_report_lines()
@@ -219,7 +216,12 @@ class HtmlReporterDelta(DeltaReporter):
         }
 
         if self.show_source is True:
-            render_kwargs["sources"] = [(filename, self.get_source_hunks(
-                filename)) for filename in self.differ.files() if self.get_source_hunks(filename)]
+            render_kwargs["sources"] = [
+                (
+                    filename, self.differ.file_source_hunks(filename)
+                )
+                for filename in self.differ.files()
+                if self.differ.file_source_hunks(filename)
+            ]
 
         return template.render(**render_kwargs)
