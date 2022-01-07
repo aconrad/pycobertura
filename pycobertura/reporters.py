@@ -86,9 +86,15 @@ class HtmlReporter(Reporter):
 
 
 class DeltaReporter(object):
-    def __init__(self, cobertura1, cobertura2, show_source=True):
+    def __init__(self, cobertura1, cobertura2, show_source=True, *args, **kwargs):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
         self.show_source = show_source
+        self.color = kwargs.pop("color", False)
+    
+    def color_row(self, row):
+        if self.color is True:
+            return red(row) if row[0] == "+" else green(row)
+        return row
 
     def get_report_lines(self):
         if not self.show_source:
@@ -151,18 +157,7 @@ class DeltaReporter(object):
 
 class TextReporterDelta(DeltaReporter):
     def __init__(self, *args, **kwargs):
-        """
-        Takes the same arguments as `DeltaReporter` but also takes the keyword
-        argument `color` which can be set to True or False depending if the
-        generated report should be colored or not (default `color=False`).
-        """
-        self.color = kwargs.pop("color", False)
         super(TextReporterDelta, self).__init__(*args, **kwargs)
-
-    def color_row(self, row):
-        if self.color is True:
-            return red(row) if row[0] == "+" else green(row)
-        return row
 
     def get_row_values(self, row):
         return [
