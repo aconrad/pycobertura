@@ -43,7 +43,7 @@ class Reporter(object):
                 self.cobertura.total_statements(),
                 self.cobertura.total_misses(),
                 self.format_line_rate(self.cobertura.line_rate()),
-                '',  # stringify([]); dummy missed lines
+                '',
             ),
         )
 
@@ -104,13 +104,16 @@ class DeltaReporter(object):
     def format_total_statements(total_statements):
         return f"{total_statements:+d}" if total_statements else "-"
 
+    def format_total_misses(self, total_misses):
+        return self.color_row(f"{total_misses:+d}") if total_misses else "-"
+
     def get_report_lines(self):
         if not self.show_source:
             row_values = tuple(
                 (
                     filename,
                     self.format_total_statements(self.differ.diff_total_statements(filename)),
-                    self.differ.diff_total_misses(filename),
+                    self.format_total_misses(self.differ.diff_total_misses(filename)),
                     self.format_line_rate(self.differ.diff_line_rate(filename)),
                 )
                     for filename in self.differ.files() if any(
@@ -126,7 +129,7 @@ class DeltaReporter(object):
                 (
                 "TOTAL",
                 self.format_total_statements(self.differ.diff_total_statements()),
-                self.differ.diff_total_misses(),
+                self.format_total_misses(self.differ.diff_total_misses()),
                 self.format_line_rate(self.differ.diff_line_rate()),
                 ),
             )
@@ -137,7 +140,7 @@ class DeltaReporter(object):
                 (
                     filename,
                     self.format_total_statements(self.differ.diff_total_statements(filename)),
-                    self.differ.diff_total_misses(filename),
+                    self.format_total_misses(self.differ.diff_total_misses(filename)),
                     self.format_line_rate(self.differ.diff_line_rate(filename)),
                     self.differ.diff_missed_lines(filename),
                 )
@@ -154,7 +157,7 @@ class DeltaReporter(object):
                 (
                 "TOTAL",
                 self.format_total_statements(self.differ.diff_total_statements()),
-                self.differ.diff_total_misses(),
+                self.format_total_misses(self.differ.diff_total_misses()),
                 self.format_line_rate(self.differ.diff_line_rate()),
                 [],
                 ),
@@ -171,14 +174,12 @@ class TextReporterDelta(DeltaReporter):
         return [
             row.filename,
             row.total_statements,
-            self.color_row(f"{row.total_misses:+d}") if row.total_misses else "-",
-            row.line_rate #f"{row.line_rate:+.2%}" if row.line_rate else "-",
+            row.total_misses, 
+            row.line_rate 
         ]
 
     def format_row(self, row):
-        #print(f"---row={row}")
         row_values = self.get_row_values(row)
-        #print(f"---row_values={row_values}")
 
         if self.show_source is True:
             missed_lines = [
