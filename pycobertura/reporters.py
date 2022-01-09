@@ -26,29 +26,15 @@ class Reporter(object):
         return f"{line_rate:.2%}"
 
     def get_report_lines(self):
-        rows = tuple(
-            (
-                filename,
-                self.cobertura.total_statements(filename),
-                self.cobertura.total_misses(filename),
-                self.format_line_rate(self.cobertura.line_rate(filename)),
-                stringify(self.cobertura.missed_lines(filename))
-            )
-            for filename in self.cobertura.files()
-        )
-        footer = (
-            (
-                "TOTAL",
-                self.cobertura.total_statements(),
-                self.cobertura.total_misses(),
-                self.format_line_rate(self.cobertura.line_rate()),
-                '',
-            ),
-        )
+        lines = {
+            "Filename": [filename for filename in self.cobertura.files()]+["TOTAL"],
+            "Stmts": [self.cobertura.total_statements(filename) for filename in self.cobertura.files()]+[self.cobertura.total_statements()],
+            "Miss": [self.cobertura.total_misses(filename) for filename in self.cobertura.files()]+[self.cobertura.total_misses()],
+            "Cover": [self.format_line_rate(self.cobertura.line_rate(filename)) for filename in self.cobertura.files()]+[self.format_line_rate(self.cobertura.line_rate())],
+            "Missing": [stringify(self.cobertura.missed_lines(filename)) for filename in self.cobertura.files()]+['']
+        }
 
-        rows += footer
-
-        return tuple(file_row_missed(*row) for row in rows)
+        return lines
 
 class TextReporter(Reporter):
     def generate(self):
@@ -72,10 +58,13 @@ class HtmlReporter(Reporter):
             sources = [(filename, self.cobertura.file_source(filename)) for filename in self.cobertura.files()]
 
         template = env.get_template("html.jinja2")
+        rows = {k: v[:-1] for k, v in lines.items()}
+        footer = {k: v[-1] for k, v in lines.items()}
+
         return template.render(
             title=self.title,
-            lines=lines[:-1],
-            footer=lines[-1],
+            lines=rows,
+            footer=footer,
             sources=sources,
             no_file_sources_message=self.no_file_sources_message,
         )
