@@ -28,17 +28,22 @@ class Reporter(object):
 
     def get_report_lines(self):
         lines = {
-            "Filename": [filename for filename in self.cobertura.files()]
-            + ["TOTAL"],
-            "Stmts": [self.cobertura.total_statements(filename) for filename in self.cobertura.files()] +
-            [self.cobertura.total_statements()],
-            "Miss": [self.cobertura.total_misses(filename) for filename in self.cobertura.files()]
-            + [self.cobertura.total_misses()],
-            "Cover": [self.format_line_rate(self.cobertura.line_rate(filename)) for filename in self.cobertura.files()]
-            + [self.format_line_rate(self.cobertura.line_rate())],
-            "Missing": [stringify(self.cobertura.missed_lines(filename)) for filename in self.cobertura.files()]
-            + ['']
+            "Filename": [filename
+                         for filename in self.cobertura.files()],
+            "Stmts": [self.cobertura.total_statements(filename)
+                      for filename in self.cobertura.files()],
+            "Miss": [self.cobertura.total_misses(filename)
+                     for filename in self.cobertura.files()],
+            "Cover": [self.format_line_rate(self.cobertura.line_rate(filename))
+                      for filename in self.cobertura.files()],
+            "Missing": [stringify(self.cobertura.missed_lines(filename))
+                        for filename in self.cobertura.files()]
         }
+        lines["Filename"].extend(["TOTAL"])
+        lines["Stmts"].extend([self.cobertura.total_statements()])
+        lines["Miss"].extend([self.cobertura.total_misses()])
+        lines["Cover"].extend([self.format_line_rate(self.cobertura.line_rate())])
+        lines["Missing"].extend([''])
 
         return lines
 

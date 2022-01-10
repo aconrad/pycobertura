@@ -87,7 +87,8 @@ def stringify(number_list):
     """Assumes the list is sorted."""
     rangified_list = rangify(number_list)
     stringified_list = [f"{line_start}" if line_start == line_stop
-                        else f"{line_start}-{line_stop}" for line_start, line_stop in rangified_list]
+                        else f"{line_start}-{line_stop}"
+                        for line_start, line_stop in rangified_list]
     return ", ".join(stringified_list)
 
 
