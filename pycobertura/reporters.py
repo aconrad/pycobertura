@@ -28,22 +28,29 @@ class Reporter(object):
 
     def get_report_lines(self):
         lines = {
-            "Filename": [filename
-                         for filename in self.cobertura.files()],
-            "Stmts": [self.cobertura.total_statements(filename)
-                      for filename in self.cobertura.files()],
-            "Miss": [self.cobertura.total_misses(filename)
-                     for filename in self.cobertura.files()],
-            "Cover": [self.format_line_rate(self.cobertura.line_rate(filename))
-                      for filename in self.cobertura.files()],
-            "Missing": [stringify(self.cobertura.missed_lines(filename))
-                        for filename in self.cobertura.files()]
+            "Filename": [filename for filename in self.cobertura.files()],
+            "Stmts": [
+                self.cobertura.total_statements(filename)
+                for filename in self.cobertura.files()
+            ],
+            "Miss": [
+                self.cobertura.total_misses(filename)
+                for filename in self.cobertura.files()
+            ],
+            "Cover": [
+                self.format_line_rate(self.cobertura.line_rate(filename))
+                for filename in self.cobertura.files()
+            ],
+            "Missing": [
+                stringify(self.cobertura.missed_lines(filename))
+                for filename in self.cobertura.files()
+            ],
         }
         lines["Filename"].extend(["TOTAL"])
         lines["Stmts"].extend([self.cobertura.total_statements()])
         lines["Miss"].extend([self.cobertura.total_misses()])
         lines["Cover"].extend([self.format_line_rate(self.cobertura.line_rate())])
-        lines["Missing"].extend([''])
+        lines["Missing"].extend([""])
 
         return lines
 
@@ -68,8 +75,10 @@ class HtmlReporter(Reporter):
 
         sources = []
         if self.render_file_sources:
-            sources = [(filename, self.cobertura.file_source(filename))
-                       for filename in self.cobertura.files()]
+            sources = [
+                (filename, self.cobertura.file_source(filename))
+                for filename in self.cobertura.files()
+            ]
 
         template = env.get_template("html.jinja2")
         rows = {k: v[:-1] for k, v in lines.items()}
@@ -116,11 +125,13 @@ class DeltaReporter(object):
                 (
                     filename,
                     self.format_total_statements(
-                        self.differ.diff_total_statements(filename)),
+                        self.differ.diff_total_statements(filename)
+                    ),
                     self.format_total_misses(self.differ.diff_total_misses(filename)),
                     self.format_line_rate(self.differ.diff_line_rate(filename)),
                 )
-                for filename in self.differ.files() if any(
+                for filename in self.differ.files()
+                if any(
                     (
                         self.differ.diff_total_statements(filename),
                         self.differ.diff_total_misses(filename),
@@ -144,12 +155,14 @@ class DeltaReporter(object):
                 (
                     filename,
                     self.format_total_statements(
-                        self.differ.diff_total_statements(filename)),
+                        self.differ.diff_total_statements(filename)
+                    ),
                     self.format_total_misses(self.differ.diff_total_misses(filename)),
                     self.format_line_rate(self.differ.diff_line_rate(filename)),
                     self.format_missed_lines(self.differ.diff_missed_lines(filename)),
                 )
-                for filename in self.differ.files() if any(
+                for filename in self.differ.files()
+                if any(
                     (
                         self.differ.diff_total_statements(filename),
                         self.differ.diff_total_misses(filename),
@@ -177,7 +190,8 @@ class TextReporterDelta(DeltaReporter):
 
     def format_row_if_show_source(self, row):
         missed_lines_colored = ", ".join(
-            [self.color_row(line) for line in row.missed_lines])
+            [self.color_row(line) for line in row.missed_lines]
+        )
         row_values = row[:-1]
         row_values += (missed_lines_colored,)
         return row_values
@@ -189,8 +203,9 @@ class TextReporterDelta(DeltaReporter):
             formatted_lines = [self.format_row_if_show_source(row) for row in lines]
             lines = formatted_lines
 
-        headers = headers_missing if self.show_source is True \
-            else headers_without_missing
+        headers = (
+            headers_missing if self.show_source is True else headers_without_missing
+        )
 
         return tabulate(lines, headers=headers)
 
@@ -220,9 +235,7 @@ class HtmlReporterDelta(DeltaReporter):
 
         if self.show_source is True:
             render_kwargs["sources"] = [
-                (
-                    filename, self.differ.file_source_hunks(filename)
-                )
+                (filename, self.differ.file_source_hunks(filename))
                 for filename in self.differ.files()
                 if self.differ.file_source_hunks(filename)
             ]
