@@ -28,11 +28,16 @@ class Reporter(object):
 
     def get_report_lines(self):
         lines = {
-            "Filename": [filename for filename in self.cobertura.files()]+["TOTAL"],
-            "Stmts": [self.cobertura.total_statements(filename) for filename in self.cobertura.files()]+[self.cobertura.total_statements()],
-            "Miss": [self.cobertura.total_misses(filename) for filename in self.cobertura.files()]+[self.cobertura.total_misses()],
-            "Cover": [self.format_line_rate(self.cobertura.line_rate(filename)) for filename in self.cobertura.files()]+[self.format_line_rate(self.cobertura.line_rate())],
-            "Missing": [stringify(self.cobertura.missed_lines(filename)) for filename in self.cobertura.files()]+['']
+            "Filename": [filename for filename in self.cobertura.files()]
+            + ["TOTAL"],
+            "Stmts": [self.cobertura.total_statements(filename) for filename in self.cobertura.files()] +
+            [self.cobertura.total_statements()],
+            "Miss": [self.cobertura.total_misses(filename) for filename in self.cobertura.files()]
+            + [self.cobertura.total_misses()],
+            "Cover": [self.format_line_rate(self.cobertura.line_rate(filename)) for filename in self.cobertura.files()]
+            + [self.format_line_rate(self.cobertura.line_rate())],
+            "Missing": [stringify(self.cobertura.missed_lines(filename)) for filename in self.cobertura.files()]
+            + ['']
         }
 
         return lines
@@ -179,7 +184,8 @@ class TextReporterDelta(DeltaReporter):
             formatted_lines = [self.format_row_if_show_source(row) for row in lines]
             lines = formatted_lines
 
-        headers = headers_missing if self.show_source is True else headers_without_missing
+        headers = headers_missing if self.show_source is True \
+            else headers_without_missing
 
         return tabulate(lines, headers=headers)
 
