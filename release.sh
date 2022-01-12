@@ -4,8 +4,8 @@
 # - update the package version in the CHANGES file
 # - commit the changes to master and push
 
-PKG_NAME=$(python read_setup_cfg.py --section metadata --key name)
-PKG_VERSION=$(python read_setup_cfg.py --section metadata --key version)
+PKG_NAME = $(python read_setup_cfg.py | head -n1)
+PKG_VERSION = $(python read_setup_cfg.py | tail -n1)
 
 git tag -am "release v${PKG_VERSION}" "v${PKG_VERSION}"
 git push --tags
