@@ -1,21 +1,11 @@
-import configparser
-import argparse
+import os
+from setuptools.config import read_configuration
 
-config = configparser.ConfigParser()
+if __name__=="__main__":
+    conf_dict = read_configuration("setup.cfg")
 
-with open('setup.cfg') as f:
-    config.read_file(f)
+    pkg_name= conf_dict['metadata']['name']
+    pkg_version = conf_dict['metadata']['version']
 
-parser = argparse.ArgumentParser(description='Return setup.cfg section value for given metadata key')
-parser.add_argument('--section', metavar='section', nargs=1, help="section header")
-parser.add_argument('--key', metavar='key', nargs=1, help='metadata key')
-args = vars(parser.parse_args())
-
-section, key = args['section'], args['key']
-
-if type(section) == list:
-    section = section[0]
-if type(key) == list:
-    key = key[0]
-
-print(config[section][key])
+    print(pkg_name)
+    print(pkg_version)
