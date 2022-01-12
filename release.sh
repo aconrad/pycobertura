@@ -4,9 +4,9 @@
 # - update the package version in the CHANGES file
 # - commit the changes to master and push
 
-PKG_NAME = pycobertura
+PKG_NAME=pycobertura
 # from importlib import metadata is unfortunately only available from Python 3.8 onwards
-PKG_VERSION = python -c "from pkg_resources import get_distribution; print(get_distribution('pycobertura').version)"
+PKG_VERSION=$(python -c "from pkg_resources import get_distribution; print(get_distribution('pycobertura').version)")
 
 git tag -am "release v${PKG_VERSION}" "v${PKG_VERSION}"
 git push --tags

@@ -36,7 +36,7 @@ NOTE: The API is unstable any may be subject to changes until it reaches 1.0.
 
 ## Install
 
-```bash
+```shell
 pip install pycobertura
 ```
 
@@ -48,7 +48,7 @@ pycobertura provides a command line interface to report on coverage files.
 
 Different help screens are available depending on what you need help about.
 
-```bash
+```shell
 $ pycobertura --help
 Usage: pycobertura [OPTIONS] COMMAND [ARGS]...
 
@@ -60,11 +60,11 @@ Commands:
   show  show coverage summary of a Cobertura report
 ```
 
-```bash
+```shell
 pycobertura show --help
 ```
 
-```bash
+```shell
 pycobertura diff --help
 ```
 
@@ -72,7 +72,7 @@ pycobertura diff --help
 
 The `show` command displays the report summary of a coverage file.
 
-```bash
+```shell
 $ pycobertura show coverage.xml
 Filename                     Stmts    Miss  Cover    Missing
 -------------------------  -------  ------  -------  ---------
@@ -88,7 +88,7 @@ The following is a screenshot of the HTML version of another coverage file
 which also include the source code with highlighted source code to indicate
 whether lines were covered (green) or not (red).
 
-```bash
+```shell
 pycobertura show --format html --output coverage.html coverage.xml
 ```
 
@@ -101,7 +101,7 @@ files. To properly compute the `Missing` column, it is necessary to provide the
 source code that was used to generate each of the passed Cobertura reports
 ([see why](#why-do-i-need-to-provide-the-path-to-the-source-code-directory)).
 
-```bash
+```shell
 $ pycobertura diff coverage.old.xml coverage.new.xml --source1 old_source/ --source2 new_source/
 Filename          Stmts    Miss    Cover     Missing
 ----------------  -------  ------  --------  ---------
@@ -119,7 +119,7 @@ This screenshot shows how the HTML output only applies coverage highlighting to
 the parts of the code where the coverage has changed (from covered to
 uncovered, or vice versa).
 
-```bash
+```shell
 pycobertura diff --format html --output coverage.html ./master/coverage.xml ./myfeature/coverage.xml
 ```
 
@@ -192,7 +192,7 @@ If you submit a PR:
 * update the README accordingly if your changes outdate the documentation
 * make sure all tests are passing using `tox`
 
-```bash
+```shell
 pip install tox
 tox
 ```
@@ -215,7 +215,7 @@ can generate a summary table for a single Cobertura file (the `show` command).
 Yes. All you have to do is pass your same coverage report twice and provide the
 path to the two different code bases:
 
-```bash
+```shell
 pycobertura diff coverage.xml coverage.xml --source1 master/ --source2 myfeature/
 ```
 
@@ -228,7 +228,7 @@ Because we would have to support N version control systems (VCS). It is easy
 enough to generate a directory that contains the source code at a given commit
 or branch name that it's not a top priority for pycobertura to be VCS-aware:
 
-```bash
+```shell
 git archive --prefix=source1/ ${BRANCH_OR_COMMIT1} | tar -xf -
 git archive --prefix=source2/ ${BRANCH_OR_COMMIT2} | tar -xf -
 pycobertura diff --source1 source1/ --source2 source2/ coverage1.xml coverage2.xml -o output.html
@@ -258,7 +258,7 @@ following info:
 
 Report A:
 
-```bash
+```shell
 line 1, hit
 line 2, miss
 line 3, hit
@@ -266,7 +266,7 @@ line 3, hit
 
 and Report B:
 
-```bash
+```shell
 line 1, hit
 line 2, miss
 line 3, hit
@@ -330,7 +330,7 @@ published as an artifact to make it available to developers to look at.
 
 The step could look like this:
 
-```bash
+```shell
 # Download artifacts of current build
 curl -o coverage.${BUILD_ID}.xml https://ciserver/artifacts/${BUILD_ID}/coverage.xml
 curl -o source.${BUILD_ID}.zip https://ciserver/artifacts/${BUILD_ID}/source.zip
@@ -360,7 +360,7 @@ The line rate (percentage of covered lines) can legitimately go down for a
 number of reasons. To illustrate, suppose we have this code coverage report for
 version A of our code:
 
-```bash
+```shell
 line 1: hit
 line 2: hit
 line 3: miss
@@ -372,7 +372,7 @@ Here, the line rate is 80% and uncovered lines is 1 (miss). Later in version B
 of our code, we legitimately delete a covered line and the following coverage
 report is generated:
 
-```bash
+```shell
 line 1: hit
 ### line deleted ###
 line 2: miss
