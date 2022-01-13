@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+* BACKWARD INCOMPATIBLE:
+  * Deprecate Python3.5 and 3.6, support Python 3.7 onwards (see python_requires, classifiers in `setup.cfg`)
+  * Update tests to Python 3.7 through 3.9 (affects `tox.ini` and `.travis.yml`).
+  * Migrate to `setup.cfg` and `pyproject.toml`; empty `setup.py` kept for compatibility reasons.
+  * update `release.sh` script.
+  * address markdown lint in `README.md`
+  Thanks @gro1m
+
 ## 2.1.0 (2021-09-23)
 
 * Added the option `show_missing` to `HtmlReporterDelta`, which specifies
