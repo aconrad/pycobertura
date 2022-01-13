@@ -11,4 +11,4 @@ PKG_VERSION=$(python -c "from pkg_resources import get_distribution; print(get_d
 git tag -am "release v${PKG_VERSION}" "v${PKG_VERSION}"
 git push --tags
 python -m build
-twine upload dist/"${PKG_NAME}-${PKG_VERSION}*"
+twine upload dist/"${PKG_NAME}-${PKG_VERSION}"{.tar.gz,.whl}
