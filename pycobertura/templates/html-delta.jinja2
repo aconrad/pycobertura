@@ -38,12 +38,12 @@ table.code td.lineno pre {margin-right: 1rem;}
           <tr>
             <td><a href="#{{ line.filename }}">{{ line.filename }}</a></td>
             <td>{{ line.total_statements }}</td>
-            <td><span{% if line.total_misses != '-' %} class="{% if line.total_misses[0] == '+' %}red{% else %}green{% endif%}"{% endif %}>{{ line.total_misses }}</span></td>
+            <td><span{% if line.total_misses | total_misses_span %} class="{{ line.total_misses[0] | misses_color }}"{% endif %}>{{ line.total_misses }}</span></td>
             <td>{{ line.line_rate }}</td>
 {%- if show_source and show_missing %}
             <td>
 {%- for missed_line in line.missed_lines %}
-            {%- if not loop.first %}, {% endif %}<span class="{% if missed_line[0] == '+' %}red{% else %}green{% endif %}">{{ missed_line }}</span>
+            {%- if not loop.first %}, {% endif %}<span class="{{ missed_line[0] | misses_color }}">{{ missed_line }}</span>
 {%- endfor %}
             </td>
 {%- endif %}
@@ -54,7 +54,7 @@ table.code td.lineno pre {margin-right: 1rem;}
           <tr>
             <td>{{ footer.filename }}</td>
             <td>{{ footer.total_statements }}</td>
-            <td><span{% if footer.total_misses != '-' %} class="{% if footer.total_misses[0] == '+' %}red{% else %}green{% endif%}"{% endif %}>{{ footer.total_misses }}</span></td>
+            <td><span{% if footer.total_misses | total_misses_span %} class="{{ footer.total_misses[0] | misses_color }}"{% endif %}>{{ footer.total_misses }}</span></td>
             <td>{{ footer.line_rate }}</td>
 {%- if show_source and show_missing %}
             <td></td>

@@ -2,6 +2,8 @@
 Jinja2 filters meant to be used by templates.
 """
 
+from pycobertura.utils import green, red
+
 line_status_style = {
     True: "hit",
     False: "miss",
@@ -16,6 +18,11 @@ line_reason_html_icon = {
     None: "&nbsp;",
 }
 
+def total_misses_span(total_misses):
+    return total_misses != '-'
+
+def misses_color(arg):
+    return "red" if arg == '+' else "green"
 
 def line_status(line):
     return line_status_style[line.status]
