@@ -7,8 +7,6 @@ jobs:
       env: TOXENV=py38
     - python: 3.9
       env: TOXENV=py39
-    - python: 3.10
-      env: TOXENV=py310
     - env: TOXENV=pep8
     - env: TOXENV=black
 
