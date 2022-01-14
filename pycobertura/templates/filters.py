@@ -18,11 +18,14 @@ line_reason_html_icon = {
     None: "&nbsp;",
 }
 
-def total_misses_span(total_misses):
-    return total_misses != '-'
+
+def is_not_equal_to_dash(arg):
+    return not (arg == "-")
+
 
 def misses_color(arg):
-    return "red" if arg[0] == '+' else "green"
+    return "red" if arg.startswith("+") else "green"
+
 
 def line_status(line):
     return line_status_style[line.status]

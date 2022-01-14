@@ -38,7 +38,7 @@ table.code td.lineno pre {margin-right: 1rem;}
           <tr>
             <td><a href="#{{ line.filename }}">{{ line.filename }}</a></td>
             <td>{{ line.total_statements }}</td>
-            <td><span{% if line.total_misses | total_misses_span %} class="{{ line.total_misses | misses_color }}"{% endif %}>{{ line.total_misses }}</span></td>
+            <td><span{% if line.total_misses | is_not_equal_to_dash %} class="{{ line.total_misses | misses_color }}"{% endif %}>{{ line.total_misses }}</span></td>
             <td>{{ line.line_rate }}</td>
 {%- if show_source and show_missing %}
             <td>
@@ -54,7 +54,7 @@ table.code td.lineno pre {margin-right: 1rem;}
           <tr>
             <td>{{ footer.filename }}</td>
             <td>{{ footer.total_statements }}</td>
-            <td><span{% if footer.total_misses | total_misses_span %} class="{{ footer.total_misses | misses_color }}"{% endif %}>{{ footer.total_misses }}</span></td>
+            <td><span{% if footer.total_misses | is_not_equal_to_dash %} class="{{ footer.total_misses | misses_color }}"{% endif %}>{{ footer.total_misses }}</span></td>
             <td>{{ footer.line_rate }}</td>
 {%- if show_source and show_missing %}
             <td></td>
