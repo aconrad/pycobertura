@@ -115,7 +115,7 @@ class DeltaReporter(object):
 
     def color_row(self, row):
         if self.color is True:
-            return red(row) if row[0] == "+" else green(row)
+            return red(row) if row.startswith("+") else green(row)
         return row
 
     def format_total_misses(self, total_misses):
