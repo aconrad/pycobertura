@@ -2,8 +2,6 @@
 Jinja2 filters meant to be used by templates.
 """
 
-from pycobertura.utils import green, red
-
 line_status_style = {
     True: "hit",
     False: "miss",
