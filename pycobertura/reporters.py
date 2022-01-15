@@ -29,26 +29,27 @@ class Reporter(object):
         return f"{line_rate:.2%}"
 
     def get_report_lines(self):
+        files_info = self.cobertura.files()
         lines = {
-            "Filename": [filename for filename in self.cobertura.files()] + ["TOTAL"],
+            "Filename": [filename for filename in files_info] + ["TOTAL"],
             "Stmts": [
                 self.cobertura.total_statements(filename)
-                for filename in self.cobertura.files()
+                for filename in files_info
             ]
             + [self.cobertura.total_statements()],
             "Miss": [
                 self.cobertura.total_misses(filename)
-                for filename in self.cobertura.files()
+                for filename in files_info
             ]
             + [self.cobertura.total_misses()],
             "Cover": [
                 self.format_line_rate(self.cobertura.line_rate(filename))
-                for filename in self.cobertura.files()
+                for filename in files_info
             ]
             + [self.format_line_rate(self.cobertura.line_rate())],
             "Missing": [
                 stringify(self.cobertura.missed_lines(filename))
-                for filename in self.cobertura.files()
+                for filename in files_info
             ]
             + [""],
         }
