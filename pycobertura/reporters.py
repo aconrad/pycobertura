@@ -11,12 +11,9 @@ env.filters["line_status"] = filters.line_status
 env.filters["line_reason"] = filters.line_reason_icon
 env.filters["is_not_equal_to_dash"] = filters.is_not_equal_to_dash
 env.filters["misses_color"] = filters.misses_color
-row_attributes = ["filename", "total_statements", "total_misses", "line_rate"]
-file_row = namedtuple("FileRow", row_attributes)
-file_row_missed = namedtuple("FileRowMissed", row_attributes + ["missed_lines"])
 
 headers_without_missing = ["Filename", "Stmts", "Miss", "Cover"]
-headers_missing = ["Filename", "Stmts", "Miss", "Cover", "Missing"]
+headers_with_missing = ["Filename", "Stmts", "Miss", "Cover", "Missing"]
 
 
 class Reporter(object):
@@ -59,7 +56,7 @@ class Reporter(object):
 class TextReporter(Reporter):
     def generate(self):
         lines = self.get_report_lines()
-        return tabulate(lines, headers=headers_missing)
+        return tabulate(lines, headers=headers_with_missing)
 
 
 class HtmlReporter(Reporter):
@@ -139,8 +136,6 @@ class DeltaReporter(object):
         return self.color_number(f"{total_misses:+d}") if total_misses else "-"
 
     def get_report_lines(self):
-        lines = {k: [] for k in ["Filename", "Stmts", "Miss", "Cover"]}
-
         filenames_of_files_with_changes = [
             filename
             for filename in self.differ_files_info
@@ -153,23 +148,25 @@ class DeltaReporter(object):
             )
         ]
 
-        for filename in filenames_of_files_with_changes:
-            lines["Filename"].extend([filename])
-            lines["Stmts"].extend(
-                [
-                    self.format_total_statements(
-                        self.differ.diff_total_statements(filename)
-                    )
-                ]
-            )
-            lines["Miss"].extend(
-                [self.format_total_misses(self.differ.diff_total_misses(filename))]
-            )
-            lines["Cover"].extend(
-                [self.format_line_rate(self.differ.diff_line_rate(filename))]
-            )
+        lines = {
+            "Filename": [filename for filename in filenames_of_files_with_changes],
+            "Stmts": [
+                self.format_total_statements(
+                    self.differ.diff_total_statements(filename)
+                )
+                for filename in filenames_of_files_with_changes
+            ],
+            "Miss": [
+                self.format_total_misses(self.differ.diff_total_misses(filename))
+                for filename in filenames_of_files_with_changes
+            ],
+            "Cover": [
+                self.format_line_rate(self.differ.diff_line_rate(filename))
+                for filename in filenames_of_files_with_changes
+            ],
+        }
 
-        lines["Filename"].extend(["TOTAL"]),
+        lines["Filename"].extend(["TOTAL"])
         lines["Stmts"].extend(
             [self.format_total_statements(self.differ.diff_total_statements())]
         )
@@ -179,11 +176,10 @@ class DeltaReporter(object):
         lines["Cover"].extend([self.format_line_rate(self.differ.diff_line_rate())])
 
         if self.show_source:
-            lines["Missing"] = []
-            for filename in filenames_of_files_with_changes:
-                lines["Missing"].extend(
-                    [self.format_missed_lines(self.differ.diff_missed_lines(filename))]
-                )
+            lines["Missing"] = [
+                self.format_missed_lines(self.differ.diff_missed_lines(filename))
+                for filename in filenames_of_files_with_changes
+            ]
             lines["Missing"].extend([""])
 
         return lines
@@ -203,7 +199,9 @@ class TextReporterDelta(DeltaReporter):
             lines["Missing"] = missed_lines_colored
 
         headers = (
-            headers_missing if self.show_source is True else headers_without_missing
+            headers_with_missing
+            if self.show_source is True
+            else headers_without_missing
         )
 
         return tabulate(lines, headers=headers)
