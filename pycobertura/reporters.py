@@ -36,8 +36,7 @@ class Reporter(object):
                 for filename in self.files_info
             ],
             "Miss": [
-                self.cobertura.total_misses(filename)
-                for filename in self.files_info
+                self.cobertura.total_misses(filename) for filename in self.files_info
             ],
             "Cover": [
                 self.format_line_rate(self.cobertura.line_rate(filename))
@@ -46,13 +45,13 @@ class Reporter(object):
             "Missing": [
                 stringify(self.cobertura.missed_lines(filename))
                 for filename in self.files_info
-            ]
+            ],
         }
         lines["Filename"].extend(["TOTAL"])
         lines["Stmts"].extend([self.cobertura.total_statements()])
         lines["Miss"].extend([self.cobertura.total_misses()])
         lines["Cover"].extend([self.format_line_rate(self.cobertura.line_rate())])
-        lines["Missing"].extend([''])
+        lines["Missing"].extend([""])
 
         return lines
 
@@ -122,7 +121,12 @@ class DeltaReporter(object):
                 color = self.determine_color_of_number(numbers)
                 result = color(numbers)
             else:
-                result = ", ".join([self.determine_color_of_number(number)(number) for number in numbers])
+                result = ", ".join(
+                    [
+                        self.determine_color_of_number(number)(number)
+                        for number in numbers
+                    ]
+                )
         else:
             if type(numbers) is str:
                 result = numbers
@@ -137,43 +141,71 @@ class DeltaReporter(object):
         lines = {k: [] for k in ["Filename", "Stmts", "Miss", "Cover"]}
 
         for filename in self.differ.files():
-            total_statements = self.format_total_statements(self.differ.diff_total_statements(filename))
-            total_misses = self.format_total_misses(self.differ.diff_total_misses(filename))
+            total_statements = self.format_total_statements(
+                self.differ.diff_total_statements(filename)
+            )
+            total_misses = self.format_total_misses(
+                self.differ.diff_total_misses(filename)
+            )
             line_rate = self.format_line_rate(self.differ.diff_line_rate(filename))
 
-            if any((self.differ.diff_total_statements(filename), self.differ.diff_total_misses(filename), self.differ.diff_line_rate(filename))):
+            if any(
+                (
+                    self.differ.diff_total_statements(filename),
+                    self.differ.diff_total_misses(filename),
+                    self.differ.diff_line_rate(filename),
+                )
+            ):
                 lines["Filename"].extend([filename])
                 lines["Stmts"].extend([total_statements])
                 lines["Miss"].extend([total_misses])
                 lines["Cover"].extend([line_rate])
 
         lines["Filename"].extend(["TOTAL"]),
-        lines["Stmts"].extend([self.format_total_statements(self.differ.diff_total_statements())])
-        lines["Miss"].extend([self.format_total_misses(self.differ.diff_total_misses())])
+        lines["Stmts"].extend(
+            [self.format_total_statements(self.differ.diff_total_statements())]
+        )
+        lines["Miss"].extend(
+            [self.format_total_misses(self.differ.diff_total_misses())]
+        )
         lines["Cover"].extend([self.format_line_rate(self.differ.diff_line_rate())])
         if self.show_source:
             lines = {k: [] for k in ["Filename", "Stmts", "Miss", "Cover", "Missing"]}
             for filename in self.differ.files():
-                missed_line = self.format_missed_lines(self.differ.diff_missed_lines(filename))
-                total_statements = self.format_total_statements(self.differ.diff_total_statements(filename))
-                total_misses = self.format_total_misses(self.differ.diff_total_misses(filename))
+                missed_line = self.format_missed_lines(
+                    self.differ.diff_missed_lines(filename)
+                )
+                total_statements = self.format_total_statements(
+                    self.differ.diff_total_statements(filename)
+                )
+                total_misses = self.format_total_misses(
+                    self.differ.diff_total_misses(filename)
+                )
                 line_rate = self.format_line_rate(self.differ.diff_line_rate(filename))
 
-                if any((self.differ.diff_total_statements(filename),
-                 self.differ.diff_total_misses(filename), 
-                 self.differ.diff_line_rate(filename), 
-                 self.differ.diff_missed_lines(filename))):
+                if any(
+                    (
+                        self.differ.diff_total_statements(filename),
+                        self.differ.diff_total_misses(filename),
+                        self.differ.diff_line_rate(filename),
+                        self.differ.diff_missed_lines(filename),
+                    )
+                ):
                     lines["Filename"].extend([filename])
                     lines["Stmts"].extend([total_statements])
                     lines["Miss"].extend([total_misses])
                     lines["Cover"].extend([line_rate])
                     lines["Missing"].extend([missed_line])
-            
+
             lines["Filename"].extend(["TOTAL"]),
-            lines["Stmts"].extend([self.format_total_statements(self.differ.diff_total_statements())])
-            lines["Miss"].extend([self.format_total_misses(self.differ.diff_total_misses())])
+            lines["Stmts"].extend(
+                [self.format_total_statements(self.differ.diff_total_statements())]
+            )
+            lines["Miss"].extend(
+                [self.format_total_misses(self.differ.diff_total_misses())]
+            )
             lines["Cover"].extend([self.format_line_rate(self.differ.diff_line_rate())])
-            lines["Missing"].extend([''])
+            lines["Missing"].extend([""])
 
         return lines
 
@@ -186,10 +218,14 @@ class TextReporterDelta(DeltaReporter):
         lines = self.get_report_lines()
 
         if self.show_source:
-            missed_lines_colored = [self.color_number(line) for line in lines["Missing"]]
+            missed_lines_colored = [
+                self.color_number(line) for line in lines["Missing"]
+            ]
             lines["Missing"] = missed_lines_colored
 
-        headers = headers_missing if self.show_source is True else headers_without_missing
+        headers = (
+            headers_missing if self.show_source is True else headers_without_missing
+        )
 
         return tabulate(lines, headers=headers)
 
@@ -224,9 +260,7 @@ class HtmlReporterDelta(DeltaReporter):
             for filename in self.differ.files():
                 if self.differ.file_source_hunks(filename):
                     render_kwargs["sources"].append(
-                        (
-                            filename, self.differ.file_source_hunks(filename)
-                        )
+                        (filename, self.differ.file_source_hunks(filename))
                     )
 
         return template.render(**render_kwargs)
