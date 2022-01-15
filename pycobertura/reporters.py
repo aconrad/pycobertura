@@ -23,33 +23,33 @@ headers_missing = ["Filename", "Stmts", "Miss", "Cover", "Missing"]
 class Reporter(object):
     def __init__(self, cobertura):
         self.cobertura = cobertura
+        self.files_info = self.cobertura.files()
 
     @staticmethod
     def format_line_rate(line_rate):
         return f"{line_rate:.2%}"
 
     def get_report_lines(self):
-        files_info = self.cobertura.files()
         lines = {
-            "Filename": [filename for filename in files_info] + ["TOTAL"],
+            "Filename": [filename for filename in self.files_info] + ["TOTAL"],
             "Stmts": [
                 self.cobertura.total_statements(filename)
-                for filename in files_info
+                for filename in self.files_info
             ]
             + [self.cobertura.total_statements()],
             "Miss": [
                 self.cobertura.total_misses(filename)
-                for filename in files_info
+                for filename in self.files_info
             ]
             + [self.cobertura.total_misses()],
             "Cover": [
                 self.format_line_rate(self.cobertura.line_rate(filename))
-                for filename in files_info
+                for filename in self.files_info
             ]
             + [self.format_line_rate(self.cobertura.line_rate())],
             "Missing": [
                 stringify(self.cobertura.missed_lines(filename))
-                for filename in files_info
+                for filename in self.files_info
             ]
             + [""],
         }
@@ -79,7 +79,7 @@ class HtmlReporter(Reporter):
         if self.render_file_sources:
             sources = [
                 (filename, self.cobertura.file_source(filename))
-                for filename in self.cobertura.files()
+                for filename in self.files_info
             ]
 
         template = env.get_template("html.jinja2")
