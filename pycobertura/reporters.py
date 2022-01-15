@@ -179,34 +179,11 @@ class DeltaReporter(object):
         lines["Cover"].extend([self.format_line_rate(self.differ.diff_line_rate())])
 
         if self.show_source:
-            lines = {k: [] for k in ["Filename", "Stmts", "Miss", "Cover", "Missing"]}
+            lines["Missing"] = []
             for filename in filenames_of_files_with_changes:
-                lines["Filename"].extend([filename])
-                lines["Stmts"].extend(
-                    [
-                        self.format_total_statements(
-                            self.differ.diff_total_statements(filename)
-                        )
-                    ]
-                )
-                lines["Miss"].extend(
-                    [self.format_total_misses(self.differ.diff_total_misses(filename))]
-                )
-                lines["Cover"].extend(
-                    [self.format_line_rate(self.differ.diff_line_rate(filename))]
-                )
                 lines["Missing"].extend(
                     [self.format_missed_lines(self.differ.diff_missed_lines(filename))]
                 )
-
-            lines["Filename"].extend(["TOTAL"]),
-            lines["Stmts"].extend(
-                [self.format_total_statements(self.differ.diff_total_statements())]
-            )
-            lines["Miss"].extend(
-                [self.format_total_misses(self.differ.diff_total_misses())]
-            )
-            lines["Cover"].extend([self.format_line_rate(self.differ.diff_line_rate())])
             lines["Missing"].extend([""])
 
         return lines
