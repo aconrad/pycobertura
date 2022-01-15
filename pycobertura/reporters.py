@@ -1,4 +1,3 @@
-from collections import namedtuple
 from jinja2 import Environment, PackageLoader
 from pycobertura.cobertura import CoberturaDiff
 from pycobertura.utils import green, red, stringify
