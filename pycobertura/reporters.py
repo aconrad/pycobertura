@@ -97,6 +97,7 @@ class HtmlReporter(Reporter):
 class DeltaReporter(object):
     def __init__(self, cobertura1, cobertura2, show_source=True, *args, **kwargs):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
+        self.differ_files_info = self.differ.files()
         self.show_source = show_source
         self.color = kwargs.pop("color", False)
 
@@ -140,26 +141,33 @@ class DeltaReporter(object):
     def get_report_lines(self):
         lines = {k: [] for k in ["Filename", "Stmts", "Miss", "Cover"]}
 
-        for filename in self.differ.files():
-            total_statements = self.format_total_statements(
-                self.differ.diff_total_statements(filename)
-            )
-            total_misses = self.format_total_misses(
-                self.differ.diff_total_misses(filename)
-            )
-            line_rate = self.format_line_rate(self.differ.diff_line_rate(filename))
-
+        filenames_of_files_with_changes = [
+            filename
+            for filename in self.differ_files_info
             if any(
                 (
                     self.differ.diff_total_statements(filename),
                     self.differ.diff_total_misses(filename),
                     self.differ.diff_line_rate(filename),
                 )
-            ):
-                lines["Filename"].extend([filename])
-                lines["Stmts"].extend([total_statements])
-                lines["Miss"].extend([total_misses])
-                lines["Cover"].extend([line_rate])
+            )
+        ]
+
+        for filename in filenames_of_files_with_changes:
+            lines["Filename"].extend([filename])
+            lines["Stmts"].extend(
+                [
+                    self.format_total_statements(
+                        self.differ.diff_total_statements(filename)
+                    )
+                ]
+            )
+            lines["Miss"].extend(
+                [self.format_total_misses(self.differ.diff_total_misses(filename))]
+            )
+            lines["Cover"].extend(
+                [self.format_line_rate(self.differ.diff_line_rate(filename))]
+            )
 
         lines["Filename"].extend(["TOTAL"]),
         lines["Stmts"].extend(
@@ -169,33 +177,27 @@ class DeltaReporter(object):
             [self.format_total_misses(self.differ.diff_total_misses())]
         )
         lines["Cover"].extend([self.format_line_rate(self.differ.diff_line_rate())])
+
         if self.show_source:
             lines = {k: [] for k in ["Filename", "Stmts", "Miss", "Cover", "Missing"]}
-            for filename in self.differ.files():
-                missed_line = self.format_missed_lines(
-                    self.differ.diff_missed_lines(filename)
+            for filename in filenames_of_files_with_changes:
+                lines["Filename"].extend([filename])
+                lines["Stmts"].extend(
+                    [
+                        self.format_total_statements(
+                            self.differ.diff_total_statements(filename)
+                        )
+                    ]
                 )
-                total_statements = self.format_total_statements(
-                    self.differ.diff_total_statements(filename)
+                lines["Miss"].extend(
+                    [self.format_total_misses(self.differ.diff_total_misses(filename))]
                 )
-                total_misses = self.format_total_misses(
-                    self.differ.diff_total_misses(filename)
+                lines["Cover"].extend(
+                    [self.format_line_rate(self.differ.diff_line_rate(filename))]
                 )
-                line_rate = self.format_line_rate(self.differ.diff_line_rate(filename))
-
-                if any(
-                    (
-                        self.differ.diff_total_statements(filename),
-                        self.differ.diff_total_misses(filename),
-                        self.differ.diff_line_rate(filename),
-                        self.differ.diff_missed_lines(filename),
-                    )
-                ):
-                    lines["Filename"].extend([filename])
-                    lines["Stmts"].extend([total_statements])
-                    lines["Miss"].extend([total_misses])
-                    lines["Cover"].extend([line_rate])
-                    lines["Missing"].extend([missed_line])
+                lines["Missing"].extend(
+                    [self.format_missed_lines(self.differ.diff_missed_lines(filename))]
+                )
 
             lines["Filename"].extend(["TOTAL"]),
             lines["Stmts"].extend(
@@ -257,7 +259,7 @@ class HtmlReporterDelta(DeltaReporter):
 
         if self.show_source is True:
             render_kwargs["sources"] = []
-            for filename in self.differ.files():
+            for filename in self.differ_files_info:
                 if self.differ.file_source_hunks(filename):
                     render_kwargs["sources"].append(
                         (filename, self.differ.file_source_hunks(filename))
