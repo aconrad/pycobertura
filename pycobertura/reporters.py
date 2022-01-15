@@ -235,9 +235,10 @@ class HtmlReporterDelta(DeltaReporter):
         if self.show_source is True:
             render_kwargs["sources"] = []
             for filename in self.differ_files_info:
-                if self.differ.file_source_hunks(filename):
+                differ_file_source_hunks = self.differ.file_source_hunks(filename)
+                if differ_file_source_hunks:
                     render_kwargs["sources"].append(
-                        (filename, self.differ.file_source_hunks(filename))
+                        (filename, differ_file_source_hunks)
                     )
 
         return template.render(**render_kwargs)
