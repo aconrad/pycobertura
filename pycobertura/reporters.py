@@ -11,7 +11,6 @@ env.filters["line_status"] = filters.line_status
 env.filters["line_reason"] = filters.line_reason_icon
 env.filters["is_not_equal_to_dash"] = filters.is_not_equal_to_dash
 env.filters["misses_color"] = filters.misses_color
-
 row_attributes = ["filename", "total_statements", "total_misses", "line_rate"]
 file_row = namedtuple("FileRow", row_attributes)
 file_row_missed = namedtuple("FileRowMissed", row_attributes + ["missed_lines"])
@@ -31,28 +30,29 @@ class Reporter(object):
 
     def get_report_lines(self):
         lines = {
-            "Filename": [filename for filename in self.files_info] + ["TOTAL"],
+            "Filename": [filename for filename in self.files_info],
             "Stmts": [
                 self.cobertura.total_statements(filename)
                 for filename in self.files_info
-            ]
-            + [self.cobertura.total_statements()],
+            ],
             "Miss": [
                 self.cobertura.total_misses(filename)
                 for filename in self.files_info
-            ]
-            + [self.cobertura.total_misses()],
+            ],
             "Cover": [
                 self.format_line_rate(self.cobertura.line_rate(filename))
                 for filename in self.files_info
-            ]
-            + [self.format_line_rate(self.cobertura.line_rate())],
+            ],
             "Missing": [
                 stringify(self.cobertura.missed_lines(filename))
                 for filename in self.files_info
             ]
-            + [""],
         }
+        lines["Filename"].extend(["TOTAL"])
+        lines["Stmts"].extend([self.cobertura.total_statements()])
+        lines["Miss"].extend([self.cobertura.total_misses()])
+        lines["Cover"].extend([self.format_line_rate(self.cobertura.line_rate())])
+        lines["Missing"].extend([''])
 
         return lines
 
@@ -113,101 +113,83 @@ class DeltaReporter(object):
     def format_missed_lines(missed_lines):
         return [f"+{lno:d}" if is_new else f"-{lno:d}" for lno, is_new in missed_lines]
 
-    def color_row(self, row):
-        if self.color is True:
-            return red(row) if row.startswith("+") else green(row)
-        return row
+    def determine_color_of_number(self, number):
+        return red if number.startswith("+") else green
+
+    def color_number(self, numbers):
+        if numbers and self.color:
+            if type(numbers) is str:
+                color = self.determine_color_of_number(numbers)
+                result = color(numbers)
+            else:
+                result = ", ".join([self.determine_color_of_number(number)(number) for number in numbers])
+        else:
+            if type(numbers) is str:
+                result = numbers
+            else:
+                result = ", ".join(numbers)
+        return result
 
     def format_total_misses(self, total_misses):
-        return self.color_row(f"{total_misses:+d}") if total_misses else "-"
+        return self.color_number(f"{total_misses:+d}") if total_misses else "-"
 
     def get_report_lines(self):
-        if not self.show_source:
-            row_values = tuple(
-                (
-                    filename,
-                    self.format_total_statements(
-                        self.differ.diff_total_statements(filename)
-                    ),
-                    self.format_total_misses(self.differ.diff_total_misses(filename)),
-                    self.format_line_rate(self.differ.diff_line_rate(filename)),
-                )
-                for filename in self.differ.files()
-                if any(
-                    (
-                        self.differ.diff_total_statements(filename),
-                        self.differ.diff_total_misses(filename),
-                        self.differ.diff_line_rate(filename),
-                    )
-                )
-            )
+        lines = {k: [] for k in ["Filename", "Stmts", "Miss", "Cover"]}
 
-            footer_values = (
-                (
-                    "TOTAL",
-                    self.format_total_statements(self.differ.diff_total_statements()),
-                    self.format_total_misses(self.differ.diff_total_misses()),
-                    self.format_line_rate(self.differ.diff_line_rate()),
-                ),
-            )
-            row_values += footer_values
-            return tuple(file_row(*row) for row in row_values)
-        else:
-            row_values = tuple(
-                (
-                    filename,
-                    self.format_total_statements(
-                        self.differ.diff_total_statements(filename)
-                    ),
-                    self.format_total_misses(self.differ.diff_total_misses(filename)),
-                    self.format_line_rate(self.differ.diff_line_rate(filename)),
-                    self.format_missed_lines(self.differ.diff_missed_lines(filename)),
-                )
-                for filename in self.differ.files()
-                if any(
-                    (
-                        self.differ.diff_total_statements(filename),
-                        self.differ.diff_total_misses(filename),
-                        self.differ.diff_line_rate(filename),
-                        self.differ.diff_missed_lines(filename),
-                    )
-                )
-            )
-            footer_values = (
-                (
-                    "TOTAL",
-                    self.format_total_statements(self.differ.diff_total_statements()),
-                    self.format_total_misses(self.differ.diff_total_misses()),
-                    self.format_line_rate(self.differ.diff_line_rate()),
-                    [],
-                ),
-            )
-            row_values += footer_values
-            return tuple(file_row_missed(*row) for row in row_values)
+        for filename in self.differ.files():
+            total_statements = self.format_total_statements(self.differ.diff_total_statements(filename))
+            total_misses = self.format_total_misses(self.differ.diff_total_misses(filename))
+            line_rate = self.format_line_rate(self.differ.diff_line_rate(filename))
+
+            if any((self.differ.diff_total_statements(filename), self.differ.diff_total_misses(filename), self.differ.diff_line_rate(filename))):
+                lines["Filename"].extend([filename])
+                lines["Stmts"].extend([total_statements])
+                lines["Miss"].extend([total_misses])
+                lines["Cover"].extend([line_rate])
+
+        lines["Filename"].extend(["TOTAL"]),
+        lines["Stmts"].extend([self.format_total_statements(self.differ.diff_total_statements())])
+        lines["Miss"].extend([self.format_total_misses(self.differ.diff_total_misses())])
+        lines["Cover"].extend([self.format_line_rate(self.differ.diff_line_rate())])
+        if self.show_source:
+            lines = {k: [] for k in ["Filename", "Stmts", "Miss", "Cover", "Missing"]}
+            for filename in self.differ.files():
+                missed_line = self.format_missed_lines(self.differ.diff_missed_lines(filename))
+                total_statements = self.format_total_statements(self.differ.diff_total_statements(filename))
+                total_misses = self.format_total_misses(self.differ.diff_total_misses(filename))
+                line_rate = self.format_line_rate(self.differ.diff_line_rate(filename))
+
+                if any((self.differ.diff_total_statements(filename),
+                 self.differ.diff_total_misses(filename), 
+                 self.differ.diff_line_rate(filename), 
+                 self.differ.diff_missed_lines(filename))):
+                    lines["Filename"].extend([filename])
+                    lines["Stmts"].extend([total_statements])
+                    lines["Miss"].extend([total_misses])
+                    lines["Cover"].extend([line_rate])
+                    lines["Missing"].extend([missed_line])
+            
+            lines["Filename"].extend(["TOTAL"]),
+            lines["Stmts"].extend([self.format_total_statements(self.differ.diff_total_statements())])
+            lines["Miss"].extend([self.format_total_misses(self.differ.diff_total_misses())])
+            lines["Cover"].extend([self.format_line_rate(self.differ.diff_line_rate())])
+            lines["Missing"].extend([''])
+
+        return lines
 
 
 class TextReporterDelta(DeltaReporter):
     def __init__(self, *args, **kwargs):
         super(TextReporterDelta, self).__init__(*args, **kwargs)
 
-    def format_row_if_show_source(self, row):
-        missed_lines_colored = ", ".join(
-            [self.color_row(line) for line in row.missed_lines]
-        )
-        row_values = row[:-1]
-        row_values += (missed_lines_colored,)
-        return row_values
-
     def generate(self):
         lines = self.get_report_lines()
 
         if self.show_source:
-            formatted_lines = [self.format_row_if_show_source(row) for row in lines]
-            lines = formatted_lines
+            missed_lines_colored = [self.color_number(line) for line in lines["Missing"]]
+            lines["Missing"] = missed_lines_colored
 
-        headers = (
-            headers_missing if self.show_source is True else headers_without_missing
-        )
+        headers = headers_missing if self.show_source is True else headers_without_missing
 
         return tabulate(lines, headers=headers)
 
@@ -225,21 +207,26 @@ class HtmlReporterDelta(DeltaReporter):
 
     def generate(self):
         lines = self.get_report_lines()
-
         template = env.get_template("html-delta.jinja2")
 
+        rows = {k: v[:-1] for k, v in lines.items()}
+        footer = {k: v[-1] for k, v in lines.items()}
+
         render_kwargs = {
-            "lines": lines[:-1],
-            "footer": lines[-1],
+            "lines": rows,
+            "footer": footer,
             "show_missing": self.show_missing,
             "show_source": self.show_source,
         }
 
         if self.show_source is True:
-            render_kwargs["sources"] = [
-                (filename, self.differ.file_source_hunks(filename))
-                for filename in self.differ.files()
-                if self.differ.file_source_hunks(filename)
-            ]
+            render_kwargs["sources"] = []
+            for filename in self.differ.files():
+                if self.differ.file_source_hunks(filename):
+                    render_kwargs["sources"].append(
+                        (
+                            filename, self.differ.file_source_hunks(filename)
+                        )
+                    )
 
         return template.render(**render_kwargs)
