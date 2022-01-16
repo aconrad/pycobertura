@@ -26,7 +26,7 @@ class Reporter(object):
 
     def get_report_lines(self):
         lines = {
-            "Filename": [filename for filename in self.files_info],
+            "Filename": self.files_info.copy(),
             "Stmts": [
                 self.cobertura.total_statements(filename)
                 for filename in self.files_info
@@ -148,7 +148,7 @@ class DeltaReporter(object):
         ]
 
         lines = {
-            "Filename": [filename for filename in filenames_of_files_with_changes],
+            "Filename": filenames_of_files_with_changes.copy(),
             "Stmts": [
                 self.format_total_statements(
                     self.differ.diff_total_statements(filename)
