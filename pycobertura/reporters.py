@@ -135,33 +135,49 @@ class DeltaReporter(object):
         return self.color_number(f"{total_misses:+d}") if total_misses else "-"
 
     def get_report_lines(self):
-        filenames_of_files_with_changes = [
-            filename
+        diff_total_stmts = [
+            self.differ.diff_total_statements(filename)
             for filename in self.differ_files_info
+        ]
+
+        diff_total_miss = [
+            self.differ.diff_total_misses(filename)
+            for filename in self.differ_files_info
+        ]
+
+        diff_total_cover = [
+            self.differ.diff_line_rate(filename) for filename in self.differ_files_info
+        ]
+
+        indexes_of_files_with_changes = [
+            i
+            for i in range(len(self.differ_files_info))
             if any(
                 (
-                    self.differ.diff_total_statements(filename),
-                    self.differ.diff_total_misses(filename),
-                    self.differ.diff_line_rate(filename),
+                    diff_total_stmts[i],
+                    diff_total_miss[i],
+                    diff_total_cover[i],
                 )
             )
         ]
 
+        filenames_of_files_with_changes = [
+            self.differ_files_info[i] for i in indexes_of_files_with_changes
+        ]
+
         lines = {
-            "Filename": filenames_of_files_with_changes.copy(),
+            "Filename": filenames_of_files_with_changes,
             "Stmts": [
-                self.format_total_statements(
-                    self.differ.diff_total_statements(filename)
-                )
-                for filename in filenames_of_files_with_changes
+                self.format_total_statements(diff_total_stmts[i])
+                for i in indexes_of_files_with_changes
             ],
             "Miss": [
-                self.format_total_misses(self.differ.diff_total_misses(filename))
-                for filename in filenames_of_files_with_changes
+                self.format_total_misses(diff_total_miss[i])
+                for i in indexes_of_files_with_changes
             ],
             "Cover": [
-                self.format_line_rate(self.differ.diff_line_rate(filename))
-                for filename in filenames_of_files_with_changes
+                self.format_line_rate(diff_total_cover[i])
+                for i in indexes_of_files_with_changes
             ],
         }
 
@@ -175,9 +191,13 @@ class DeltaReporter(object):
         lines["Cover"].extend([self.format_line_rate(self.differ.diff_line_rate())])
 
         if self.show_source:
+            diff_total_missing = [
+                self.differ.diff_missed_lines(filename)
+                for filename in self.differ_files_info
+            ]
             lines["Missing"] = [
-                self.format_missed_lines(self.differ.diff_missed_lines(filename))
-                for filename in filenames_of_files_with_changes
+                self.format_missed_lines(diff_total_missing[i])
+                for i in indexes_of_files_with_changes
             ]
             lines["Missing"].extend([""])
 
