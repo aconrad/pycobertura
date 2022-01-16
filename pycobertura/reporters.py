@@ -4,7 +4,8 @@ from pycobertura.cobertura import CoberturaDiff
 from pycobertura.utils import green, rangify, red
 from pycobertura.templates import filters
 from tabulate import tabulate
-
+from pathlib import Path
+import yaml
 
 env = Environment(loader=PackageLoader("pycobertura", "templates"))
 env.filters["line_status"] = filters.line_status
@@ -83,6 +84,82 @@ class TextReporter(Reporter):
 
         return report
 
+class TextDirectorySummaryReporter(Reporter):
+    def format_row(self, last_path, dir_total_lines, dir_total_missed):
+        formatted_missed_lines = ""
+        percent = 0
+        if (dir_total_lines != 0 and dir_total_missed != 0):
+            percent = (dir_total_lines - dir_total_missed) / dir_total_lines * 100
+
+        row = file_row_missed(
+            last_path,
+            dir_total_lines,
+            dir_total_missed,
+            percent,
+            formatted_missed_lines,
+        )
+
+        return row
+
+    def generate(self):
+        fileset = {}
+        reverseset = {}
+        resultgroup = {}
+        lines = self.get_report_lines()
+        with open("pycobertura/groups.yml") as fileh:
+            fileset = yaml.load(fileh, Loader=yaml.Loader)
+        for key in fileset.keys():
+            for directory in fileset[key].split(' '):
+                reverseset[directory] = key
+        dir_total_lines = 0
+        dir_total_missed = 0
+
+        lines = self.get_report_lines()
+        last_path = Path()
+        formatted_lines = []
+        for row in lines:
+            filename, total_lines, total_misses, line_rate, missed_lines = row
+            path = Path(filename).parents[0]
+            if last_path == Path():
+                last_path = path
+                dir_total_lines = total_lines
+                dir_total_missed = total_misses
+            elif last_path != path:
+                formatted_row = self.format_row(last_path, dir_total_lines, dir_total_missed)
+                formatted_lines.append(formatted_row)
+                strpath = str(last_path)
+                if strpath in reverseset:
+                    k = reverseset[strpath]
+                    if k in resultgroup:
+                        resultgroup[k]['dir_total_lines'] += dir_total_lines
+                        resultgroup[k]['dir_total_missed'] += dir_total_missed
+                    else:                        
+                        resultgroup[k] = {
+                            'dir_total_lines': dir_total_lines,
+                            'dir_total_missed': dir_total_missed
+                            }
+                else:
+                    print('path not covered in config: ' + strpath)
+                last_path = path
+                dir_total_lines = total_lines
+                dir_total_missed = total_misses
+            else:
+                dir_total_lines += total_lines
+                dir_total_missed += total_misses
+
+        report = tabulate(
+            formatted_lines, headers=["Directories", "Stmts", "Miss", "Cover", "Missing"]
+        )
+
+        for key in fileset.keys():
+            res = resultgroup[key]
+            percent = 0
+            if (res['dir_total_lines'] != 0 and res['dir_total_missed'] != 0):
+                percent = (res['dir_total_lines'] - res['dir_total_missed']) / res['dir_total_lines'] * 100
+
+            print(key + " - %+.2f%%" %(percent) + " %")
+
+        return report
 
 class HtmlReporter(TextReporter):
     def __init__(self, *args, **kwargs):

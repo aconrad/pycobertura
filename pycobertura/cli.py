@@ -4,6 +4,7 @@ from pycobertura.cobertura import Cobertura
 from pycobertura.reporters import (
     HtmlReporter,
     TextReporter,
+    TextDirectorySummaryReporter,
     HtmlReporterDelta,
     TextReporterDelta,
 )
@@ -16,6 +17,7 @@ pycobertura = click.Group()
 reporters = {
     "html": HtmlReporter,
     "text": TextReporter,
+    "textdir": TextDirectorySummaryReporter
 }
 
 
