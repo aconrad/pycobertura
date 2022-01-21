@@ -8,6 +8,7 @@
   * Migrate to `setup.cfg` and `pyproject.toml`; empty `setup.py` kept for compatibility reasons.
   * update `release.sh` script.
   * address markdown lint in `README.md`
+  * do not use object in class inheritance as this is default behaviour in Python3
   Thanks @gro1m
 
 ## 2.1.0 (2021-09-23)
