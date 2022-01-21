@@ -18,12 +18,10 @@ line_reason_html_icon = {
 
 
 def is_not_equal_to_dash(arg):
-    # print(f"is_not_equal_to_dash: arg={arg}")
     return not (arg == "-")
 
 
 def misses_color(arg):
-    # print(f"misses_color: arg={arg}")
     return "red" if arg.startswith("+") else "green"
 
 

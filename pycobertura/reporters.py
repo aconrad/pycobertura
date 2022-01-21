@@ -43,11 +43,11 @@ class Reporter(object):
                 for filename in self.files_info
             ],
         }
-        lines["Filename"].extend(["TOTAL"])
-        lines["Stmts"].extend([self.cobertura.total_statements()])
-        lines["Miss"].extend([self.cobertura.total_misses()])
-        lines["Cover"].extend([self.format_line_rate(self.cobertura.line_rate())])
-        lines["Missing"].extend([""])
+        lines["Filename"].append("TOTAL")
+        lines["Stmts"] += [self.cobertura.total_statements()]
+        lines["Miss"] += [self.cobertura.total_misses()]
+        lines["Cover"] += [self.format_line_rate(self.cobertura.line_rate())]
+        lines["Missing"].append("")
 
         return lines
 
@@ -181,14 +181,12 @@ class DeltaReporter(object):
             ],
         }
 
-        lines["Filename"].extend(["TOTAL"])
-        lines["Stmts"].extend(
-            [self.format_total_statements(self.differ.diff_total_statements())]
-        )
-        lines["Miss"].extend(
-            [self.format_total_misses(self.differ.diff_total_misses())]
-        )
-        lines["Cover"].extend([self.format_line_rate(self.differ.diff_line_rate())])
+        lines["Filename"].append("TOTAL")
+        lines["Stmts"] += [
+            self.format_total_statements(self.differ.diff_total_statements())
+        ]
+        lines["Miss"] += [self.format_total_misses(self.differ.diff_total_misses())]
+        lines["Cover"] += [self.format_line_rate(self.differ.diff_line_rate())]
 
         if self.show_source:
             diff_total_missing = [
@@ -199,7 +197,7 @@ class DeltaReporter(object):
                 self.format_missed_lines(diff_total_missing[i])
                 for i in indexes_of_files_with_changes
             ]
-            lines["Missing"].extend([""])
+            lines["Missing"].append("")
 
         return lines
 

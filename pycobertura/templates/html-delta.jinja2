@@ -34,15 +34,15 @@ table.code td.lineno pre {margin-right: 1rem;}
           </tr>
         </thead>
         <tbody>
-{%- for iter in range(lines["Filename"]|length) %}
+{%- for file_index in range(lines["Filename"]|length) %}
           <tr>
-            <td><a href="#{{ lines["Filename"][iter] }}">{{ lines["Filename"][iter]}}</a></td>
-            <td>{{ lines["Stmts"][iter] }}</td>
-            <td><span{% if lines["Miss"][iter] | is_not_equal_to_dash %} class="{{ lines["Miss"][iter] | misses_color }}"{% endif %}>{{ lines["Miss"][iter] }}</span></td>
-            <td>{{ lines["Cover"][iter] }}</td>
+            <td><a href="#{{ lines["Filename"][file_index] }}">{{ lines["Filename"][file_index]}}</a></td>
+            <td>{{ lines["Stmts"][file_index] }}</td>
+            <td><span{% if lines["Miss"][file_index] | is_not_equal_to_dash %} class="{{ lines["Miss"][file_index] | misses_color }}"{% endif %}>{{ lines["Miss"][file_index] }}</span></td>
+            <td>{{ lines["Cover"][file_index] }}</td>
 {%- if show_source and show_missing %}
             <td>
-{%- for missed_line in lines["Missing"][iter] %}
+{%- for missed_line in lines["Missing"][file_index] %}
             {%- if not loop.first %}, {% endif %}<span class="{{ missed_line | misses_color }}">{{ missed_line }}</span>
 {%- endfor %}
             </td>
