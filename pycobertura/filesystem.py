@@ -8,7 +8,7 @@ import shlex
 from contextlib import contextmanager
 
 
-class FileSystem(object):
+class FileSystem:
     class FileNotFound(Exception):
         def __init__(self, path):
             super(self.__class__, self).__init__(path)

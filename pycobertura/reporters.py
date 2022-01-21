@@ -15,7 +15,7 @@ file_row = namedtuple("FileRow", row_attributes)
 file_row_missed = namedtuple("FileRowMissed", row_attributes + ["missed_lines"])
 
 
-class Reporter(object):
+class Reporter:
     def __init__(self, cobertura):
         self.cobertura = cobertura
 
@@ -121,7 +121,7 @@ class HtmlReporter(TextReporter):
         )
 
 
-class DeltaReporter(object):
+class DeltaReporter:
     def __init__(self, cobertura1, cobertura2, show_source=True):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
         self.show_source = show_source
