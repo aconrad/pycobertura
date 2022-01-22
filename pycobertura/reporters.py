@@ -64,11 +64,8 @@ class JsonReporter(Reporter):
         lines = self.get_report_lines()
         rows = {k: v[:-1] for k, v in lines.items()}
         footer = {k: v[-1] for k, v in lines.items()}
-        
-        return json.dumps({
-            "total": footer,
-            "files":[rows]
-        })
+
+        return json.dumps({"total": footer, "files": [rows]})
 
 
 class HtmlReporter(Reporter):
