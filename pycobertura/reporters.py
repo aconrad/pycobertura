@@ -15,7 +15,7 @@ headers_without_missing = ["Filename", "Stmts", "Miss", "Cover"]
 headers_with_missing = ["Filename", "Stmts", "Miss", "Cover", "Missing"]
 
 
-class Reporter(object):
+class Reporter:
     def __init__(self, cobertura):
         self.cobertura = cobertura
 
@@ -90,7 +90,7 @@ class HtmlReporter(Reporter):
         )
 
 
-class DeltaReporter(object):
+class DeltaReporter:
     def __init__(self, cobertura1, cobertura2, show_source=True, *args, **kwargs):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
         self.show_source = show_source

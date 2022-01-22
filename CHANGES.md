@@ -8,6 +8,7 @@
   * Migrate to `setup.cfg` and `pyproject.toml`; empty `setup.py` kept for compatibility reasons.
   * update `release.sh` script.
   * address markdown lint in `README.md`
+  * do not use object in class inheritance as this is default behaviour in Python3
   * move formatting in `reporters.py` into `Reporter` and `DeltaReporter` base classes to have a uniform formatting: new `stringify` in `utils.py` method and corresponding test in `test_stringify.py`. The subclasses and only inherit from these two base classes to ensure a consistent formatting across the reporters.
   * change datastructure of coverage information from `namedtuple` (immutable) to `dictionary` (mutable) in `reporters.py`. Adjusted `html-delta.jinja2`,, `html.jinja2` and `filters.py` accordingly. This change in datastructure leads to a more compact and more readable code.
   Thanks @gro1m

@@ -29,7 +29,7 @@ class Line(namedtuple("Line", ["number", "source", "status", "reason"])):
     """
 
 
-class Cobertura(object):
+class Cobertura:
     """
     An XML Cobertura parser.
     """
@@ -285,7 +285,7 @@ class Cobertura(object):
         return [el.attrib["name"] for el in self.xml.xpath("//package")]
 
 
-class CoberturaDiff(object):
+class CoberturaDiff:
     """
     Diff Cobertura objects.
     """
