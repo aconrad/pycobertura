@@ -3,6 +3,7 @@ from pycobertura.cobertura import CoberturaDiff
 from pycobertura.utils import green, red, stringify
 from pycobertura.templates import filters
 from tabulate import tabulate
+import json
 
 
 env = Environment(loader=PackageLoader("pycobertura", "templates"))
@@ -56,6 +57,18 @@ class TextReporter(Reporter):
     def generate(self):
         lines = self.get_report_lines()
         return tabulate(lines, headers=headers_with_missing)
+
+
+class JsonReporter(Reporter):
+    def generate(self):
+        lines = self.get_report_lines()
+        rows = {k: v[:-1] for k, v in lines.items()}
+        footer = {k: v[-1] for k, v in lines.items()}
+        
+        return json.dumps({
+            "total": footer,
+            "files":[rows]
+        })
 
 
 class HtmlReporter(Reporter):
