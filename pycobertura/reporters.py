@@ -231,6 +231,17 @@ class TextReporterDelta(DeltaReporter):
 
         return tabulate(lines, headers=headers)
 
+class JsonReporterDelta(DeltaReporter):
+    def __init__(self, *args, **kwargs):
+        super(JsonReporterDelta, self).__init__(*args, **kwargs)
+
+    def generate(self):
+        lines = self.get_report_lines()
+        rows = {k: v[:-1] for k, v in lines.items()}
+        footer = {k: v[-1] for k, v in lines.items()}
+
+        return json.dumps({"total": footer, "files": [rows]})
+
 
 class HtmlReporterDelta(DeltaReporter):
     def __init__(self, *args, **kwargs):

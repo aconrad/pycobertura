@@ -7,6 +7,7 @@ from pycobertura.reporters import (
     JsonReporter,
     HtmlReporterDelta,
     TextReporterDelta,
+    JsonReporterDelta
 )
 from pycobertura.filesystem import filesystem_factory
 from pycobertura.utils import get_dir_from_file_path
@@ -95,6 +96,7 @@ def show(cobertura_file, format, output, source, source_prefix):
 delta_reporters = {
     "text": TextReporterDelta,
     "html": HtmlReporterDelta,
+    "json": JsonReporterDelta,
 }
 
 
