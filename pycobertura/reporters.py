@@ -238,10 +238,21 @@ class JsonReporterDelta(DeltaReporter):
 
     def generate(self):
         lines = self.get_report_lines()
+
+        if self.show_source:
+            missed_lines_colored = [
+                self.color_number(line) for line in lines["Missing"]
+            ]
+            lines["Missing"] = missed_lines_colored
+
         rows = {k: v[:-1] for k, v in lines.items()}
         footer = {k: v[-1] for k, v in lines.items()}
 
-        return json.dumps({"total": footer, "files": [rows]})
+        json_string = json.dumps({"total": footer, "files": [rows]})
+
+        return json_string.encode("utf-8").decode(
+            "unicode_escape"
+        )  # for colors, explanation see here: https://stackoverflow.com/a/61273717/9698518
 
 
 class HtmlReporterDelta(DeltaReporter):
