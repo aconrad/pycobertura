@@ -204,7 +204,7 @@ def diff(
 
     isatty = True if output is None else output.isatty()
 
-    if format == "text":
+    if format in {"text", "json"}:
         color = isatty if color is None else color is True
         reporter_kwargs["color"] = color
 
