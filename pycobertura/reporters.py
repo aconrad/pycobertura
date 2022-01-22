@@ -228,6 +228,7 @@ class TextReporterDelta(DeltaReporter):
 
         return tabulate(lines, headers=headers)
 
+
 class JsonReporterDelta(DeltaReporter):
     def __init__(self, *args, **kwargs):
         super(JsonReporterDelta, self).__init__(*args, **kwargs)
