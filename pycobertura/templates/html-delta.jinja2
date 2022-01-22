@@ -34,16 +34,16 @@ table.code td.lineno pre {margin-right: 1rem;}
           </tr>
         </thead>
         <tbody>
-{%- for line in lines %}
+{%- for file_index in range(lines["Filename"]|length) %}
           <tr>
-            <td><a href="#{{ line.filename }}">{{ line.filename }}</a></td>
-            <td>{{ line.total_statements }}</td>
-            <td><span{% if line.total_misses != '-' %} class="{% if line.total_misses[0] == '+' %}red{% else %}green{% endif%}"{% endif %}>{{ line.total_misses }}</span></td>
-            <td>{{ line.line_rate }}</td>
+            <td><a href="#{{ lines["Filename"][file_index] }}">{{ lines["Filename"][file_index]}}</a></td>
+            <td>{{ lines["Stmts"][file_index] }}</td>
+            <td><span{% if lines["Miss"][file_index] | is_not_equal_to_dash %} class="{{ lines["Miss"][file_index] | misses_color }}"{% endif %}>{{ lines["Miss"][file_index] }}</span></td>
+            <td>{{ lines["Cover"][file_index] }}</td>
 {%- if show_source and show_missing %}
             <td>
-{%- for missed_line in line.missed_lines %}
-            {%- if not loop.first %}, {% endif %}<span class="{% if missed_line[0] == '+' %}red{% else %}green{% endif %}">{{ missed_line }}</span>
+{%- for missed_line in lines["Missing"][file_index] %}
+            {%- if not loop.first %}, {% endif %}<span class="{{ missed_line | misses_color }}">{{ missed_line }}</span>
 {%- endfor %}
             </td>
 {%- endif %}
@@ -52,10 +52,10 @@ table.code td.lineno pre {margin-right: 1rem;}
         </tbody>
         <tfoot>
           <tr>
-            <td>{{ footer.filename }}</td>
-            <td>{{ footer.total_statements }}</td>
-            <td><span{% if footer.total_misses != '-' %} class="{% if footer.total_misses[0] == '+' %}red{% else %}green{% endif%}"{% endif %}>{{ footer.total_misses }}</span></td>
-            <td>{{ footer.line_rate }}</td>
+            <td>{{ footer["Filename"] }}</td>
+            <td>{{ footer["Stmts"] }}</td>
+            <td><span{% if footer["Miss"] | is_not_equal_to_dash %} class="{{ footer["Miss"] | misses_color }}"{% endif %}>{{ footer["Miss"] }}</span></td>
+            <td>{{ footer["Cover"] }}</td>
 {%- if show_source and show_missing %}
             <td></td>
 {%- endif %}

@@ -17,6 +17,14 @@ line_reason_html_icon = {
 }
 
 
+def is_not_equal_to_dash(arg):
+    return not (arg == "-")
+
+
+def misses_color(arg):
+    return "red" if arg.startswith("+") else "green"
+
+
 def line_status(line):
     return line_status_style[line.status]
 

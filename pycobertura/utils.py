@@ -54,7 +54,7 @@ class memoize(object):
 
 def colorize(text, color):
     color_code = ANSI_ESCAPE_CODES[color]
-    return "%s%s%s" % (color_code, text, ANSI_ESCAPE_CODES["reset"])
+    return f'{color_code}{text}{ANSI_ESCAPE_CODES["reset"]}'
 
 
 def red(text):
@@ -81,6 +81,16 @@ def rangify(number_list):
 
     ranges.append((range_start, prev_num))
     return ranges
+
+
+def stringify(number_list):
+    """Assumes the list is sorted."""
+    rangified_list = rangify(number_list)
+    stringified_list = [
+        f"{line_start}" if line_start == line_stop else f"{line_start}-{line_stop}"
+        for line_start, line_stop in rangified_list
+    ]
+    return ", ".join(stringified_list)
 
 
 def extrapolate_coverage(lines_w_status):
