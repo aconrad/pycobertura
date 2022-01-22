@@ -250,9 +250,11 @@ class JsonReporterDelta(DeltaReporter):
 
         json_string = json.dumps({"total": footer, "files": [rows]})
 
-        return json_string.encode("utf-8").decode(
-            "unicode_escape"
-        )  # for colors, explanation see here: https://stackoverflow.com/a/61273717/9698518
+        # for colors, explanation see here:
+        # https://stackoverflow.com/a/61273717/9698518
+        colored_json_string = json_string.encode("utf-8").decode("unicode_escape")
+
+        return colored_json_string
 
 
 class HtmlReporterDelta(DeltaReporter):
