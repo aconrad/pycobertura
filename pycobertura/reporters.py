@@ -18,7 +18,6 @@ headers_with_missing = ["Filename", "Stmts", "Miss", "Cover", "Missing"]
 class Reporter(object):
     def __init__(self, cobertura):
         self.cobertura = cobertura
-        self.files_info = self.cobertura.files()
 
     @staticmethod
     def format_line_rate(line_rate):
@@ -26,21 +25,22 @@ class Reporter(object):
 
     def get_report_lines(self):
         lines = {
-            "Filename": self.files_info.copy(),
+            "Filename": self.cobertura.files().copy(),
             "Stmts": [
                 self.cobertura.total_statements(filename)
-                for filename in self.files_info
+                for filename in self.cobertura.files()
             ],
             "Miss": [
-                self.cobertura.total_misses(filename) for filename in self.files_info
+                self.cobertura.total_misses(filename)
+                for filename in self.cobertura.files()
             ],
             "Cover": [
                 self.format_line_rate(self.cobertura.line_rate(filename))
-                for filename in self.files_info
+                for filename in self.cobertura.files()
             ],
             "Missing": [
                 stringify(self.cobertura.missed_lines(filename))
-                for filename in self.files_info
+                for filename in self.cobertura.files()
             ],
         }
         lines["Filename"].append("TOTAL")
@@ -74,7 +74,7 @@ class HtmlReporter(Reporter):
         if self.render_file_sources:
             sources = [
                 (filename, self.cobertura.file_source(filename))
-                for filename in self.files_info
+                for filename in self.cobertura.files()
             ]
 
         template = env.get_template("html.jinja2")
@@ -93,7 +93,6 @@ class HtmlReporter(Reporter):
 class DeltaReporter(object):
     def __init__(self, cobertura1, cobertura2, show_source=True, *args, **kwargs):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
-        self.differ_files_info = self.differ.files()
         self.show_source = show_source
         self.color = kwargs.pop("color", False)
 
@@ -137,21 +136,20 @@ class DeltaReporter(object):
     def get_report_lines(self):
         diff_total_stmts = [
             self.differ.diff_total_statements(filename)
-            for filename in self.differ_files_info
+            for filename in self.differ.files()
         ]
 
         diff_total_miss = [
-            self.differ.diff_total_misses(filename)
-            for filename in self.differ_files_info
+            self.differ.diff_total_misses(filename) for filename in self.differ.files()
         ]
 
         diff_total_cover = [
-            self.differ.diff_line_rate(filename) for filename in self.differ_files_info
+            self.differ.diff_line_rate(filename) for filename in self.differ.files()
         ]
 
         indexes_of_files_with_changes = [
             i
-            for i in range(len(self.differ_files_info))
+            for i in range(len(self.differ.files()))
             if any(
                 (
                     diff_total_stmts[i],
@@ -162,7 +160,7 @@ class DeltaReporter(object):
         ]
 
         filenames_of_files_with_changes = [
-            self.differ_files_info[i] for i in indexes_of_files_with_changes
+            self.differ.files()[i] for i in indexes_of_files_with_changes
         ]
 
         lines = {
@@ -191,7 +189,7 @@ class DeltaReporter(object):
         if self.show_source:
             diff_total_missing = [
                 self.differ.diff_missed_lines(filename)
-                for filename in self.differ_files_info
+                for filename in self.differ.files()
             ]
             lines["Missing"] = [
                 self.format_missed_lines(diff_total_missing[i])
@@ -251,7 +249,7 @@ class HtmlReporterDelta(DeltaReporter):
 
         if self.show_source is True:
             render_kwargs["sources"] = []
-            for filename in self.differ_files_info:
+            for filename in self.differ.files():
                 differ_file_source_hunks = self.differ.file_source_hunks(filename)
                 if differ_file_source_hunks:
                     render_kwargs["sources"].append(
