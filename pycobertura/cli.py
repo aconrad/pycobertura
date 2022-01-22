@@ -7,7 +7,7 @@ from pycobertura.reporters import (
     JsonReporter,
     HtmlReporterDelta,
     TextReporterDelta,
-    JsonReporterDelta,
+    JsonReporterDelta
 )
 from pycobertura.filesystem import filesystem_factory
 from pycobertura.utils import get_dir_from_file_path
