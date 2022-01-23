@@ -291,6 +291,25 @@ TOTAL            +4           \x1b[31m+1\x1b[39m  +31.06%
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
+def test_diff__format_text__with_no_color():
+    from pycobertura.cli import diff, ExitCodes
+
+    runner = CliRunner()
+    result = runner.invoke(diff, [
+        '--no-color',
+        'tests/dummy.source1/coverage.xml',
+        'tests/dummy.source2/coverage.xml',
+    ], catch_exceptions=False)
+    assert result.output == """\
+Filename         Stmts      Miss  Cover    Missing
+---------------  -------  ------  -------  ----------
+dummy/dummy.py   -            -2  +40.00%  -5, -6
+dummy/dummy2.py  +2           +1  -25.00%  -2, -4, +5
+dummy/dummy3.py  +2           +2  -        +1, +2
+TOTAL            +4           +1  +31.06%
+"""
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
+
 def test_diff__format_json__with_color():
     from pycobertura.cli import diff, ExitCodes
 
