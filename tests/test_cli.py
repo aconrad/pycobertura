@@ -385,6 +385,7 @@ TOTAL            +4           \x1b[31m+1\x1b[39m  +31.06%
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
+
 def test_diff__format_text__with_no_color():
     from pycobertura.cli import diff, ExitCodes
 
