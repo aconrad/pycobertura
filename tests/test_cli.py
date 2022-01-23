@@ -123,8 +123,7 @@ def test_show__format_json():
         "Filename": "TOTAL",
         "Stmts": 4,
         "Miss": 2,
-        "Cover": "50.00%",
-        "Missing": ""
+        "Cover": "50.00%"
     },
     "files": [
         {
