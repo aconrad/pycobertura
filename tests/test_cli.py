@@ -717,7 +717,6 @@ def test_diff__format_html__no_source():
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
-
 def test_diff__same_coverage_has_exit_status_of_zero():
     from pycobertura.cli import diff, ExitCodes
 
