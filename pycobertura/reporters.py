@@ -230,9 +230,7 @@ class TextReporterDelta(DeltaReporter):
 
 
 class JsonReporterDelta(DeltaReporter):
-    def __init__(self, *args, **kwargs):
-        self.not_available = None
-        super(JsonReporterDelta, self).__init__(*args, **kwargs)
+    not_available = None
 
     def generate(self):
         lines = self.get_report_lines()
@@ -289,7 +287,6 @@ class HtmlReporterDelta(DeltaReporter):
         or not the generated report should contain a listing of missing lines in
         the summary table.
         """
-        self.not_available = "-"
         self.show_missing = kwargs.pop("show_missing", True)
         super(HtmlReporterDelta, self).__init__(*args, **kwargs)
 
