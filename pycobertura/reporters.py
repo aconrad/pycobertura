@@ -145,7 +145,7 @@ class DeltaReporter:
             else self.not_available
         )
 
-    def get_report_lines(self, format_type="text"):
+    def get_report_lines(self):
         diff_total_stmts = [
             self.differ.diff_total_statements(filename)
             for filename in self.differ.files()
@@ -241,7 +241,7 @@ class JsonReporterDelta(DeltaReporter):
         super(JsonReporterDelta, self).__init__(*args, **kwargs)
 
     def generate(self):
-        lines = self.get_report_lines(format_type="json")
+        lines = self.get_report_lines()
 
         if self.show_source:
             missed_lines_colored = [
