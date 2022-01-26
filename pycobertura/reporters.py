@@ -178,31 +178,25 @@ class DeltaReporter:
         lines = {
             "Filename": filenames_of_files_with_changes,
             "Stmts": [
-                self.format_total_statements(diff_total_stmts[i], format_type)
+                self.format_total_statements(diff_total_stmts[i])
                 for i in indexes_of_files_with_changes
             ],
             "Miss": [
-                self.format_total_misses(diff_total_miss[i], format_type)
+                self.format_total_misses(diff_total_miss[i])
                 for i in indexes_of_files_with_changes
             ],
             "Cover": [
-                self.format_line_rate(diff_total_cover[i], format_type)
+                self.format_line_rate(diff_total_cover[i])
                 for i in indexes_of_files_with_changes
             ],
         }
 
         lines["Filename"].append("TOTAL")
         lines["Stmts"] += [
-            self.format_total_statements(
-                self.differ.diff_total_statements(), format_type
-            )
+            self.format_total_statements(self.differ.diff_total_statements())
         ]
-        lines["Miss"] += [
-            self.format_total_misses(self.differ.diff_total_misses(), format_type)
-        ]
-        lines["Cover"] += [
-            self.format_line_rate(self.differ.diff_line_rate(), format_type)
-        ]
+        lines["Miss"] += [self.format_total_misses(self.differ.diff_total_misses())]
+        lines["Cover"] += [self.format_line_rate(self.differ.diff_line_rate())]
 
         if self.show_source:
             diff_total_missing = [
@@ -237,6 +231,7 @@ class TextReporterDelta(DeltaReporter):
 
 class JsonReporterDelta(DeltaReporter):
     def __init__(self, *args, **kwargs):
+        self.not_available = None
         super(JsonReporterDelta, self).__init__(*args, **kwargs)
 
     def generate(self):
@@ -294,6 +289,7 @@ class HtmlReporterDelta(DeltaReporter):
         or not the generated report should contain a listing of missing lines in
         the summary table.
         """
+        self.not_available = "-"
         self.show_missing = kwargs.pop("show_missing", True)
         super(HtmlReporterDelta, self).__init__(*args, **kwargs)
 
