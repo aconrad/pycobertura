@@ -213,32 +213,24 @@ class DeltaReporter:
 
 
 class TextReporterDelta(DeltaReporter):
-    def __init__(self, *args, **kwargs):
-        self.not_available = "-"
-        super(TextReporterDelta, self).__init__(*args, **kwargs)
+    not_available = "-"
 
     def generate(self):
         lines = self.get_report_lines()
+        headers = headers_without_missing
 
         if self.show_source:
             missed_lines_colored = [
                 self.color_number(line) for line in lines["Missing"]
             ]
             lines["Missing"] = missed_lines_colored
-
-        headers = (
-            headers_with_missing
-            if self.show_source is True
-            else headers_without_missing
-        )
+            headers = headers_with_missing
 
         return tabulate(lines, headers=headers)
 
 
 class JsonReporterDelta(DeltaReporter):
-    def __init__(self, *args, **kwargs):
-        self.not_available = None
-        super(JsonReporterDelta, self).__init__(*args, **kwargs)
+    not_available = None
 
     def generate(self):
         lines = self.get_report_lines()
@@ -262,6 +254,8 @@ class JsonReporterDelta(DeltaReporter):
 
 
 class HtmlReporterDelta(DeltaReporter):
+    not_available = "-"
+
     def __init__(self, *args, **kwargs):
         """
         Takes the same arguments as `TextReporterDelta` but also takes the keyword
@@ -269,7 +263,6 @@ class HtmlReporterDelta(DeltaReporter):
         or not the generated report should contain a listing of missing lines in
         the summary table.
         """
-        self.not_available = "-"
         self.show_missing = kwargs.pop("show_missing", True)
         super(HtmlReporterDelta, self).__init__(*args, **kwargs)
 
