@@ -106,19 +106,11 @@ class DeltaReporter:
         self.show_source = show_source
         self.color = kwargs.pop("color", False)
 
-    @staticmethod
-    def format_line_rate(line_rate, format_type="text"):
-        if format_type == "json":
-            return f"{line_rate:+.2%}" if line_rate else None
-        else:
-            return f"{line_rate:+.2%}" if line_rate else "-"
+    def format_line_rate(self, line_rate):
+        return f"{line_rate:+.2%}" if line_rate else self.not_available
 
-    @staticmethod
-    def format_total_statements(total_statements, format_type="text"):
-        if format_type == "json":
-            return f"{total_statements:+d}" if total_statements else None
-        else:
-            return f"{total_statements:+d}" if total_statements else "-"
+    def format_total_statements(self, total_statements):
+        return f"{total_statements:+d}" if total_statements else self.not_available
 
     @staticmethod
     def format_missed_lines(missed_lines):
@@ -146,11 +138,12 @@ class DeltaReporter:
                 result = ", ".join(numbers)
         return result
 
-    def format_total_misses(self, total_misses, format_type="text"):
-        if format_type == "json":
-            return self.color_number(f"{total_misses:+d}") if total_misses else None
-        else:
-            return self.color_number(f"{total_misses:+d}") if total_misses else "-"
+    def format_total_misses(self, total_misses):
+        return (
+            self.color_number(f"{total_misses:+d}")
+            if total_misses
+            else self.not_available
+        )
 
     def get_report_lines(self, format_type="text"):
         diff_total_stmts = [
@@ -185,31 +178,25 @@ class DeltaReporter:
         lines = {
             "Filename": filenames_of_files_with_changes,
             "Stmts": [
-                self.format_total_statements(diff_total_stmts[i], format_type)
+                self.format_total_statements(diff_total_stmts[i])
                 for i in indexes_of_files_with_changes
             ],
             "Miss": [
-                self.format_total_misses(diff_total_miss[i], format_type)
+                self.format_total_misses(diff_total_miss[i])
                 for i in indexes_of_files_with_changes
             ],
             "Cover": [
-                self.format_line_rate(diff_total_cover[i], format_type)
+                self.format_line_rate(diff_total_cover[i])
                 for i in indexes_of_files_with_changes
             ],
         }
 
         lines["Filename"].append("TOTAL")
         lines["Stmts"] += [
-            self.format_total_statements(
-                self.differ.diff_total_statements(), format_type
-            )
+            self.format_total_statements(self.differ.diff_total_statements())
         ]
-        lines["Miss"] += [
-            self.format_total_misses(self.differ.diff_total_misses(), format_type)
-        ]
-        lines["Cover"] += [
-            self.format_line_rate(self.differ.diff_line_rate(), format_type)
-        ]
+        lines["Miss"] += [self.format_total_misses(self.differ.diff_total_misses())]
+        lines["Cover"] += [self.format_line_rate(self.differ.diff_line_rate())]
 
         if self.show_source:
             diff_total_missing = [
@@ -227,6 +214,7 @@ class DeltaReporter:
 
 class TextReporterDelta(DeltaReporter):
     def __init__(self, *args, **kwargs):
+        self.not_available = "-"
         super(TextReporterDelta, self).__init__(*args, **kwargs)
 
     def generate(self):
@@ -249,6 +237,7 @@ class TextReporterDelta(DeltaReporter):
 
 class JsonReporterDelta(DeltaReporter):
     def __init__(self, *args, **kwargs):
+        self.not_available = None
         super(JsonReporterDelta, self).__init__(*args, **kwargs)
 
     def generate(self):
@@ -280,6 +269,7 @@ class HtmlReporterDelta(DeltaReporter):
         or not the generated report should contain a listing of missing lines in
         the summary table.
         """
+        self.not_available = "-"
         self.show_missing = kwargs.pop("show_missing", True)
         super(HtmlReporterDelta, self).__init__(*args, **kwargs)
 
