@@ -65,7 +65,7 @@ class JsonReporter(Reporter):
         rows = {k: v[:-1] for k, v in lines.items()}
         footer = {k: v[-1] for k, v in lines.items() if k != "Missing"}
 
-        return json.dumps({"total": footer, "files": [rows]}, indent=4)
+        return json.dumps({"total": footer, "files": rows}, indent=4)
 
 
 class HtmlReporter(Reporter):
@@ -244,7 +244,7 @@ class JsonReporterDelta(DeltaReporter):
         rows = {k: v[:-1] for k, v in lines.items()}
         footer = {k: v[-1] for k, v in lines.items() if k != "Missing"}
 
-        json_string = json.dumps({"total": footer, "files": [rows]}, indent=4)
+        json_string = json.dumps({"total": footer, "files": rows}, indent=4)
 
         # for colors, explanation see here:
         # https://stackoverflow.com/a/61273717/9698518
