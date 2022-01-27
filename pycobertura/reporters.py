@@ -58,6 +58,20 @@ class TextReporter(Reporter):
         lines = self.get_report_lines()
         return tabulate(lines, headers=headers_with_missing)
 
+class MarkdownReporter(Reporter):
+    def generate(self):
+        lines = self.get_report_lines()
+        return tabulate(lines, headers=headers_with_missing, tablefmt="github")
+
+
+class JsonReporter(Reporter):
+    def generate(self):
+        lines = self.get_report_lines()
+        rows = {k: v[:-1] for k, v in lines.items()}
+        footer = {k: v[-1] for k, v in lines.items() if k != "Missing"}
+
+        return json.dumps({"total": footer, "files": rows}, indent=4)
+
 
 class MarkdownReporter(Reporter):
     def generate(self):
