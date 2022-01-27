@@ -3,6 +3,7 @@ from pycobertura.cobertura import CoberturaDiff
 from pycobertura.utils import green, red, stringify
 from pycobertura.templates import filters
 from tabulate import tabulate
+import json
 
 
 env = Environment(loader=PackageLoader("pycobertura", "templates"))
@@ -58,6 +59,15 @@ class TextReporter(Reporter):
         return tabulate(lines, headers=headers_with_missing)
 
 
+class JsonReporter(Reporter):
+    def generate(self):
+        lines = self.get_report_lines()
+        rows = {k: v[:-1] for k, v in lines.items()}
+        footer = {k: v[-1] for k, v in lines.items() if k != "Missing"}
+
+        return json.dumps({"total": footer, "files": rows}, indent=4)
+
+
 class HtmlReporter(Reporter):
     def __init__(self, *args, **kwargs):
         self.title = kwargs.pop("title", "pycobertura report")
@@ -96,13 +106,11 @@ class DeltaReporter:
         self.show_source = show_source
         self.color = kwargs.pop("color", False)
 
-    @staticmethod
-    def format_line_rate(line_rate):
-        return f"{line_rate:+.2%}" if line_rate else "-"
+    def format_line_rate(self, line_rate):
+        return f"{line_rate:+.2%}" if line_rate else self.not_available
 
-    @staticmethod
-    def format_total_statements(total_statements):
-        return f"{total_statements:+d}" if total_statements else "-"
+    def format_total_statements(self, total_statements):
+        return f"{total_statements:+d}" if total_statements else self.not_available
 
     @staticmethod
     def format_missed_lines(missed_lines):
@@ -131,7 +139,11 @@ class DeltaReporter:
         return result
 
     def format_total_misses(self, total_misses):
-        return self.color_number(f"{total_misses:+d}") if total_misses else "-"
+        return (
+            self.color_number(f"{total_misses:+d}")
+            if total_misses
+            else self.not_available
+        )
 
     def get_report_lines(self):
         diff_total_stmts = [
@@ -201,8 +213,24 @@ class DeltaReporter:
 
 
 class TextReporterDelta(DeltaReporter):
-    def __init__(self, *args, **kwargs):
-        super(TextReporterDelta, self).__init__(*args, **kwargs)
+    not_available = "-"
+
+    def generate(self):
+        lines = self.get_report_lines()
+        headers = headers_without_missing
+
+        if self.show_source:
+            missed_lines_colored = [
+                self.color_number(line) for line in lines["Missing"]
+            ]
+            lines["Missing"] = missed_lines_colored
+            headers = headers_with_missing
+
+        return tabulate(lines, headers=headers)
+
+
+class JsonReporterDelta(DeltaReporter):
+    not_available = None
 
     def generate(self):
         lines = self.get_report_lines()
@@ -213,16 +241,21 @@ class TextReporterDelta(DeltaReporter):
             ]
             lines["Missing"] = missed_lines_colored
 
-        headers = (
-            headers_with_missing
-            if self.show_source is True
-            else headers_without_missing
-        )
+        rows = {k: v[:-1] for k, v in lines.items()}
+        footer = {k: v[-1] for k, v in lines.items() if k != "Missing"}
 
-        return tabulate(lines, headers=headers)
+        json_string = json.dumps({"total": footer, "files": rows}, indent=4)
+
+        # for colors, explanation see here:
+        # https://stackoverflow.com/a/61273717/9698518
+        colored_json_string = json_string.encode("utf-8").decode("unicode_escape")
+
+        return colored_json_string
 
 
 class HtmlReporterDelta(DeltaReporter):
+    not_available = "-"
+
     def __init__(self, *args, **kwargs):
         """
         Takes the same arguments as `TextReporterDelta` but also takes the keyword

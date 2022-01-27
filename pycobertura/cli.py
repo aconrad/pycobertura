@@ -4,8 +4,10 @@ from pycobertura.cobertura import Cobertura
 from pycobertura.reporters import (
     HtmlReporter,
     TextReporter,
+    JsonReporter,
     HtmlReporterDelta,
     TextReporterDelta,
+    JsonReporterDelta,
 )
 from pycobertura.filesystem import filesystem_factory
 from pycobertura.utils import get_dir_from_file_path
@@ -16,6 +18,7 @@ pycobertura = click.Group()
 reporters = {
     "html": HtmlReporter,
     "text": TextReporter,
+    "json": JsonReporter,
 }
 
 
@@ -93,6 +96,7 @@ def show(cobertura_file, format, output, source, source_prefix):
 delta_reporters = {
     "text": TextReporterDelta,
     "html": HtmlReporterDelta,
+    "json": JsonReporterDelta,
 }
 
 
@@ -200,7 +204,7 @@ def diff(
 
     isatty = True if output is None else output.isatty()
 
-    if format == "text":
+    if format in {"text", "json"}:
         color = isatty if color is None else color is True
         reporter_kwargs["color"] = color
 

@@ -94,6 +94,72 @@ pycobertura show --format html --output coverage.html coverage.xml
 
 ![Example output of html formatted pycobertura show command](http://i.imgur.com/BYnXmAp.png)
 
+The following shows how to generate a JSON version of another coverage file.
+
+```shell
+$ pycobertura show --format json --output coverage.json coverage.xml
+{
+    "total": {
+        "Filename": "TOTAL",
+        "Stmts": 794,
+        "Miss": 264,
+        "Cover": "66.75%"
+    },
+    "files": {
+        "Filename": [
+            "pycobertura/__init__.py",
+            "pycobertura/cli.py",
+            "pycobertura/cobertura.py",
+            "pycobertura/filesystem.py",
+            "pycobertura/reporters.py",
+            "pycobertura/utils.py",
+            "pycobertura/templates/__init__.py",
+            "pycobertura/templates/filters.py"
+        ],
+        "Stmts": [
+            2,
+            132,
+            216,
+            91,
+            214,
+            122,
+            0,
+            17
+        ],
+        "Miss": [
+            0,
+            88,
+            35,
+            6,
+            110,
+            15,
+            0,
+            10
+        ],
+        "Cover": [
+            "100.00%",
+            "33.33%",
+            "83.80%",
+            "93.41%",
+            "48.60%",
+            "87.70%",
+            "100.00%",
+            "41.18%"
+        ],
+        "Missing": [
+            "",
+            "274-3758",
+            "423, 648-696",
+            "343-625",
+            "291, 295-3284",
+            "38, 262-486",
+            "",
+            "261-544"
+        ]
+    }
+}
+```
+
 ### Command `diff`
 
 You can also use the `diff` command to show the difference between two coverage
@@ -124,6 +190,16 @@ pycobertura diff --format html --output coverage.html ./master/coverage.xml ./my
 ```
 
 ![Example output of html formatted pycobertura diff command](http://i.imgur.com/L5ZUarI.png)
+
+This screenshot shows how the JSON output only applies coverage highlighting to
+the parts of the code where the coverage has changed (from covered to
+uncovered, or vice versa).
+
+```shell
+pycobertura diff --format json tests/dummy.source1/coverage.xml tests/dummy.source2/coverage.xml
+```
+
+![Example output of json formatted pycobertura diff command](images/example_json_output.png)
 
 #### `diff` exit codes
 
