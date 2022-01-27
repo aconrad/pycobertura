@@ -13,6 +13,9 @@
   * change datastructure of coverage information from `namedtuple` (immutable) to `dictionary` (mutable) in `reporters.py`. Adjusted `html-delta.jinja2`, `html.jinja2` and `filters.py` accordingly. This change in datastructure leads to a more compact and more readable code.
   * `pycobertura show` now includes json format
   * `pycobertura diff` now includes json format
+  * `pycobertura show` now includes markdown format
+  * `pycobertura diff` now includes markdown format
+  
   Thanks @gro1m
 
 ## 2.1.0 (2021-09-23)
