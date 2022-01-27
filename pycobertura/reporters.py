@@ -58,6 +58,11 @@ class TextReporter(Reporter):
         lines = self.get_report_lines()
         return tabulate(lines, headers=headers_with_missing)
 
+class MarkdownReporter(Reporter):
+    def generate(self):
+        lines = self.get_report_lines()
+        return tabulate(lines, headers=headers_with_missing, tablefmt="github")
+
 
 class JsonReporter(Reporter):
     def generate(self):
