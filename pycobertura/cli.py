@@ -8,6 +8,7 @@ from pycobertura.reporters import (
     JsonReporter,
     HtmlReporterDelta,
     TextReporterDelta,
+    MarkdownReporterDelta,
     JsonReporterDelta,
 )
 from pycobertura.filesystem import filesystem_factory
@@ -97,6 +98,7 @@ def show(cobertura_file, format, output, source, source_prefix):
 
 delta_reporters = {
     "text": TextReporterDelta,
+    "markdown": MarkdownReporterDelta,
     "html": HtmlReporterDelta,
     "json": JsonReporterDelta,
 }
@@ -206,7 +208,7 @@ def diff(
 
     isatty = True if output is None else output.isatty()
 
-    if format in {"text", "json"}:
+    if format in {"text", "json", "markdown"}:
         color = isatty if color is None else color is True
         reporter_kwargs["color"] = color
 

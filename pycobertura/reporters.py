@@ -231,8 +231,23 @@ class TextReporterDelta(DeltaReporter):
             ]
             lines["Missing"] = missed_lines_colored
             headers = headers_with_missing
-
         return tabulate(lines, headers=headers)
+
+
+class MarkdownReporterDelta(DeltaReporter):
+    not_available = "-"
+
+    def generate(self):
+        lines = self.get_report_lines()
+        headers = headers_without_missing
+
+        if self.show_source:
+            missed_lines_colored = [
+                self.color_number(line) for line in lines["Missing"]
+            ]
+            lines["Missing"] = missed_lines_colored
+            headers = headers_with_missing
+        return tabulate(lines, headers=headers, tablefmt="github")
 
 
 class JsonReporterDelta(DeltaReporter):
