@@ -73,6 +73,15 @@ class JsonReporter(Reporter):
         return json.dumps({"total": footer, "files": rows}, indent=4)
 
 
+class JsonReporter(Reporter):
+    def generate(self):
+        lines = self.get_report_lines()
+        rows = {k: v[:-1] for k, v in lines.items()}
+        footer = {k: v[-1] for k, v in lines.items() if k != "Missing"}
+
+        return json.dumps({"total": footer, "files": rows}, indent=4)
+
+
 class HtmlReporter(Reporter):
     def __init__(self, *args, **kwargs):
         self.title = kwargs.pop("title", "pycobertura report")
