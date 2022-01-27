@@ -84,6 +84,21 @@ pycobertura/utils.py            12       0  100.00%
 TOTAL                          253       0  100.00%
 ```
 
+```shell
+$ pycobertura show --format markdown coverage.xml 
+| Filename                          |   Stmts |   Miss | Cover   | Missing            |
+|-----------------------------------|---------|--------|---------|--------------------|
+| pycobertura/__init__.py           |       2 |      0 | 100.00% |                    |
+| pycobertura/cli.py                |     132 |     88 | 33.33%  | 274-3758           |
+| pycobertura/cobertura.py          |     216 |     35 | 83.80%  | 423, 648-696       |
+| pycobertura/filesystem.py         |      91 |      6 | 93.41%  | 343-625            |
+| pycobertura/reporters.py          |     222 |    114 | 48.65%  | 286, 290, 331-4065 |
+| pycobertura/utils.py              |     122 |     15 | 87.70%  | 38, 262-486        |
+| pycobertura/templates/__init__.py |       0 |      0 | 100.00% |                    |
+| pycobertura/templates/filters.py  |      17 |     10 | 41.18%  | 261-544            |
+| TOTAL                             |     802 |    268 | 66.58%  |                    |
+```
+
 The following is a screenshot of the HTML version of another coverage file
 which also include the source code with highlighted source code to indicate
 whether lines were covered (green) or not (red).
@@ -180,6 +195,15 @@ The column `Missing` will show line numbers prefixed with either a plus sign
 `+` or a minus sign `-`. When prefixed with a plus sign, the line was
 introduced as uncovered and is shown in red, when prefixed as a minus sign, the
 line is no longer uncovered and is rendered in green.
+
+Analogously you can also show the diff in markdown format via:
+
+```shell
+$ pycobertura diff --format markdown tests/dummy.source1/coverage.xml tests/dummy.source2/coverage.xml
+```
+
+This will lead to the following output
+![Example output of markdown formatted pycobertura diff command](images/example_markdown_diff_output.png)
 
 This screenshot shows how the HTML output only applies coverage highlighting to
 the parts of the code where the coverage has changed (from covered to
