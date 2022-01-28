@@ -56,7 +56,23 @@ class Reporter:
 class TextReporter(Reporter):
     def generate(self):
         lines = self.get_report_lines()
+        print(lines)
         return tabulate(lines, headers=headers_with_missing)
+
+
+class SvReporter(Reporter):
+    delim = ","
+
+    def generate(self):
+        lines = self.get_report_lines()
+        list_of_lines = [self.delim.join([str(k) for k in lines.keys()])]
+        list_of_lines.extend(
+            [self.delim.join([str(r) for r in row]) for row in zip(*lines.values())]
+        )
+
+        list_of_lines_sv = "\n".join(list_of_lines)
+
+        return list_of_lines_sv
 
 
 class MarkdownReporter(Reporter):

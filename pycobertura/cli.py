@@ -4,6 +4,7 @@ from pycobertura.cobertura import Cobertura
 from pycobertura.reporters import (
     HtmlReporter,
     TextReporter,
+    SvReporter,
     MarkdownReporter,
     JsonReporter,
     HtmlReporterDelta,
@@ -20,6 +21,7 @@ pycobertura = click.Group()
 reporters = {
     "html": HtmlReporter,
     "text": TextReporter,
+    "sv": SvReporter,
     "markdown": MarkdownReporter,
     "json": JsonReporter,
 }
