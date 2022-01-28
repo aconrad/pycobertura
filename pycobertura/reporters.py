@@ -56,7 +56,6 @@ class Reporter:
 class TextReporter(Reporter):
     def generate(self):
         lines = self.get_report_lines()
-        print(lines)
         return tabulate(lines, headers=headers_with_missing)
 
 
