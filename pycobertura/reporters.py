@@ -62,17 +62,17 @@ class TextReporter(Reporter):
 class CsvReporter(Reporter):
     def generate(self, delimiter):
         lines = self.get_report_lines()
-        list_of_lines = [delimiter.join([f"{key}" for key in lines])]
+        list_of_lines = [[f"{key}" for key in lines]]
         list_of_lines.extend(
-            [
-                delimiter.join([f"{item}" for item in row])
-                for row in zip(*lines.values())
-            ]
+            [[f"{item}" for item in row] for row in zip(*lines.values())]
         )
 
-        list_of_lines_sv = "\n".join(list_of_lines)
+        if '\\n' in repr(delimiter):
+            delimiter = "\n"
+        if '\\t' in repr(delimiter):
+            delimiter = "\t"
 
-        return list_of_lines_sv
+        return "\n".join([delimiter.join(line)+delimiter for line in list_of_lines])
 
 
 class MarkdownReporter(Reporter):
