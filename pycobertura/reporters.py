@@ -67,12 +67,12 @@ class CsvReporter(Reporter):
             [[f"{item}" for item in row] for row in zip(*lines.values())]
         )
 
-        if '\\n' in repr(delimiter):
+        if "\\n" in repr(delimiter):
             delimiter = "\n"
-        if '\\t' in repr(delimiter):
+        if "\\t" in repr(delimiter):
             delimiter = "\t"
 
-        return "\n".join([delimiter.join(line)+delimiter for line in list_of_lines])
+        return "\n".join([delimiter.join(line) + delimiter for line in list_of_lines])
 
 
 class MarkdownReporter(Reporter):
