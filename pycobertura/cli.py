@@ -93,10 +93,10 @@ def show(cobertura_file, format, delimiter, output, source, source_prefix):
     )
     Reporter = reporters[format]
     reporter = Reporter(cobertura)
-    
+
     if format == "csv":
         report = reporter.generate(delimiter)
-    else:  
+    else:
         report = reporter.generate()
 
     if not isinstance(report, bytes):
