@@ -60,14 +60,12 @@ class TextReporter(Reporter):
 
 
 class CsvReporter(Reporter):
-    delim = ","
-
-    def generate(self):
+    def generate(self, delimiter):
         lines = self.get_report_lines()
-        list_of_lines = [self.delim.join([str(k) for k in lines])]
+        list_of_lines = [delimiter.join([f"{key}" for key in lines])]
         list_of_lines.extend(
             [
-                self.delim.join([f"{item}" for item in row])
+                delimiter.join([f"{item}" for item in row])
                 for row in zip(*lines.values())
             ]
         )

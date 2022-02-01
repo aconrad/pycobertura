@@ -56,6 +56,9 @@ def get_exit_code(differ, source):
 @click.argument("cobertura_file")
 @click.option("-f", "--format", default="text", type=click.Choice(list(reporters)))
 @click.option(
+    "-delim", "--delimiter", default=",", type=str, help="Delimiter for csv format"
+)
+@click.option(
     "-o",
     "--output",
     metavar="<file>",
@@ -78,8 +81,9 @@ def get_exit_code(differ, source):
     "the --source is a zip archive and the files were zipped under "
     "a directory prefix that is not part of the source.",
 )
-def show(cobertura_file, format, output, source, source_prefix):
+def show(cobertura_file, format, delimiter, output, source, source_prefix):
     """show coverage summary of a Cobertura report"""
+
     if not source:
         source = get_dir_from_file_path(cobertura_file)
 
@@ -89,7 +93,11 @@ def show(cobertura_file, format, output, source, source_prefix):
     )
     Reporter = reporters[format]
     reporter = Reporter(cobertura)
-    report = reporter.generate()
+    
+    if format == "csv":
+        report = reporter.generate(delimiter)
+    else:  
+        report = reporter.generate()
 
     if not isinstance(report, bytes):
         report = report.encode("utf-8")
