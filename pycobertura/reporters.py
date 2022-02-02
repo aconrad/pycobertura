@@ -62,7 +62,7 @@ class TextReporter(Reporter):
 class CsvReporter(Reporter):
     def generate(self, delimiter):
         lines = self.get_report_lines()
-        list_of_lines = [headers_with_missing] #[[f"{key}" for key in lines]]
+        list_of_lines = [headers_with_missing]
         list_of_lines.extend(
             [[f"{item}" for item in row] for row in zip(*lines.values())]
         )
@@ -72,7 +72,7 @@ class CsvReporter(Reporter):
         if "\\t" in repr(delimiter):
             delimiter = "\t"
 
-        return "\n".join([delimiter.join(line) + delimiter for line in list_of_lines])
+        return "\n".join([delimiter.join(line) for line in list_of_lines])
 
 
 class MarkdownReporter(Reporter):
@@ -142,23 +142,13 @@ class DeltaReporter:
         return red if number.startswith("+") else green
 
     def color_number(self, numbers):
-        if numbers and self.color:
-            if type(numbers) is str:
-                color = self.determine_color_of_number(numbers)
-                result = color(numbers)
-            else:
-                result = ", ".join(
-                    [
-                        self.determine_color_of_number(number)(number)
-                        for number in numbers
-                    ]
-                )
-        else:
-            if type(numbers) is str:
-                result = numbers
-            else:
-                result = ", ".join(numbers)
-        return result
+        if numbers and self.color and isinstance(numbers, str):
+            return self.determine_color_of_number(numbers)(numbers)
+        if numbers and self.color and not isinstance(numbers, str):
+            return ", ".join(
+                [self.determine_color_of_number(number)(number) for number in numbers]
+            )
+        return numbers if isinstance(numbers, str) else ", ".join(numbers)
 
     def format_total_misses(self, total_misses):
         return (
@@ -249,36 +239,35 @@ class TextReporterDelta(DeltaReporter):
             headers = headers_with_missing
         return tabulate(lines, headers=headers)
 
+
 class CsvReporterDelta(DeltaReporter):
     not_available = "-"
 
     def generate(self, delimiter):
         lines = self.get_report_lines()
-        print(f"{lines}")
+
         list_of_lines = [headers_without_missing]
         list_of_lines.extend(
-            [[f"{item}" for item in row if item!="Missing"] for row in zip(*lines.values())]
+            [[f"{item}" for item in row[:-1]] for row in zip(*lines.values())]
         )
 
-        print(f"lines['Missing'] = {lines['Missing']}")
-
         if self.show_source:
-            print(f"list_of_lines={list_of_lines}")
             list_of_lines[0].append("Missing")
-            for count in range(1,len(list_of_lines)):
-                print(f"count={count}")
-                print(f"{lines['Missing'][count-1]}")
-                list_of_lines[count].append(f"{lines['Missing'][count-1]}")
-            print(f"list_of_lines={list_of_lines}")
+            for count in range(1, len(list_of_lines)):
+                list_of_lines[count].append(
+                    f"{[self.color_number(number) for number in lines['Missing'][count-1]]}".encode(
+                        "utf-8"
+                    ).decode(
+                        "unicode_escape"
+                    )
+                )
 
         if "\\n" in repr(delimiter):
             delimiter = "\n"
         if "\\t" in repr(delimiter):
             delimiter = "\t"
 
-        print(f"list_of_lines={list_of_lines}")
-
-        return "\n".join([delimiter.join(line) + delimiter for line in list_of_lines])
+        return "\n".join([delimiter.join(line) for line in list_of_lines])
 
 
 class MarkdownReporterDelta(DeltaReporter):

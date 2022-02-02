@@ -232,12 +232,11 @@ def diff(
 
     isatty = True if output is None else output.isatty()
 
-    if format in {"text", "json", "markdown"}:
+    if format in {"text", "csv", "json", "markdown"}:
         color = isatty if color is None else color is True
         reporter_kwargs["color"] = color
 
     reporter = Reporter(*reporter_args, **reporter_kwargs)
-    
     if format == "csv":
         report = reporter.generate(delimiter)
     else:
