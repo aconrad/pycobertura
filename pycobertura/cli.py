@@ -9,6 +9,7 @@ from pycobertura.reporters import (
     JsonReporter,
     HtmlReporterDelta,
     TextReporterDelta,
+    CsvReporterDelta,
     MarkdownReporterDelta,
     JsonReporterDelta,
 )
@@ -56,7 +57,11 @@ def get_exit_code(differ, source):
 @click.argument("cobertura_file")
 @click.option("-f", "--format", default="text", type=click.Choice(list(reporters)))
 @click.option(
-    "-delim", "--delimiter", default=",", type=str, help="Delimiter for csv format"
+    "-delim",
+    "--delimiter",
+    default=",",
+    type=str,
+    help="Delimiter for csv format, e.g. ,;\n\t",
 )
 @click.option(
     "-o",
@@ -108,6 +113,7 @@ def show(cobertura_file, format, delimiter, output, source, source_prefix):
 
 delta_reporters = {
     "text": TextReporterDelta,
+    "csv": CsvReporterDelta,
     "markdown": MarkdownReporterDelta,
     "html": HtmlReporterDelta,
     "json": JsonReporterDelta,
@@ -130,6 +136,13 @@ directories (or zip archives). If the source is not available at all, pass
 )
 @click.argument("cobertura_file1")
 @click.argument("cobertura_file2")
+@click.option(
+    "-delim",
+    "--delimiter",
+    default=",",
+    type=str,
+    help="Delimiter for csv format, e.g. ,;\n\t",
+)
 @click.option(
     "--color/--no-color",
     default=None,
@@ -188,6 +201,7 @@ directories (or zip archives). If the source is not available at all, pass
 def diff(
     cobertura_file1,
     cobertura_file2,
+    delimiter,
     color,
     format,
     output,
@@ -223,7 +237,11 @@ def diff(
         reporter_kwargs["color"] = color
 
     reporter = Reporter(*reporter_args, **reporter_kwargs)
-    report = reporter.generate()
+    
+    if format == "csv":
+        report = reporter.generate(delimiter)
+    else:
+        report = reporter.generate()
 
     if not isinstance(report, bytes):
         report = report.encode("utf-8")

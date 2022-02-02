@@ -62,7 +62,7 @@ class TextReporter(Reporter):
 class CsvReporter(Reporter):
     def generate(self, delimiter):
         lines = self.get_report_lines()
-        list_of_lines = [[f"{key}" for key in lines]]
+        list_of_lines = [headers_with_missing] #[[f"{key}" for key in lines]]
         list_of_lines.extend(
             [[f"{item}" for item in row] for row in zip(*lines.values())]
         )
@@ -248,6 +248,37 @@ class TextReporterDelta(DeltaReporter):
             lines["Missing"] = missed_lines_colored
             headers = headers_with_missing
         return tabulate(lines, headers=headers)
+
+class CsvReporterDelta(DeltaReporter):
+    not_available = "-"
+
+    def generate(self, delimiter):
+        lines = self.get_report_lines()
+        print(f"{lines}")
+        list_of_lines = [headers_without_missing]
+        list_of_lines.extend(
+            [[f"{item}" for item in row if item!="Missing"] for row in zip(*lines.values())]
+        )
+
+        print(f"lines['Missing'] = {lines['Missing']}")
+
+        if self.show_source:
+            print(f"list_of_lines={list_of_lines}")
+            list_of_lines[0].append("Missing")
+            for count in range(1,len(list_of_lines)):
+                print(f"count={count}")
+                print(f"{lines['Missing'][count-1]}")
+                list_of_lines[count].append(f"{lines['Missing'][count-1]}")
+            print(f"list_of_lines={list_of_lines}")
+
+        if "\\n" in repr(delimiter):
+            delimiter = "\n"
+        if "\\t" in repr(delimiter):
+            delimiter = "\t"
+
+        print(f"list_of_lines={list_of_lines}")
+
+        return "\n".join([delimiter.join(line) + delimiter for line in list_of_lines])
 
 
 class MarkdownReporterDelta(DeltaReporter):
