@@ -276,7 +276,7 @@ TOTAL            +4           \x1b[31m+1\x1b[39m  +31.06%
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
-def test_diff__format_csv_delimiter_semicolon():
+def test_diff__format_csv():
     from pycobertura.cli import diff, ExitCodes
 
     runner = CliRunner()
@@ -285,8 +285,49 @@ def test_diff__format_csv_delimiter_semicolon():
             opt, 'csv',
             'tests/dummy.source1/coverage.xml',
             'tests/dummy.source2/coverage.xml',
-            '--delimiter',
-            ';'
+        ], catch_exceptions=False)
+        assert result.output == """\
+Filename,Stmts,Miss,Cover,Missing
+dummy/dummy.py,-,\x1b[32m-2\x1b[39m,+40.00%,['\x1b[32m-5\x1b[39m', '\x1b[32m-6\x1b[39m']
+dummy/dummy2.py,+2,\x1b[31m+1\x1b[39m,-25.00%,['\x1b[32m-2\x1b[39m', '\x1b[32m-4\x1b[39m', '\x1b[31m+5\x1b[39m']
+dummy/dummy3.py,+2,\x1b[31m+2\x1b[39m,-,['\x1b[31m+1\x1b[39m', '\x1b[31m+2\x1b[39m']
+TOTAL,+4,\x1b[31m+1\x1b[39m,+31.06%,[]
+"""
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
+
+def test_diff__format_csv_delimiter_comma():
+    from pycobertura.cli import diff, ExitCodes
+
+    runner = CliRunner()
+    for delim_opt in ('-delim', '--delimiter'):
+        for opt in ('-f', '--format'):
+            result = runner.invoke(diff, [
+                opt, 'csv',
+                'tests/dummy.source1/coverage.xml',
+                'tests/dummy.source2/coverage.xml',
+                delim_opt,
+                ',',
+            ], catch_exceptions=False)
+            assert result.output == """\
+Filename,Stmts,Miss,Cover,Missing
+dummy/dummy.py,-,\x1b[32m-2\x1b[39m,+40.00%,['\x1b[32m-5\x1b[39m', '\x1b[32m-6\x1b[39m']
+dummy/dummy2.py,+2,\x1b[31m+1\x1b[39m,-25.00%,['\x1b[32m-2\x1b[39m', '\x1b[32m-4\x1b[39m', '\x1b[31m+5\x1b[39m']
+dummy/dummy3.py,+2,\x1b[31m+2\x1b[39m,-,['\x1b[31m+1\x1b[39m', '\x1b[31m+2\x1b[39m']
+TOTAL,+4,\x1b[31m+1\x1b[39m,+31.06%,[]
+"""
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
+
+def test_diff__format_csv_delimiter_semicolon():
+    from pycobertura.cli import diff, ExitCodes
+
+    runner = CliRunner()
+    for delim_opt in ('-delim', '--delimiter'):
+        for opt in ('-f', '--format'):
+            result = runner.invoke(diff, [
+                opt, 'csv',
+                'tests/dummy.source1/coverage.xml',
+                'tests/dummy.source2/coverage.xml',
+                delim_opt, ';',
         ], catch_exceptions=False)
         assert result.output == """\
 Filename;Stmts;Miss;Cover;Missing
@@ -301,14 +342,14 @@ def test_diff__format_csv_delimiter_tab():
     from pycobertura.cli import diff, ExitCodes
 
     runner = CliRunner()
-    for opt in ('-f', '--format'):
-        result = runner.invoke(diff, [
-            opt, 'csv',
-            'tests/dummy.source1/coverage.xml',
-            'tests/dummy.source2/coverage.xml',
-            '--delimiter',
-            '\t'
-        ], catch_exceptions=False)
+    for delim_opt in ('-delim', '--delimiter'):
+        for opt in ('-f', '--format'):
+            result = runner.invoke(diff, [
+                opt, 'csv',
+                'tests/dummy.source1/coverage.xml',
+                'tests/dummy.source2/coverage.xml',
+                delim_opt, '\t'
+            ], catch_exceptions=False)
         assert result.output == """\
 Filename\tStmts\tMiss\tCover\tMissing
 dummy/dummy.py\t-\t\x1b[32m-2\x1b[39m\t+40.00%\t['\x1b[32m-5\x1b[39m', '\x1b[32m-6\x1b[39m']
@@ -322,13 +363,13 @@ def test_diff__format_csv_delimiter_newline():
     from pycobertura.cli import diff, ExitCodes
 
     runner = CliRunner()
-    for opt in ('-f', '--format'):
-        result = runner.invoke(diff, [
-            opt, 'csv',
-            'tests/dummy.source1/coverage.xml',
-            'tests/dummy.source2/coverage.xml',
-            '--delimiter',
-            '\n'
+    for delim_opt in ('-delim', '--delimiter'):
+        for opt in ('-f', '--format'):
+            result = runner.invoke(diff, [
+                opt, 'csv',
+                'tests/dummy.source1/coverage.xml',
+                'tests/dummy.source2/coverage.xml',
+                delim_opt, '\n',
         ], catch_exceptions=False)
         assert result.output == """\
 Filename
