@@ -255,7 +255,6 @@ class CsvReporterDelta(DeltaReporter):
             if "Missing" in list_of_lines[0]:
                 list_of_lines = [line[:-1] for line in list_of_lines]
             else:
-                print(list_of_lines)
                 list_of_lines[0].append("Missing")
 
             for count in range(1, len(list_of_lines)):

@@ -288,7 +288,6 @@ def test_diff__format_csv_delimiter_semicolon():
             '--delimiter',
             ';'
         ], catch_exceptions=False)
-        print(f"result.output={result.output}")
         assert result.output == """\
 Filename;Stmts;Miss;Cover;Missing
 dummy/dummy.py;-;\x1b[32m-2\x1b[39m;+40.00%;['\x1b[32m-5\x1b[39m', '\x1b[32m-6\x1b[39m']
