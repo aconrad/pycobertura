@@ -138,16 +138,20 @@ class DeltaReporter:
     def format_missed_lines(missed_lines):
         return [f"+{lno:d}" if is_new else f"-{lno:d}" for lno, is_new in missed_lines]
 
-    def determine_color_of_number(self, number):
+    @staticmethod
+    def determine_color_function_of_number(number):
         return red if number.startswith("+") else green
+
+    @classmethod
+    def colorize_number(cls, number):
+        color_function = cls.determine_color_function_of_number(number)
+        return color_function(number)
 
     def color_number(self, numbers):
         if numbers and self.color and isinstance(numbers, str):
-            return self.determine_color_of_number(numbers)(numbers)
+            return self.colorize_number(numbers)
         if numbers and self.color and not isinstance(numbers, str):
-            return ", ".join(
-                [self.determine_color_of_number(number)(number) for number in numbers]
-            )
+            return ", ".join([self.colorize_number(number) for number in numbers])
         return numbers if isinstance(numbers, str) else ", ".join(numbers)
 
     def format_total_misses(self, total_misses):
