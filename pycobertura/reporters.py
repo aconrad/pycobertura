@@ -252,14 +252,19 @@ class CsvReporterDelta(DeltaReporter):
         )
 
         if self.show_source:
-            list_of_lines[0].append("Missing")
+            if "Missing" in list_of_lines[0]:
+                list_of_lines = [line[:-1] for line in list_of_lines]
+            else:
+                print(list_of_lines)
+                list_of_lines[0].append("Missing")
+
             for count in range(1, len(list_of_lines)):
                 list_of_lines[count].append(
                     f"{[self.color_number(number) for number in lines['Missing'][count-1]]}".encode(
                         "utf-8"
                     ).decode(
                         "unicode_escape"
-                    )
+                    )   
                 )
 
         if "\\n" in repr(delimiter):

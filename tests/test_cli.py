@@ -49,6 +49,94 @@ TOTAL                    4       2  50.00%
 """
     assert result.exit_code == ExitCodes.OK
 
+def test_show__format_csv():
+    from pycobertura.cli import show, ExitCodes
+
+    runner = CliRunner()
+    for opt in ('-f', '--format'):
+        result = runner.invoke(
+            show,
+            ['tests/dummy.original.xml', opt, 'csv'],
+            catch_exceptions=False
+        )
+        assert result.output == """\
+Filename,Stmts,Miss,Cover,Missing
+dummy/__init__.py,0,0,0.00%,
+dummy/dummy.py,4,2,50.00%,2, 5
+TOTAL,4,2,50.00%,
+"""
+    assert result.exit_code == ExitCodes.OK
+
+def test_show__format_csv_delimiter_semicolon():
+    from pycobertura.cli import show, ExitCodes
+
+    runner = CliRunner()
+    for opt in ('-f', '--format'):
+        result = runner.invoke(
+            show,
+            ['tests/dummy.original.xml', opt, 'csv', '--delimiter', ';'],
+            catch_exceptions=False
+        )
+        assert result.output == """\
+Filename;Stmts;Miss;Cover;Missing
+dummy/__init__.py;0;0;0.00%;
+dummy/dummy.py;4;2;50.00%;2, 5
+TOTAL;4;2;50.00%;
+"""
+    assert result.exit_code == ExitCodes.OK    
+
+def test_show__format_csv_delimiter_tab():
+    from pycobertura.cli import show, ExitCodes
+
+    runner = CliRunner()
+    for opt in ('-f', '--format'):
+        result = runner.invoke(
+            show,
+            ['tests/dummy.original.xml', opt, 'csv', '--delimiter', '\t'],
+            catch_exceptions=False
+        )
+        assert result.output == """\
+Filename\tStmts\tMiss\tCover\tMissing
+dummy/__init__.py\t0\t0\t0.00%\t
+dummy/dummy.py\t4\t2\t50.00%\t2, 5
+TOTAL\t4\t2\t50.00%\t
+"""
+    assert result.exit_code == ExitCodes.OK 
+
+def test_show__format_csv_delimiter_newline():
+    from pycobertura.cli import show, ExitCodes
+
+    runner = CliRunner()
+    for opt in ('-f', '--format'):
+        result = runner.invoke(
+            show,
+            ['tests/dummy.original.xml', opt, 'csv', '--delimiter', '\n'],
+            catch_exceptions=False
+        )
+        assert result.output == """\
+Filename
+Stmts
+Miss
+Cover
+Missing
+dummy/__init__.py
+0
+0
+0.00%
+
+dummy/dummy.py
+4
+2
+50.00%
+2, 5
+TOTAL
+4
+2
+50.00%
+
+"""
+    assert result.exit_code == ExitCodes.OK    
+
 def test_show__format_markdown():
     from pycobertura.cli import show, ExitCodes
 
@@ -185,6 +273,28 @@ dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \
 dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
 dummy/dummy3.py  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
 TOTAL            +4           \x1b[31m+1\x1b[39m  +31.06%
+"""
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
+
+def test_diff__format_csv_delimiter_semicolon():
+    from pycobertura.cli import diff, ExitCodes
+
+    runner = CliRunner()
+    for opt in ('-f', '--format'):
+        result = runner.invoke(diff, [
+            opt, 'csv',
+            'tests/dummy.source1/coverage.xml',
+            'tests/dummy.source2/coverage.xml',
+            '--delimiter',
+            ';'
+        ], catch_exceptions=False)
+        print(f"result.output={result.output}")
+        assert result.output == """\
+Filename;Stmts;Miss;Cover;Missing
+dummy/dummy.py;-;\x1b[32m-2\x1b[39m;+40.00%;['\x1b[32m-5\x1b[39m', '\x1b[32m-6\x1b[39m']
+dummy/dummy2.py;+2;\x1b[31m+1\x1b[39m;-25.00%;['\x1b[32m-2\x1b[39m', '\x1b[32m-4\x1b[39m', '\x1b[31m+5\x1b[39m']
+dummy/dummy3.py;+2;\x1b[31m+2\x1b[39m;-;['\x1b[31m+1\x1b[39m', '\x1b[31m+2\x1b[39m']
+TOTAL;+4;\x1b[31m+1\x1b[39m;+31.06%;[]
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
