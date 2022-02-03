@@ -3,7 +3,9 @@ from pycobertura.cobertura import CoberturaDiff
 from pycobertura.utils import green, red, stringify
 from pycobertura.templates import filters
 from tabulate import tabulate
+from ruamel import yaml
 import json
+import io
 
 
 env = Environment(loader=PackageLoader("pycobertura", "templates"))
@@ -72,6 +74,17 @@ class JsonReporter(Reporter):
         footer = {k: v[-1] for k, v in lines.items() if k != "Missing"}
 
         return json.dumps({"total": footer, "files": rows}, indent=4)
+
+
+class YamlReporter(Reporter):
+    def generate(self):
+        lines = self.get_report_lines()
+        rows = {k: v[:-1] for k, v in lines.items()}
+        footer = {k: v[-1] for k, v in lines.items() if k != "Missing"}
+        # need to write to a buffer as yml packages are using a streaming interface
+        buf = io.BytesIO()
+        yaml.YAML().dump({"total": footer, "files": rows}, buf)
+        return buf.getvalue()
 
 
 class HtmlReporter(Reporter):
@@ -272,6 +285,27 @@ class JsonReporterDelta(DeltaReporter):
         colored_json_string = json_string.encode("utf-8").decode("unicode_escape")
 
         return colored_json_string
+
+
+class YamlReporterDelta(DeltaReporter):
+    not_available = None
+
+    def generate(self):
+        lines = self.get_report_lines()
+
+        # if self.show_source:
+        #    missed_lines_colored = [
+        #        self.color_number(line) for line in lines["Missing"]
+        #    ]
+        #    lines["Missing"] = missed_lines_colored
+
+        rows = {k: v[:-1] for k, v in lines.items()}
+        footer = {k: v[-1] for k, v in lines.items() if k != "Missing"}
+        # need to write to a buffer as yml packages are using a streaming interface
+        buf = io.BytesIO()
+        yaml.YAML().dump({"total": footer, "files": rows}, buf)
+
+        return buf.getvalue()
 
 
 class HtmlReporterDelta(DeltaReporter):
