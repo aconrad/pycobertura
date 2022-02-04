@@ -304,7 +304,7 @@ class YamlReporterDelta(DeltaReporter):
         # need to write to a buffer as yml packages are using a streaming interface
         buf = io.BytesIO()
         yaml.YAML().dump({"total": footer, "files": rows}, buf)
-        return buf.getvalue().replace(br"\e", b"\x1b")
+        return buf.getvalue().replace(rb"\e", b"\x1b")
 
 
 class HtmlReporterDelta(DeltaReporter):
