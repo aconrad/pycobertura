@@ -125,6 +125,42 @@ def test_show__format_json():
 """
     assert result.exit_code == ExitCodes.OK
 
+def test_show__format_yaml():
+    from pycobertura.cli import show, ExitCodes
+
+    runner = CliRunner()
+    for opt in ('-f', '--format'):
+        result = runner.invoke(
+            show,
+            ['tests/dummy.original.xml', opt, 'yaml'],
+            catch_exceptions=False
+        )
+        assert result.output == """\
+total:
+  Filename: TOTAL
+  Stmts: 4
+  Miss: 2
+  Cover: 50.00%
+files:
+  Filename:
+  - dummy/__init__.py
+  - dummy/dummy.py
+  Stmts:
+  - 0
+  - 4
+  Miss:
+  - 0
+  - 2
+  Cover:
+  - 0.00%
+  - 50.00%
+  Missing:
+  - ''
+  - 2, 5
+
+"""
+    assert result.exit_code == ExitCodes.OK
+
 
 def test_show__output_to_file():
     from pycobertura.cli import show, ExitCodes
@@ -255,6 +291,47 @@ def test_diff__format_json():
         ]
     }
 }
+"""
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
+
+def test_diff__format_yaml():
+    from pycobertura.cli import diff, ExitCodes
+
+    runner = CliRunner()
+    for opt in ('-f', '--format'):
+        result = runner.invoke(diff, [
+            opt, 'yaml',
+            'tests/dummy.source1/coverage.xml',
+            'tests/dummy.source2/coverage.xml',
+        ], catch_exceptions=False)
+        assert result.output == """\
+total:
+  Filename: TOTAL
+  Stmts: '+4'
+  Miss: "\x1b[31m+1\x1b[39m"
+  Cover: +31.06%
+files:
+  Filename:
+  - dummy/dummy.py
+  - dummy/dummy2.py
+  - dummy/dummy3.py
+  Stmts:
+  - 
+  - '+2'
+  - '+2'
+  Miss:
+  - "\x1b[32m-2\x1b[39m"
+  - "\x1b[31m+1\x1b[39m"
+  - "\x1b[31m+2\x1b[39m"
+  Cover:
+  - +40.00%
+  - -25.00%
+  - 
+  Missing:
+  - "\x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m"
+  - "\x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m"
+  - "\x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m"
+
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
@@ -488,6 +565,90 @@ def test_diff__format_json__with_no_color():
         ]
     }
 }
+"""
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
+
+def test_diff__format_yaml_with_color():
+    from pycobertura.cli import diff, ExitCodes
+
+    runner = CliRunner()
+    for opt in ('-f', '--format'):
+        result = runner.invoke(diff, [
+            '--color',
+            opt, 'yaml',
+            'tests/dummy.source1/coverage.xml',
+            'tests/dummy.source2/coverage.xml',
+        ], catch_exceptions=False)
+        assert result.output == """\
+total:
+  Filename: TOTAL
+  Stmts: '+4'
+  Miss: "\x1b[31m+1\x1b[39m"
+  Cover: +31.06%
+files:
+  Filename:
+  - dummy/dummy.py
+  - dummy/dummy2.py
+  - dummy/dummy3.py
+  Stmts:
+  - 
+  - '+2'
+  - '+2'
+  Miss:
+  - "\x1b[32m-2\x1b[39m"
+  - "\x1b[31m+1\x1b[39m"
+  - "\x1b[31m+2\x1b[39m"
+  Cover:
+  - +40.00%
+  - -25.00%
+  - 
+  Missing:
+  - "\x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m"
+  - "\x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m"
+  - "\x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m"
+
+"""
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
+
+def test_diff__format_yaml_with_no_color():
+    from pycobertura.cli import diff, ExitCodes
+
+    runner = CliRunner()
+    for opt in ('-f', '--format'):
+        result = runner.invoke(diff, [
+            '--no-color',
+            opt, 'yaml',
+            'tests/dummy.source1/coverage.xml',
+            'tests/dummy.source2/coverage.xml',
+        ], catch_exceptions=False)
+        assert result.output == """\
+total:
+  Filename: TOTAL
+  Stmts: '+4'
+  Miss: '+1'
+  Cover: +31.06%
+files:
+  Filename:
+  - dummy/dummy.py
+  - dummy/dummy2.py
+  - dummy/dummy3.py
+  Stmts:
+  - 
+  - '+2'
+  - '+2'
+  Miss:
+  - '-2'
+  - '+1'
+  - '+2'
+  Cover:
+  - +40.00%
+  - -25.00%
+  - 
+  Missing:
+  - -5, -6
+  - -2, -4, +5
+  - +1, +2
+
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
