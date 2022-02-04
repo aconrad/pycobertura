@@ -175,6 +175,64 @@ $ pycobertura show --format json --output coverage.json coverage.xml
 }
 ```
 
+```shell
+$ pycobertura show --format yaml --output coverage.yaml coverage.xml
+total:
+  Filename: TOTAL
+  Stmts: 683
+  Miss: 261
+  Cover: 61.79%
+files:
+  Filename:
+  - __init__.py
+  - cli.py
+  - cobertura.py
+  - filesystem.py
+  - reporters.py
+  - utils.py
+  - templates/__init__.py
+  - templates/filters.py
+  Stmts:
+  - 2
+  - 72
+  - 222
+  - 87
+  - 170
+  - 118
+  - 0
+  - 12
+  Miss:
+  - 0
+  - 16
+  - 63
+  - 44
+  - 72
+  - 60
+  - 0
+  - 6
+  Cover:
+  - 100.00%
+  - 77.78%
+  - 71.62%
+  - 49.43%
+  - 57.65%
+  - 49.15%
+  - 100.00%
+  - 50.00%
+  Missing:
+  - ''
+  - 47-53, 84-99, 223
+  - 63-66, 78, 93, 112-117, 135-137, 161-163, 166, 179-194, 205-209, 217-224, 236-241,
+    255, 275, 285, 307, 313-320, 359, 410-412, 449-451
+  - 14-15, 25, 43, 51-52, 55-58, 62, 66-73, 78-83, 86-87, 92-100, 103-113, 122-133,
+    148, 151
+  - 23, 27, 30-55, 60-61, 66-67, 72-76, 81-87, 92-97, 100-113, 238-247, 254-263, 270-287,
+    320-321, 324-346
+  - 38, 70-83, 88-93, 122-137, 186-227
+  - ''
+  - 21, 25, 29, 33-35
+```
+
 ### Command `diff`
 
 You can also use the `diff` command to show the difference between two coverage
@@ -199,7 +257,7 @@ line is no longer uncovered and is rendered in green.
 Analogously you can also show the diff in markdown format via:
 
 ```shell
-$ pycobertura diff --format markdown tests/dummy.source1/coverage.xml tests/dummy.source2/coverage.xml
+pycobertura diff --format markdown tests/dummy.source1/coverage.xml tests/dummy.source2/coverage.xml
 ```
 
 This will lead to the following output
@@ -224,6 +282,16 @@ pycobertura diff --format json tests/dummy.source1/coverage.xml tests/dummy.sour
 ```
 
 ![Example output of json formatted pycobertura diff command](images/example_json_output.png)
+
+This screenshot shows how the YAML output only applies coverage highlighting to
+the parts of the code where the coverage has changed (from covered to
+uncovered, or vice versa).
+
+```shell
+pycobertura diff --format yaml tests/dummy.source1/coverage.xml tests/dummy.source2/coverage.xml
+```
+
+![Example output of yaml formatted pycobertura diff command](images/example_yaml_output.png)
 
 #### `diff` exit codes
 
