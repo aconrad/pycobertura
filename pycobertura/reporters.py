@@ -293,19 +293,18 @@ class YamlReporterDelta(DeltaReporter):
     def generate(self):
         lines = self.get_report_lines()
 
-        # if self.show_source:
-        #    missed_lines_colored = [
-        #        self.color_number(line) for line in lines["Missing"]
-        #    ]
-        #    lines["Missing"] = missed_lines_colored
+        if self.show_source:
+            missed_lines_colored = [
+                self.color_number(line) for line in lines["Missing"]
+            ]
+            lines["Missing"] = missed_lines_colored
 
         rows = {k: v[:-1] for k, v in lines.items()}
         footer = {k: v[-1] for k, v in lines.items() if k != "Missing"}
         # need to write to a buffer as yml packages are using a streaming interface
         buf = io.BytesIO()
         yaml.YAML().dump({"total": footer, "files": rows}, buf)
-
-        return buf.getvalue()
+        return buf.getvalue().replace(br"\e", b"\x1b")
 
 
 class HtmlReporterDelta(DeltaReporter):
