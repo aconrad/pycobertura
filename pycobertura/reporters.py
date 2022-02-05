@@ -245,7 +245,7 @@ class TextReporterDelta(DeltaReporter):
 
 
 class CsvReporterDelta(DeltaReporter):
-    not_available = "-"
+    not_available = ""
 
     def generate(self, delimiter):
         lines = self.get_report_lines()
