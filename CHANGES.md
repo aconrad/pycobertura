@@ -11,9 +11,7 @@
   * Do not use `object` in class inheritance as this is default behaviour in Python3
   * Move formatting in `reporters.py` into `Reporter` and `DeltaReporter` base classes to have a uniform formatting: new `stringify` in `utils.py` method and corresponding test in `test_stringify.py`. The subclasses and only inherit from these two base classes to ensure a consistent formatting across the reporters
   * Change datastructure of coverage information from `namedtuple` (immutable) to `dictionary` (mutable) in `reporters.py`. Adjusted `html-delta.jinja2`, `html.jinja2` and `filters.py` accordingly. This change in datastructure leads to a more compact and more readable code
-  * `pycobertura show` and `pycobertura diff` now include `json` format
-  * `pycobertura show` and `pycobertura diff` now include `markdown` format
-  * `pycobertura show` and `pycobertura diff` now include `yaml` format
+  * `pycobertura show` and `pycobertura diff` now support output formats: `json`, `markdown` and `yaml`.
 
   Thanks @gro1m
 
