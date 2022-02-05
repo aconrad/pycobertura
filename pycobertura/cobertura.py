@@ -80,10 +80,7 @@ class Cobertura:
     @memoize
     def _get_class_elements_by_filename(self, filename):
         syntax = f"./packages//class[@filename='{filename}']"
-        classes = []
-        for c in self.xml.xpath(syntax):
-            classes.append(c)
-        return classes
+        return [classElement for classElement in self.xml.xpath(syntax)]
 
     @memoize
     def _get_class_element_by_filename(self, filename):
@@ -109,18 +106,16 @@ class Cobertura:
         Return the global line rate of the coverage report. If the
         `filename` file is given, return the line rate of the file.
         """
-        lineRate = 0
-        if filename is None:
-            lineRate = float(self.xml.get("line-rate"))
-        else:
-            elements = self._get_class_elements_by_filename(filename)
-            if len(elements) == 1:
-                lineRate = float(elements[0].get("line-rate"))
-            else:
-                total = self.total_statements(filename)
-                lineRate = float(self.total_hits(filename) / total) if total != 0 else 0
 
-        return lineRate
+        if filename is None:
+            return float(self.xml.get("line-rate"))
+
+        elements = self._get_class_elements_by_filename(filename)
+        if len(elements) == 1:
+            return float(elements[0].get("line-rate"))
+        else:
+            total = self.total_statements(filename)
+            return float(self.total_hits(filename) / total) if total != 0 else 0
 
     def branch_rate(self, filename=None):
         """
@@ -128,11 +123,10 @@ class Cobertura:
         `filename` file is given, return the branch rate of the file.
         """
         if filename is None:
-            el = self.xml
+            return float(self.xml.get("branch-rate"))
         else:
-            el = self._get_class_element_by_filename(filename)
-
-        return float(el.get("branch-rate"))
+            classElement = self._get_class_element_by_filename(filename)
+            return float(classElement.get("branch-rate"))
 
     @memoize
     def missed_statements(self, filename):
@@ -140,11 +134,11 @@ class Cobertura:
         Return a list of uncovered line numbers for each of the missed
         statements found for the file `filename`.
         """
-        classes = self._get_class_elements_by_filename(filename)
+        classElements = self._get_class_elements_by_filename(filename)
         return [
             int(line.get("number"))
-            for cl in classes
-            for line in cl.xpath("./lines/line[@hits=0]")
+            for classElement in classElements
+            for line in classElement.xpath("./lines/line[@hits=0]")
         ]
 
     @memoize
@@ -153,11 +147,11 @@ class Cobertura:
         Return a list of covered line numbers for each of the hit statements
         found for the file `filename`.
         """
-        classes = self._get_class_elements_by_filename(filename)
+        classElements = self._get_class_elements_by_filename(filename)
         return [
             int(line.get("number"))
-            for cl in classes
-            for line in cl.xpath("./lines/line[@hits>0]")
+            for classElement in classElements
+            for line in classElement.xpath("./lines/line[@hits>0]")
         ]
 
     def line_statuses(self, filename):
