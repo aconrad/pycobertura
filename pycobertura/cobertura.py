@@ -79,48 +79,47 @@ class Cobertura:
 
     @memoize
     def _get_class_elements_by_filename(self, filename):
-        syntax = "./packages//class[@filename='%s']" % (filename)
+        syntax = f"./packages//class[@filename='{filename}']"
         classes = []
         for c in self.xml.xpath(syntax):
             classes.append(c)
         return classes
-        
+
     @memoize
     def _get_class_element_by_filename(self, filename):
-        syntax = "./packages//class[@filename='%s'][1]" % (filename)
+        syntax = f"./packages//class[@filename='{filename}'][1]"
         return self.xml.xpath(syntax)[0]
 
     @memoize
     def _get_lines_by_filename(self, filename):
         classElements = self._get_class_elements_by_filename(filename)
-        lineElements = []
-        for classElement in classElements:
-            for line in classElement.xpath("./lines/line"):
-                lineElements.append(line)
-        return lineElements
+        return [
+            line
+            for classElement in classElements
+            for line in classElement.xpath("./lines/line")
+        ]
 
     @property
     def version(self):
         """Return the version number of the coverage report."""
-        return self.xml.attrib["version"]
+        return self.xml.get("version")
 
     def line_rate(self, filename=None):
         """
         Return the global line rate of the coverage report. If the
         `filename` file is given, return the line rate of the file.
         """
-        lineRate=0
+        lineRate = 0
         if filename is None:
-            el = self.xml
-            lineRate = float(el.attrib["line-rate"])
+            lineRate = float(self.xml.get("line-rate"))
         else:
             elements = self._get_class_elements_by_filename(filename)
             if len(elements) == 1:
-                lineRate = float(elements[0].attrib["line-rate"])
+                lineRate = float(elements[0].get("line-rate"))
             else:
                 total = self.total_statements(filename)
-                if (total != 0):
-                    lineRate = float(self.total_hits(filename)/total)
+                if total != 0:
+                    lineRate = float(self.total_hits(filename) / total)
                 else:
                     lineRate = 0
 
@@ -136,7 +135,7 @@ class Cobertura:
         else:
             el = self._get_class_element_by_filename(filename)
 
-        return float(el.attrib["branch-rate"])
+        return float(el.get("branch-rate"))
 
     @memoize
     def missed_statements(self, filename):
@@ -145,12 +144,11 @@ class Cobertura:
         statements found for the file `filename`.
         """
         classes = self._get_class_elements_by_filename(filename)
-        lines = []
-        for cl in classes:
-            classLines = cl.xpath("./lines/line[@hits=0]")
-            for line in classLines:
-                lines.append(int(line.attrib["number"]))
-        return lines
+        return [
+            int(line.get("number"))
+            for cl in classes
+            for line in cl.xpath("./lines/line[@hits=0]")
+        ]
 
     @memoize
     def hit_statements(self, filename):
@@ -159,13 +157,11 @@ class Cobertura:
         found for the file `filename`.
         """
         classes = self._get_class_elements_by_filename(filename)
-        lines = []
-        for cl in classes:
-            classLines = cl.xpath("./lines/line[@hits>0]")
-            for line in classLines:
-                lines.append(int(line.attrib["number"]))
-        return lines
-
+        return [
+            int(line.get("number"))
+            for cl in classes
+            for line in cl.xpath("./lines/line[@hits>0]")
+        ]
 
     def line_statuses(self, filename):
         """
@@ -175,14 +171,9 @@ class Cobertura:
         be either `True` (line hit) or `False` (line miss).
         """
         line_elements = self._get_lines_by_filename(filename)
-
-        lines_w_status = []
-        for line in line_elements:
-            lineno = int(line.attrib["number"])
-            status = line.attrib["hits"] != "0"
-            lines_w_status.append((lineno, status))
-
-        return lines_w_status
+        return [
+            (int(line.get("number")), line.get("hits") != "0") for line in line_elements
+        ]
 
     def missed_lines(self, filename):
         """
@@ -195,10 +186,10 @@ class Cobertura:
 
     def _raise_MissingFileSystem(self, filename):
         raise self.MissingFileSystem(
-            "Unable to read file: {filename}. "
-            "A FileSystem instance must be provided via "
-            "Cobertura(filesystem=...) to locate and read the source "
-            "content of the file.".format(filename=filename)
+            f"Unable to read file: {filename}. "
+            f"A FileSystem instance must be provided via "
+            f"Cobertura(filesystem=...) to locate and read the source "
+            f"content of the file."
         )
 
     @memoize
@@ -220,7 +211,7 @@ class Cobertura:
                     lines.append(line)
 
         except self.filesystem.FileNotFound as file_not_found:
-            lines.append(Line(0, "%s not found" % file_not_found.path, None, None))
+            lines.append(Line(0, f"{file_not_found.path} not found", None, None))
 
         return lines
 
@@ -233,11 +224,7 @@ class Cobertura:
         if filename is not None:
             return len(self.missed_statements(filename))
 
-        total = 0
-        for filename in self.files():
-            total += len(self.missed_statements(filename))
-
-        return total
+        return sum([len(self.missed_statements(filename)) for filename in self.files()])
 
     def total_hits(self, filename=None):
         """
@@ -248,11 +235,7 @@ class Cobertura:
         if filename is not None:
             return len(self.hit_statements(filename))
 
-        total = 0
-        for filename in self.files():
-            total += len(self.hit_statements(filename))
-
-        return total
+        return sum([len(self.hit_statements(filename)) for filename in self.files()])
 
     def total_statements(self, filename=None):
         """
@@ -261,15 +244,11 @@ class Cobertura:
         number of statements for all files.
         """
         if filename is not None:
-            statements = self._get_lines_by_filename(filename)
-            return len(statements)
+            return len(self._get_lines_by_filename(filename))
 
-        total = 0
-        for filename in self.files():
-            statements = self._get_lines_by_filename(filename)
-            total += len(statements)
-
-        return total
+        return sum(
+            [len(self._get_lines_by_filename(filename)) for filename in self.files()]
+        )
 
     @memoize
     def files(self):
@@ -281,7 +260,7 @@ class Cobertura:
         filenames = []
 
         for el in self.xml.xpath("//class"):
-            filename = el.attrib["filename"]
+            filename = el.get("filename")
             if filename in already_seen:
                 continue
             already_seen.add(filename)
@@ -313,7 +292,7 @@ class Cobertura:
         """
         Return the list of available packages in the coverage report.
         """
-        return [el.attrib["name"] for el in self.xml.xpath("//package")]
+        return [el.get("name") for el in self.xml.xpath("//package")]
 
 
 class CoberturaDiff:
@@ -332,10 +311,9 @@ class CoberturaDiff:
         This does not ensure that all changes have been covered. If this is
         what you want, use `CoberturaDiff.has_all_changes_covered()` instead.
         """
-        for filename in self.files():
-            if self.diff_total_misses(filename) > 0:
-                return False
-        return True
+        return not (
+            any(self.diff_total_misses(filename) > 0 for filename in self.files())
+        )
 
     def has_all_changes_covered(self):
         """
@@ -362,10 +340,7 @@ class CoberturaDiff:
 
         The returned count may be a float.
         """
-        if filename is not None:
-            files = [filename]
-        else:
-            files = self.files()
+        files = [filename] if filename else self.files()
 
         total_count = 0.0
         for filename in files:
@@ -404,7 +379,7 @@ class CoberturaDiff:
         line_changed = []
         for line in self.file_source(filename):
             if line.status is not None:
-                is_new = not line.status
+                is_new = not (line.status)
                 line_changed.append((line.number, is_new))
         return line_changed
 
