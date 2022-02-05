@@ -19,11 +19,11 @@ def test_text_report():
     assert report.generate() == """\
 Filename                          Stmts    Miss  Cover    Missing
 ------------------------------  -------  ------  -------  ---------
-Main.java                            11       0  100.00%
+Main.java                            15       0  100.00%
 search/BinarySearch.java             12       1  91.67%   24
 search/ISortedArraySearch.java        0       0  100.00%
 search/LinearSearch.java              7       2  71.43%   19-24
-TOTAL                                30       3  90.00%"""
+TOTAL                                34       3  90.00%"""
 
 
 def test_text_report__with_missing_range():
@@ -138,7 +138,7 @@ def test_html_report():
         <tbody>
           <tr>
             <td><a href="#Main.java">Main.java</a></td>
-            <td>11</td>
+            <td>15</td>
             <td>0</td>
             <td>100.00%</td>
             <td></td>
@@ -168,7 +168,7 @@ def test_html_report():
         <tfoot>
           <tr>
             <td>TOTAL</td>
-            <td>30</td>
+            <td>34</td>
             <td>3</td>
             <td>90.00%</td>
             <td></td>
@@ -269,7 +269,7 @@ def test_html_report__no_source_files_message():
         <tbody>
           <tr>
             <td>Main.java</td>
-            <td>11</td>
+            <td>15</td>
             <td>0</td>
             <td>100.00%</td>
             <td></td>
@@ -299,7 +299,7 @@ def test_html_report__no_source_files_message():
         <tfoot>
           <tr>
             <td>TOTAL</td>
-            <td>30</td>
+            <td>34</td>
             <td>3</td>
             <td>90.00%</td>
             <td></td>
