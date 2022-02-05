@@ -118,10 +118,7 @@ class Cobertura:
                 lineRate = float(elements[0].get("line-rate"))
             else:
                 total = self.total_statements(filename)
-                if total != 0:
-                    lineRate = float(self.total_hits(filename) / total)
-                else:
-                    lineRate = 0
+                lineRate = float(self.total_hits(filename) / total) if total != 0 else 0
 
         return lineRate
 
