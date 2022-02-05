@@ -16,6 +16,8 @@
 
   Thanks @gro1m
 
+  * fix handling of multiple classes in same file - thanks to @smortvedt, @gro1m
+
 ## 2.1.0 (2021-09-23)
 
 * Added the option `show_missing` to `HtmlReporterDelta`, which specifies
