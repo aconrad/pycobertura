@@ -84,6 +84,8 @@ pycobertura/utils.py            12       0  100.00%
 TOTAL                          253       0  100.00%
 ```
 
+*NOTE*: For the csv format we chose as default delimiter the semicolon, because the common is used internally in the "Missing" column,
+therefore the "," delimiter might lead to problems when rendering the csv in an editor.
 ```shell
 $ pycobertura show --format csv coverage.xml --delimiter ";"
 Filename;Stmts;Miss;Cover;Missing
@@ -217,6 +219,9 @@ pycobertura diff tests/dummy.source1/coverage.xml tests/dummy.source2/coverage.x
 ```
 
 ![Example output of csv formatted pycobertura diff command](images/example_csv_diff_output.png)
+
+*NOTE*: For the csv format we chose as default delimiter the semicolon, because the common is used internally in the "Missing" column,
+therefore the "," delimiter might lead to problems when rendering the csv in an editor.
 
 Analogously you can also show the diff in markdown format via:
 

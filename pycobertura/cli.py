@@ -59,7 +59,7 @@ def get_exit_code(differ, source):
 @click.option(
     "-delim",
     "--delimiter",
-    default=",",
+    default=";",
     type=str,
     help="Delimiter for csv format, e.g. ,;\n\t",
 )
@@ -139,7 +139,7 @@ directories (or zip archives). If the source is not available at all, pass
 @click.option(
     "-delim",
     "--delimiter",
-    default=",",
+    default=";",
     type=str,
     help="Delimiter for csv format, e.g. ,;\n\t",
 )

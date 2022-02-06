@@ -60,10 +60,10 @@ def test_show__format_csv():
             catch_exceptions=False
         )
         assert result.output == """\
-Filename,Stmts,Miss,Cover,Missing
-dummy/__init__.py,0,0,0.00%,
-dummy/dummy.py,4,2,50.00%,2, 5
-TOTAL,4,2,50.00%,
+Filename;Stmts;Miss;Cover;Missing
+dummy/__init__.py;0;0;0.00%;
+dummy/dummy.py;4;2;50.00%;2, 5
+TOTAL;4;2;50.00%;
 """
     assert result.exit_code == ExitCodes.OK
 
@@ -287,11 +287,11 @@ def test_diff__format_csv():
             'tests/dummy.source2/coverage.xml',
         ], catch_exceptions=False)
         assert result.output == """\
-Filename,Stmts,Miss,Cover,Missing
-dummy/dummy.py,,\x1b[32m-2\x1b[39m,+40.00%,['\x1b[32m-5\x1b[39m', '\x1b[32m-6\x1b[39m']
-dummy/dummy2.py,+2,\x1b[31m+1\x1b[39m,-25.00%,['\x1b[32m-2\x1b[39m', '\x1b[32m-4\x1b[39m', '\x1b[31m+5\x1b[39m']
-dummy/dummy3.py,+2,\x1b[31m+2\x1b[39m,,['\x1b[31m+1\x1b[39m', '\x1b[31m+2\x1b[39m']
-TOTAL,+4,\x1b[31m+1\x1b[39m,+31.06%,[]
+Filename;Stmts;Miss;Cover;Missing
+dummy/dummy.py;;\x1b[32m-2\x1b[39m;+40.00%;['\x1b[32m-5\x1b[39m', '\x1b[32m-6\x1b[39m']
+dummy/dummy2.py;+2;\x1b[31m+1\x1b[39m;-25.00%;['\x1b[32m-2\x1b[39m', '\x1b[32m-4\x1b[39m', '\x1b[31m+5\x1b[39m']
+dummy/dummy3.py;+2;\x1b[31m+2\x1b[39m;;['\x1b[31m+1\x1b[39m', '\x1b[31m+2\x1b[39m']
+TOTAL;+4;\x1b[31m+1\x1b[39m;+31.06%;[]
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
