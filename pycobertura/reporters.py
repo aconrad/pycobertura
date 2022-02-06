@@ -267,10 +267,9 @@ class CsvReporterDelta(DeltaReporter):
                     ).decode("unicode_escape")
                 ]
 
-        if "\\n" in repr(delimiter):
-            delimiter = "\n"
-        if "\\t" in repr(delimiter):
-            delimiter = "\t"
+        # Explanation here: 
+        # https://stackoverflow.com/a/55889036/9698518
+        delimiter=delimiter.encode().decode('unicode_escape')
 
         return "\n".join([delimiter.join(line) for line in list_of_lines])
 
