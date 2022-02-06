@@ -248,12 +248,22 @@ class CsvReporterDelta(DeltaReporter):
 
     def generate(self, delimiter):
         lines = self.get_report_lines()
+        
+        # lines_values: List of lines dictionary values arranged in
+        # tuples of Table row values
         lines_values = list(zip(*lines.values()))
+
+        # Stringify every item in Table row values without using the Missing column
+        # and store in the list list_of_lines
         list_of_lines = [headers_without_missing]
         list_of_lines.extend([[f"{item}" for item in row[:-1]] for row in lines_values])
 
         if self.show_source:
+            # Add the Missing header to list_of_lines first inner list
+            # This is a direct assignment to avoid appending an additional "Missing"
+            # header in every iteration of the tests which would fail them
             list_of_lines[0] = headers_with_missing
+            # Add to every list inside the list_of_lines the Missing column value
             for line_index, missing_line in enumerate(lines["Missing"]):
                 # for colors, explanation see here:
                 # https://stackoverflow.com/a/61273717/9698518
