@@ -67,9 +67,9 @@ class CsvReporter(Reporter):
             [[f"{item}" for item in row] for row in zip(*lines.values())]
         )
 
-        # Explanation here: 
+        # Explanation here:
         # https://stackoverflow.com/a/55889036/9698518
-        delimiter=delimiter.encode().decode('unicode_escape')
+        delimiter = delimiter.encode().decode("unicode_escape")
 
         return "\n".join([delimiter.join(line) for line in list_of_lines])
 
@@ -248,28 +248,22 @@ class CsvReporterDelta(DeltaReporter):
 
     def generate(self, delimiter):
         lines = self.get_report_lines()
-
+        lines_values = list(zip(*lines.values()))
         list_of_lines = [headers_without_missing]
-        list_of_lines.extend(
-            [[f"{item}" for item in row[:-1]] for row in zip(*lines.values())]
-        )
+        list_of_lines.extend([[f"{item}" for item in row[:-1]] for row in lines_values])
 
         if self.show_source:
-            list_of_lines = [headers_with_missing]
-            list_of_lines.extend(
-                [[f"{item}" for item in row[:-1]] for row in zip(*lines.values())]
-            )
-            for count in range(1, len(list_of_lines)):
-                missing_line = lines["Missing"][count - 1]
-                list_of_lines[count] += [
+            list_of_lines[0] = headers_with_missing
+            for line_index, missing_line in enumerate(lines["Missing"]):
+                list_of_lines[line_index + 1] += [
                     f"{[self.color_number(number) for number in missing_line]}".encode(
                         "utf-8"
                     ).decode("unicode_escape")
                 ]
 
-        # Explanation here: 
+        # Explanation here:
         # https://stackoverflow.com/a/55889036/9698518
-        delimiter=delimiter.encode().decode('unicode_escape')
+        delimiter = delimiter.encode().decode("unicode_escape")
 
         return "\n".join([delimiter.join(line) for line in list_of_lines])
 
