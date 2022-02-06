@@ -288,9 +288,9 @@ def test_diff__format_csv():
         ], catch_exceptions=False)
         assert result.output == """\
 Filename,Stmts,Miss,Cover,Missing
-dummy/dummy.py,-,\x1b[32m-2\x1b[39m,+40.00%,['\x1b[32m-5\x1b[39m', '\x1b[32m-6\x1b[39m']
+dummy/dummy.py,,\x1b[32m-2\x1b[39m,+40.00%,['\x1b[32m-5\x1b[39m', '\x1b[32m-6\x1b[39m']
 dummy/dummy2.py,+2,\x1b[31m+1\x1b[39m,-25.00%,['\x1b[32m-2\x1b[39m', '\x1b[32m-4\x1b[39m', '\x1b[31m+5\x1b[39m']
-dummy/dummy3.py,+2,\x1b[31m+2\x1b[39m,-,['\x1b[31m+1\x1b[39m', '\x1b[31m+2\x1b[39m']
+dummy/dummy3.py,+2,\x1b[31m+2\x1b[39m,,['\x1b[31m+1\x1b[39m', '\x1b[31m+2\x1b[39m']
 TOTAL,+4,\x1b[31m+1\x1b[39m,+31.06%,[]
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
@@ -310,9 +310,9 @@ def test_diff__format_csv_delimiter_comma():
             ], catch_exceptions=False)
             assert result.output == """\
 Filename,Stmts,Miss,Cover,Missing
-dummy/dummy.py,-,\x1b[32m-2\x1b[39m,+40.00%,['\x1b[32m-5\x1b[39m', '\x1b[32m-6\x1b[39m']
+dummy/dummy.py,,\x1b[32m-2\x1b[39m,+40.00%,['\x1b[32m-5\x1b[39m', '\x1b[32m-6\x1b[39m']
 dummy/dummy2.py,+2,\x1b[31m+1\x1b[39m,-25.00%,['\x1b[32m-2\x1b[39m', '\x1b[32m-4\x1b[39m', '\x1b[31m+5\x1b[39m']
-dummy/dummy3.py,+2,\x1b[31m+2\x1b[39m,-,['\x1b[31m+1\x1b[39m', '\x1b[31m+2\x1b[39m']
+dummy/dummy3.py,+2,\x1b[31m+2\x1b[39m,,['\x1b[31m+1\x1b[39m', '\x1b[31m+2\x1b[39m']
 TOTAL,+4,\x1b[31m+1\x1b[39m,+31.06%,[]
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
@@ -331,9 +331,9 @@ def test_diff__format_csv_delimiter_semicolon():
         ], catch_exceptions=False)
         assert result.output == """\
 Filename;Stmts;Miss;Cover;Missing
-dummy/dummy.py;-;\x1b[32m-2\x1b[39m;+40.00%;['\x1b[32m-5\x1b[39m', '\x1b[32m-6\x1b[39m']
+dummy/dummy.py;;\x1b[32m-2\x1b[39m;+40.00%;['\x1b[32m-5\x1b[39m', '\x1b[32m-6\x1b[39m']
 dummy/dummy2.py;+2;\x1b[31m+1\x1b[39m;-25.00%;['\x1b[32m-2\x1b[39m', '\x1b[32m-4\x1b[39m', '\x1b[31m+5\x1b[39m']
-dummy/dummy3.py;+2;\x1b[31m+2\x1b[39m;-;['\x1b[31m+1\x1b[39m', '\x1b[31m+2\x1b[39m']
+dummy/dummy3.py;+2;\x1b[31m+2\x1b[39m;;['\x1b[31m+1\x1b[39m', '\x1b[31m+2\x1b[39m']
 TOTAL;+4;\x1b[31m+1\x1b[39m;+31.06%;[]
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
@@ -352,9 +352,9 @@ def test_diff__format_csv_delimiter_tab():
             ], catch_exceptions=False)
         assert result.output == """\
 Filename\tStmts\tMiss\tCover\tMissing
-dummy/dummy.py\t-\t\x1b[32m-2\x1b[39m\t+40.00%\t['\x1b[32m-5\x1b[39m', '\x1b[32m-6\x1b[39m']
+dummy/dummy.py\t\t\x1b[32m-2\x1b[39m\t+40.00%\t['\x1b[32m-5\x1b[39m', '\x1b[32m-6\x1b[39m']
 dummy/dummy2.py\t+2\t\x1b[31m+1\x1b[39m\t-25.00%\t['\x1b[32m-2\x1b[39m', '\x1b[32m-4\x1b[39m', '\x1b[31m+5\x1b[39m']
-dummy/dummy3.py\t+2\t\x1b[31m+2\x1b[39m\t-\t['\x1b[31m+1\x1b[39m', '\x1b[31m+2\x1b[39m']
+dummy/dummy3.py\t+2\t\x1b[31m+2\x1b[39m\t\t['\x1b[31m+1\x1b[39m', '\x1b[31m+2\x1b[39m']
 TOTAL\t+4\t\x1b[31m+1\x1b[39m\t+31.06%\t[]
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
@@ -378,7 +378,7 @@ Miss
 Cover
 Missing
 dummy/dummy.py
--
+
 \x1b[32m-2\x1b[39m
 +40.00%
 ['\x1b[32m-5\x1b[39m', '\x1b[32m-6\x1b[39m']
@@ -390,7 +390,7 @@ dummy/dummy2.py
 dummy/dummy3.py
 +2
 \x1b[31m+2\x1b[39m
--
+
 ['\x1b[31m+1\x1b[39m', '\x1b[31m+2\x1b[39m']
 TOTAL
 +4
