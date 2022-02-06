@@ -127,7 +127,7 @@ def test_hit_lines__by_iterating_over_classes():
     cobertura = make_cobertura()
 
     expected_lines = {
-        'Main.java': [10, 16, 17, 18, 19, 23, 25, 26, 28, 29, 30],
+        'Main.java': [10, 16, 17, 18, 19, 23, 25, 26, 28, 29, 30, 31, 32, 33, 34],
         'search/BinarySearch.java': [12, 16, 18, 20, 21, 23, 25, 26, 28, 29, 31],
         'search/ISortedArraySearch.java': [],
         'search/LinearSearch.java': [9, 13, 15, 16, 17],
@@ -153,13 +153,13 @@ def test_missed_lines():
 
 def test_total_statements():
     cobertura = make_cobertura()
-    assert cobertura.total_statements() == 30
+    assert cobertura.total_statements() == 34
 
 
 def test_total_statements_by_class_file():
     cobertura = make_cobertura()
     expected_total_statements = {
-        'Main.java': 11,
+        'Main.java': 15,
         'search/BinarySearch.java': 12,
         'search/ISortedArraySearch.java': 0,
         'search/LinearSearch.java': 7,
@@ -189,13 +189,13 @@ def test_total_misses_by_class_file():
 
 def test_total_hits():
     cobertura = make_cobertura()
-    assert cobertura.total_hits() == 27
+    assert cobertura.total_hits() == 31
 
 
 def test_total_hits_by_class_file():
     cobertura = make_cobertura()
     expected_total_misses = {
-        'Main.java': 11,
+        'Main.java': 15,
         'search/BinarySearch.java': 11,
         'search/ISortedArraySearch.java': 0,
         'search/LinearSearch.java': 5,
