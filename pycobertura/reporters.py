@@ -255,6 +255,8 @@ class CsvReporterDelta(DeltaReporter):
         if self.show_source:
             list_of_lines[0] = headers_with_missing
             for line_index, missing_line in enumerate(lines["Missing"]):
+                # for colors, explanation see here:
+                # https://stackoverflow.com/a/61273717/9698518
                 list_of_lines[line_index + 1] += [
                     f"{[self.color_number(number) for number in missing_line]}".encode(
                         "utf-8"
