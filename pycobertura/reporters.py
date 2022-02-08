@@ -304,7 +304,12 @@ class YamlReporterDelta(DeltaReporter):
         # need to write to a buffer as yml packages are using a streaming interface
         buf = io.BytesIO()
         yaml.YAML().dump({"total": footer, "files": rows}, buf)
-        return buf.getvalue().replace(rb"\e", b"\x1b")
+        # need to replace \e escape sequence with \x1b,
+        # because only the latter is supported, see also
+        # the Python docs for supported formats:
+        # https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals
+        yaml_string = buf.getvalue().replace(rb"\e", b"\x1b")
+        return yaml_string
 
 
 class HtmlReporterDelta(DeltaReporter):
