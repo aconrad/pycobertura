@@ -138,19 +138,24 @@ class DeltaReporter:
         return [f"+{lno:d}" if is_new else f"-{lno:d}" for lno, is_new in missed_lines]
 
     @staticmethod
-    def determine_color_function_of_number(number):
+    def determine_ANSI_color_code_function_of_number(number):
         return red if number.startswith("+") else green
 
     @classmethod
-    def colorize_number(cls, number):
-        color_function = cls.determine_color_function_of_number(number)
+    def convert_signed_number_to_ANSI_color_coded_signed_number(cls, number):
+        color_function = cls.determine_ANSI_color_code_function_of_number(number)
         return color_function(number)
 
     def color_number(self, numbers):
         if numbers and self.color and isinstance(numbers, str):
-            return self.colorize_number(numbers)
+            return self.convert_signed_number_to_ANSI_color_coded_signed_number(numbers)
         if numbers and self.color and not isinstance(numbers, str):
-            return ", ".join([self.colorize_number(number) for number in numbers])
+            return ", ".join(
+                [
+                    self.convert_signed_number_to_ANSI_color_coded_signed_number(number)
+                    for number in numbers
+                ]
+            )
         return numbers if isinstance(numbers, str) else ", ".join(numbers)
 
     def format_total_misses(self, total_misses):
@@ -248,7 +253,7 @@ class CsvReporterDelta(DeltaReporter):
 
     def generate(self, delimiter):
         lines = self.get_report_lines()
-        
+
         # lines_values: List of lines dictionary values arranged in
         # tuples of Table row values
         lines_values = list(zip(*lines.values()))
