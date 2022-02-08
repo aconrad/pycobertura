@@ -212,7 +212,7 @@ The column `Missing` will show line numbers prefixed with either a plus sign
 introduced as uncovered and is shown in red, when prefixed as a minus sign, the
 line is no longer uncovered and is rendered in green.
 
-Analogously you can also show the diff in csv format with the option to define a delimiter (\t and \n should also work here) via:
+Analogously you can also show the diff in csv format with the option to define a delimiter (\t should also work here) via:
 
 ```shell
 pycobertura diff tests/dummy.source1/coverage.xml tests/dummy.source2/coverage.xml --format csv --delimiter ";"
@@ -220,8 +220,7 @@ pycobertura diff tests/dummy.source1/coverage.xml tests/dummy.source2/coverage.x
 
 ![Example output of csv formatted pycobertura diff command](images/example_csv_diff_output.png)
 
-*NOTE*: For the csv format we chose as default delimiter the semicolon, because the common is used internally in the "Missing" column,
-therefore the "," delimiter might lead to problems when rendering the csv in an editor.
+*NOTE*: The default delimiter is semicolon (;). The delimiters comma (,) and newline (/n) are *very risky* to use and are not supported by this library. The comma delimiter is used in the "Missing" column in the list datastructure to separate the different items. Therefore the "," delimiter might lead to problems when rendering the csv in an editor. As a missing value in csv corresponds to an empty value, the newline delimiter can as well lead to problems when rendering the csv in an editor.
 
 Analogously you can also show the diff in markdown format via:
 
