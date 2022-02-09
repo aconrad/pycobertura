@@ -4,10 +4,12 @@ from pycobertura.cobertura import Cobertura
 from pycobertura.reporters import (
     HtmlReporter,
     TextReporter,
+    CsvReporter,
     MarkdownReporter,
     JsonReporter,
     HtmlReporterDelta,
     TextReporterDelta,
+    CsvReporterDelta,
     MarkdownReporterDelta,
     JsonReporterDelta,
 )
@@ -20,6 +22,7 @@ pycobertura = click.Group()
 reporters = {
     "html": HtmlReporter,
     "text": TextReporter,
+    "csv": CsvReporter,
     "markdown": MarkdownReporter,
     "json": JsonReporter,
 }
@@ -54,6 +57,13 @@ def get_exit_code(differ, source):
 @click.argument("cobertura_file")
 @click.option("-f", "--format", default="text", type=click.Choice(list(reporters)))
 @click.option(
+    "-delim",
+    "--delimiter",
+    default=";",
+    type=str,
+    help="Delimiter for csv format, e.g. ,;\n\t",
+)
+@click.option(
     "-o",
     "--output",
     metavar="<file>",
@@ -76,8 +86,9 @@ def get_exit_code(differ, source):
     "the --source is a zip archive and the files were zipped under "
     "a directory prefix that is not part of the source.",
 )
-def show(cobertura_file, format, output, source, source_prefix):
+def show(cobertura_file, format, delimiter, output, source, source_prefix):
     """show coverage summary of a Cobertura report"""
+
     if not source:
         source = get_dir_from_file_path(cobertura_file)
 
@@ -87,7 +98,11 @@ def show(cobertura_file, format, output, source, source_prefix):
     )
     Reporter = reporters[format]
     reporter = Reporter(cobertura)
-    report = reporter.generate()
+
+    if format == "csv":
+        report = reporter.generate(delimiter)
+    else:
+        report = reporter.generate()
 
     if not isinstance(report, bytes):
         report = report.encode("utf-8")
@@ -98,6 +113,7 @@ def show(cobertura_file, format, output, source, source_prefix):
 
 delta_reporters = {
     "text": TextReporterDelta,
+    "csv": CsvReporterDelta,
     "markdown": MarkdownReporterDelta,
     "html": HtmlReporterDelta,
     "json": JsonReporterDelta,
@@ -120,6 +136,13 @@ directories (or zip archives). If the source is not available at all, pass
 )
 @click.argument("cobertura_file1")
 @click.argument("cobertura_file2")
+@click.option(
+    "-delim",
+    "--delimiter",
+    default=";",
+    type=str,
+    help="Delimiter for csv format, e.g. ,;\n\t",
+)
 @click.option(
     "--color/--no-color",
     default=None,
@@ -178,6 +201,7 @@ directories (or zip archives). If the source is not available at all, pass
 def diff(
     cobertura_file1,
     cobertura_file2,
+    delimiter,
     color,
     format,
     output,
@@ -208,12 +232,15 @@ def diff(
 
     isatty = True if output is None else output.isatty()
 
-    if format in {"text", "json", "markdown"}:
+    if format in {"text", "csv", "json", "markdown"}:
         color = isatty if color is None else color is True
         reporter_kwargs["color"] = color
 
     reporter = Reporter(*reporter_args, **reporter_kwargs)
-    report = reporter.generate()
+    if format == "csv":
+        report = reporter.generate(delimiter)
+    else:
+        report = reporter.generate()
 
     if not isinstance(report, bytes):
         report = report.encode("utf-8")

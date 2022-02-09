@@ -59,6 +59,21 @@ class TextReporter(Reporter):
         return tabulate(lines, headers=headers_with_missing)
 
 
+class CsvReporter(Reporter):
+    def generate(self, delimiter):
+        lines = self.get_report_lines()
+        list_of_lines = [headers_with_missing]
+        list_of_lines.extend(
+            [[f"{item}" for item in row] for row in zip(*lines.values())]
+        )
+
+        # Explanation here:
+        # https://stackoverflow.com/a/55889036/9698518
+        delimiter = delimiter.encode().decode("unicode_escape")
+
+        return "\n".join([delimiter.join(line) for line in list_of_lines])
+
+
 class MarkdownReporter(Reporter):
     def generate(self):
         lines = self.get_report_lines()
@@ -122,27 +137,26 @@ class DeltaReporter:
     def format_missed_lines(missed_lines):
         return [f"+{lno:d}" if is_new else f"-{lno:d}" for lno, is_new in missed_lines]
 
-    def determine_color_of_number(self, number):
+    @staticmethod
+    def determine_ANSI_color_code_function_of_number(number):
         return red if number.startswith("+") else green
 
+    @classmethod
+    def convert_signed_number_to_ANSI_color_coded_signed_number(cls, number):
+        color_function = cls.determine_ANSI_color_code_function_of_number(number)
+        return color_function(number)
+
     def color_number(self, numbers):
-        if numbers and self.color:
-            if type(numbers) is str:
-                color = self.determine_color_of_number(numbers)
-                result = color(numbers)
-            else:
-                result = ", ".join(
-                    [
-                        self.determine_color_of_number(number)(number)
-                        for number in numbers
-                    ]
-                )
-        else:
-            if type(numbers) is str:
-                result = numbers
-            else:
-                result = ", ".join(numbers)
-        return result
+        if numbers and self.color and isinstance(numbers, str):
+            return self.convert_signed_number_to_ANSI_color_coded_signed_number(numbers)
+        if numbers and self.color and not isinstance(numbers, str):
+            return ", ".join(
+                [
+                    self.convert_signed_number_to_ANSI_color_coded_signed_number(number)
+                    for number in numbers
+                ]
+            )
+        return numbers if isinstance(numbers, str) else ", ".join(numbers)
 
     def format_total_misses(self, total_misses):
         return (
@@ -232,6 +246,43 @@ class TextReporterDelta(DeltaReporter):
             lines["Missing"] = missed_lines_colored
             headers = headers_with_missing
         return tabulate(lines, headers=headers)
+
+
+class CsvReporterDelta(DeltaReporter):
+    not_available = ""
+
+    def generate(self, delimiter):
+        lines = self.get_report_lines()
+
+        # lines_values: List of lines dictionary values arranged in
+        # tuples of Table row values
+        lines_values = list(zip(*lines.values()))
+
+        # Stringify every item in Table row values without using the Missing column
+        # and store in the list list_of_lines
+        list_of_lines = [headers_without_missing]
+        list_of_lines.extend([[f"{item}" for item in row[:-1]] for row in lines_values])
+
+        if self.show_source:
+            # Add the Missing header to list_of_lines first inner list
+            # This is a direct assignment to avoid appending an additional "Missing"
+            # header in every iteration of the tests which would fail them
+            list_of_lines[0] = headers_with_missing
+            # Add to every list inside the list_of_lines the Missing column value
+            for line_index, missing_line in enumerate(lines["Missing"]):
+                # for colors, explanation see here:
+                # https://stackoverflow.com/a/61273717/9698518
+                list_of_lines[line_index + 1] += [
+                    f"{[self.color_number(number) for number in missing_line]}".encode(
+                        "utf-8"
+                    ).decode("unicode_escape")
+                ]
+
+        # Explanation here:
+        # https://stackoverflow.com/a/55889036/9698518
+        delimiter = delimiter.encode().decode("unicode_escape")
+
+        return "\n".join([delimiter.join(line) for line in list_of_lines])
 
 
 class MarkdownReporterDelta(DeltaReporter):
