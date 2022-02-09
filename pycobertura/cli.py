@@ -7,11 +7,13 @@ from pycobertura.reporters import (
     CsvReporter,
     MarkdownReporter,
     JsonReporter,
+    YamlReporter,
     HtmlReporterDelta,
     TextReporterDelta,
     CsvReporterDelta,
     MarkdownReporterDelta,
     JsonReporterDelta,
+    YamlReporterDelta,
 )
 from pycobertura.filesystem import filesystem_factory
 from pycobertura.utils import get_dir_from_file_path
@@ -25,6 +27,7 @@ reporters = {
     "csv": CsvReporter,
     "markdown": MarkdownReporter,
     "json": JsonReporter,
+    "yaml": YamlReporter,
 }
 
 
@@ -117,6 +120,7 @@ delta_reporters = {
     "markdown": MarkdownReporterDelta,
     "html": HtmlReporterDelta,
     "json": JsonReporterDelta,
+    "yaml": YamlReporterDelta,
 }
 
 
@@ -232,7 +236,7 @@ def diff(
 
     isatty = True if output is None else output.isatty()
 
-    if format in {"text", "csv", "json", "markdown"}:
+    if format in {"text", "csv", "json", "markdown", "yaml"}:
         color = isatty if color is None else color is True
         reporter_kwargs["color"] = color
 

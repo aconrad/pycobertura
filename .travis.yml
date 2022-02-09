@@ -7,8 +7,10 @@ jobs:
       env: TOXENV=py38
     - python: 3.9
       env: TOXENV=py39
-    - env: TOXENV=pep8
-    - env: TOXENV=black
+    - python: 3.7
+      env: TOXENV=pep8
+    - python: 3.7
+      env: TOXENV=black
 
 install:
   - pip install tox
