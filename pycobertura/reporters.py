@@ -16,19 +16,20 @@ env.filters["misses_color"] = filters.misses_color
 
 headers_without_missing = ["Filename", "Stmts", "Miss", "Cover"]
 headers_with_missing = ["Filename", "Stmts", "Miss", "Cover", "Missing"]
+headers_hideable = {"Stmts", "Miss", "Cover", "Missing"}
 
 
 class Reporter:
-    def __init__(self, cobertura):
+    def __init__(self, cobertura, hide_columns=""):
         self.cobertura = cobertura
+        self.hide_columns = set(hide_columns.replace(" ", "").split(","))
 
     @staticmethod
     def format_line_rate(line_rate):
         return f"{line_rate:.2%}"
 
-    def get_report_lines(self):
-        lines = {
-            "Filename": self.cobertura.files().copy(),
+    def lines_dict_entry(self, key):
+        rows_func_dict = {
             "Stmts": [
                 self.cobertura.total_statements(filename)
                 for filename in self.cobertura.files()
@@ -38,19 +39,26 @@ class Reporter:
                 for filename in self.cobertura.files()
             ],
             "Cover": [
-                self.format_line_rate(self.cobertura.line_rate(filename))
-                for filename in self.cobertura.files()
+                self.format_line_rate(self.cobertura.line_rate(filename)) for filename in self.cobertura.files()
             ],
             "Missing": [
                 stringify(self.cobertura.missed_lines(filename))
                 for filename in self.cobertura.files()
             ],
         }
-        lines["Filename"].append("TOTAL")
-        lines["Stmts"] += [self.cobertura.total_statements()]
-        lines["Miss"] += [self.cobertura.total_misses()]
-        lines["Cover"] += [self.format_line_rate(self.cobertura.line_rate())]
-        lines["Missing"].append("")
+        footer_func_dict = {
+            "Stmts": [self.cobertura.total_statements()],
+            "Miss": [self.cobertura.total_misses()],
+            "Cover": [self.format_line_rate(self.cobertura.line_rate())],
+            "Missing": [""],
+        }
+        return rows_func_dict[key] + footer_func_dict[key]
+
+    def get_report_lines(self):
+        lines = {"Filename": self.cobertura.files().copy()+["TOTAL"]}
+        columns_to_display = headers_hideable.difference(self.hide_columns)
+        for column in columns_to_display:
+            lines[column] = self.lines_dict_entry(column)
 
         return lines
 
@@ -58,13 +66,13 @@ class Reporter:
 class TextReporter(Reporter):
     def generate(self):
         lines = self.get_report_lines()
-        return tabulate(lines, headers=headers_with_missing)
+        return tabulate(lines, headers=lines.keys())
 
 
 class CsvReporter(Reporter):
     def generate(self, delimiter):
         lines = self.get_report_lines()
-        list_of_lines = [headers_with_missing]
+        list_of_lines = [lines.keys()]
         list_of_lines.extend(
             [[f"{item}" for item in row] for row in zip(*lines.values())]
         )
@@ -79,7 +87,7 @@ class CsvReporter(Reporter):
 class MarkdownReporter(Reporter):
     def generate(self):
         lines = self.get_report_lines()
-        return tabulate(lines, headers=headers_with_missing, tablefmt="github")
+        return tabulate(lines, headers=lines.keys(), tablefmt="github")
 
 
 class JsonReporter(Reporter):
@@ -135,10 +143,11 @@ class HtmlReporter(Reporter):
 
 
 class DeltaReporter:
-    def __init__(self, cobertura1, cobertura2, show_source=True, *args, **kwargs):
+    def __init__(self, cobertura1, cobertura2, hide_columns=[], show_source=True, *args, **kwargs):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
         self.show_source = show_source
         self.color = kwargs.pop("color", False)
+        self.hide_columns = set(hide_columns.replace(" ", "").split(","))
 
     def format_line_rate(self, line_rate):
         return f"{line_rate:+.2%}" if line_rate else self.not_available
@@ -178,6 +187,43 @@ class DeltaReporter:
             else self.not_available
         )
 
+    def lines_dict_entry(
+        self,
+        key,
+        indexes_of_files_with_changes,
+        diff_total_stmts,
+        diff_total_miss,
+        diff_total_cover,
+    ):
+        rows_func_dict = {
+            "Stmts": [
+                self.format_total_statements(diff_total_stmts[i])
+                for i in indexes_of_files_with_changes
+            ],
+            "Miss": [
+                self.format_total_misses(diff_total_miss[i])
+                for i in indexes_of_files_with_changes
+            ],
+            "Cover": [
+                self.format_line_rate(diff_total_cover[i])
+                for i in indexes_of_files_with_changes
+            ],
+            "Missing": [
+                self.format_missed_lines(self.differ.diff_missed_lines(filename)[i])
+                for i in indexes_of_files_with_changes
+                for filename in self.differ.files()
+            ],
+        }
+        footer_func_dict = {
+            "Stmts": [
+                self.format_total_statements(self.differ.diff_total_statements())
+            ],
+            "Miss": [self.format_total_misses(self.differ.diff_total_misses())],
+            "Cover": [self.format_line_rate(self.differ.diff_line_rate())],
+            "Missing": "",
+        }
+        return rows_func_dict[key] + footer_func_dict[key]
+
     def get_report_lines(self):
         diff_total_stmts = [
             self.differ.diff_total_statements(filename)
@@ -204,43 +250,28 @@ class DeltaReporter:
             )
         ]
 
-        filenames_of_files_with_changes = [
-            self.differ.files()[i] for i in indexes_of_files_with_changes
-        ]
-
         lines = {
-            "Filename": filenames_of_files_with_changes,
-            "Stmts": [
-                self.format_total_statements(diff_total_stmts[i])
-                for i in indexes_of_files_with_changes
-            ],
-            "Miss": [
-                self.format_total_misses(diff_total_miss[i])
-                for i in indexes_of_files_with_changes
-            ],
-            "Cover": [
-                self.format_line_rate(diff_total_cover[i])
-                for i in indexes_of_files_with_changes
-            ],
+            "Filename": [self.differ.files()[i] for i in indexes_of_files_with_changes]
+            + ["TOTAL"]
         }
 
-        lines["Filename"].append("TOTAL")
-        lines["Stmts"] += [
-            self.format_total_statements(self.differ.diff_total_statements())
-        ]
-        lines["Miss"] += [self.format_total_misses(self.differ.diff_total_misses())]
-        lines["Cover"] += [self.format_line_rate(self.differ.diff_line_rate())]
+        for key in set(headers_hideable).difference(set(self.hide_columns)):
+            lines[key] = self.lines_dict_entry(
+                key,
+                indexes_of_files_with_changes,
+                diff_total_stmts,
+                diff_total_miss,
+                diff_total_cover,
+            )
 
         if self.show_source:
-            diff_total_missing = [
-                self.differ.diff_missed_lines(filename)
-                for filename in self.differ.files()
-            ]
-            lines["Missing"] = [
-                self.format_missed_lines(diff_total_missing[i])
-                for i in indexes_of_files_with_changes
-            ]
-            lines["Missing"].append("")
+            lines["Missing"] = self.lines_dict_entry(
+                "Missing",
+                indexes_of_files_with_changes,
+                diff_total_stmts,
+                diff_total_miss,
+                diff_total_cover,
+            )
 
         return lines
 
@@ -250,15 +281,13 @@ class TextReporterDelta(DeltaReporter):
 
     def generate(self):
         lines = self.get_report_lines()
-        headers = headers_without_missing
 
         if self.show_source:
             missed_lines_colored = [
                 self.color_number(line) for line in lines["Missing"]
             ]
             lines["Missing"] = missed_lines_colored
-            headers = headers_with_missing
-        return tabulate(lines, headers=headers)
+        return tabulate(lines, headers=lines.keys())
 
 
 class CsvReporterDelta(DeltaReporter):
@@ -273,14 +302,14 @@ class CsvReporterDelta(DeltaReporter):
 
         # Stringify every item in Table row values without using the Missing column
         # and store in the list list_of_lines
-        list_of_lines = [headers_without_missing]
+        list_of_lines = [lines.keys()]
         list_of_lines.extend([[f"{item}" for item in row[:-1]] for row in lines_values])
 
         if self.show_source:
             # Add the Missing header to list_of_lines first inner list
             # This is a direct assignment to avoid appending an additional "Missing"
             # header in every iteration of the tests which would fail them
-            list_of_lines[0] = headers_with_missing
+            list_of_lines[0] = lines.keys()
             # Add to every list inside the list_of_lines the Missing column value
             for line_index, missing_line in enumerate(lines["Missing"]):
                 # for colors, explanation see here:
@@ -303,15 +332,14 @@ class MarkdownReporterDelta(DeltaReporter):
 
     def generate(self):
         lines = self.get_report_lines()
-        headers = headers_without_missing
 
         if self.show_source:
             missed_lines_colored = [
                 self.color_number(line) for line in lines["Missing"]
             ]
             lines["Missing"] = missed_lines_colored
-            headers = headers_with_missing
-        return tabulate(lines, headers=headers, tablefmt="github")
+
+        return tabulate(lines, headers=lines.keys(), tablefmt="github")
 
 
 class JsonReporterDelta(DeltaReporter):

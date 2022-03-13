@@ -67,6 +67,13 @@ def get_exit_code(differ, source):
     help="Delimiter for csv format, e.g. ,;\n\t",
 )
 @click.option(
+    "-hide",
+    "--hidecolumns",
+    default="",
+    type=str,
+    help="Comma-separated string with columns you want to hide",
+)
+@click.option(
     "-o",
     "--output",
     metavar="<file>",
@@ -89,7 +96,7 @@ def get_exit_code(differ, source):
     "the --source is a zip archive and the files were zipped under "
     "a directory prefix that is not part of the source.",
 )
-def show(cobertura_file, format, delimiter, output, source, source_prefix):
+def show(cobertura_file, format, delimiter, hidecolumns, output, source, source_prefix):
     """show coverage summary of a Cobertura report"""
 
     if not source:
@@ -100,7 +107,8 @@ def show(cobertura_file, format, delimiter, output, source, source_prefix):
         filesystem=filesystem_factory(source, source_prefix=source_prefix),
     )
     Reporter = reporters[format]
-    reporter = Reporter(cobertura)
+    print(f"hidecolumns={hidecolumns}")
+    reporter = Reporter(cobertura, hide_columns=hidecolumns)
 
     if format == "csv":
         report = reporter.generate(delimiter)
@@ -140,6 +148,13 @@ directories (or zip archives). If the source is not available at all, pass
 )
 @click.argument("cobertura_file1")
 @click.argument("cobertura_file2")
+@click.option(
+    "-hide",
+    "--hidecolumns",
+    default="[]",
+    type=list,
+    help="List to show which columns you want to hide",
+)
 @click.option(
     "-delim",
     "--delimiter",
@@ -205,6 +220,7 @@ directories (or zip archives). If the source is not available at all, pass
 def diff(
     cobertura_file1,
     cobertura_file2,
+    hidecolumns,
     delimiter,
     color,
     format,
@@ -240,7 +256,7 @@ def diff(
         color = isatty if color is None else color is True
         reporter_kwargs["color"] = color
 
-    reporter = Reporter(*reporter_args, **reporter_kwargs)
+    reporter = Reporter(*reporter_args, **reporter_kwargs, hide_columns=hidecolumns)
     if format == "csv":
         report = reporter.generate(delimiter)
     else:
