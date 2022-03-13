@@ -19,31 +19,29 @@ headers_with_missing = ["Filename", "Stmts", "Miss", "Cover", "Missing"]
 
 
 class Reporter:
-    def __init__(self, cobertura):
+    def __init__(self, cobertura, regex=None):
         self.cobertura = cobertura
+        self.regex = regex
 
     @staticmethod
     def format_line_rate(line_rate):
         return f"{line_rate:.2%}"
 
     def get_report_lines(self):
+        filenames = self.cobertura.files(regex=self.regex)
         lines = {
-            "Filename": self.cobertura.files().copy(),
+            "Filename": filenames.copy(),
             "Stmts": [
-                self.cobertura.total_statements(filename)
-                for filename in self.cobertura.files()
+                self.cobertura.total_statements(filename) for filename in filenames
             ],
-            "Miss": [
-                self.cobertura.total_misses(filename)
-                for filename in self.cobertura.files()
-            ],
+            "Miss": [self.cobertura.total_misses(filename) for filename in filenames],
             "Cover": [
                 self.format_line_rate(self.cobertura.line_rate(filename))
-                for filename in self.cobertura.files()
+                for filename in filenames
             ],
             "Missing": [
                 stringify(self.cobertura.missed_lines(filename))
-                for filename in self.cobertura.files()
+                for filename in filenames
             ],
         }
         lines["Filename"].append("TOTAL")
@@ -135,10 +133,13 @@ class HtmlReporter(Reporter):
 
 
 class DeltaReporter:
-    def __init__(self, cobertura1, cobertura2, show_source=True, *args, **kwargs):
+    def __init__(
+        self, cobertura1, cobertura2, regex=None, show_source=True, *args, **kwargs
+    ):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
         self.show_source = show_source
         self.color = kwargs.pop("color", False)
+        self.regex = regex
 
     def format_line_rate(self, line_rate):
         return f"{line_rate:+.2%}" if line_rate else self.not_available
@@ -179,17 +180,17 @@ class DeltaReporter:
         )
 
     def get_report_lines(self):
+        filenames = self.differ().files(regex=self.regex)
         diff_total_stmts = [
-            self.differ.diff_total_statements(filename)
-            for filename in self.differ.files()
+            self.differ.diff_total_statements(filename) for filename in filenames
         ]
 
         diff_total_miss = [
-            self.differ.diff_total_misses(filename) for filename in self.differ.files()
+            self.differ.diff_total_misses(filename) for filename in filenames
         ]
 
         diff_total_cover = [
-            self.differ.diff_line_rate(filename) for filename in self.differ.files()
+            self.differ.diff_line_rate(filename) for filename in filenames
         ]
 
         indexes_of_files_with_changes = [

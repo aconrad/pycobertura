@@ -1,4 +1,5 @@
 import lxml.etree as ET
+import re
 
 from collections import namedtuple
 
@@ -242,21 +243,15 @@ class Cobertura:
         )
 
     @memoize
-    def files(self):
+    def files(self, regex=None):
         """
         Return the list of available files in the coverage report.
         """
         # maybe replace with a trie at some point? see has_file FIXME
-        already_seen = set()
-        filenames = []
-
-        for el in self.xml.xpath("//class"):
-            filename = el.get("filename")
-            if filename in already_seen:
-                continue
-            already_seen.add(filename)
-            filenames.append(filename)
-
+        filenames = list({elem.get("filename") for elem in self.xml.xpath("//class")})
+        if regex:
+            compiled_regex = re.compile(regex)
+            filenames = list(filter(compiled_regex.match, filenames))
         return filenames
 
     def has_file(self, filename):
