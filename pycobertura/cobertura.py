@@ -253,8 +253,12 @@ class Cobertura:
         if ignore_files_config_filepath:
             with open(ignore_files_config_filepath, 'rb') as f:
                 filtered_out_filenames_line = [line.decode('ascii').strip() for line in f.readlines()]
-                filtered_out_filenames = [line for line in filtered_out_filenames_line if not(line=="\n" or line.startswith('#'))]
-                filenames = [filename for filename in filenames if filename not in filtered_out_filenames]
+                filters_normal = [line for line in filtered_out_filenames_line if not(line=="\n" or line.startswith('#'))]
+                filters_regex = [re.compile(reg) for reg in filters_normal]
+                filenames = [filename for filename in filenames if filename not in filters_normal]
+
+                for filter_regex in filters_regex:
+                    filenames = list(filter(filter_regex), filenames)
 
         if regex:
             compiled_regex = re.compile(regex)
