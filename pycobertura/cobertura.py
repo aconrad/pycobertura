@@ -243,12 +243,20 @@ class Cobertura:
         )
 
     @memoize
-    def files(self, regex=None):
+    def files(self, regex=None, ignore_files_config_filepath=None):
         """
         Return the list of available files in the coverage report.
         """
         # maybe replace with a trie at some point? see has_file FIXME
         filenames = list({elem.get("filename") for elem in self.xml.xpath("//class")})
+
+        if ignore_files_config_filepath:
+            with open(ignore_files_config_filepath, 'rb') as f:
+                filtered_out_filenames_line = [line.decode('ascii').strip() for line in f.readlines()]
+                filtered_out_filenames = [line for line in filtered_out_filenames_line if not(line=="\n" or line.startswith('#'))]
+
+        filenames = [filename for filename in filenames if filename not in filtered_out_filenames]
+
         if regex:
             compiled_regex = re.compile(regex)
             filenames = list(filter(compiled_regex.match, filenames))
