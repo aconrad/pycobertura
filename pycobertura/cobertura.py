@@ -1,4 +1,5 @@
 import lxml.etree as ET
+import os
 import re
 
 from collections import namedtuple
@@ -7,6 +8,7 @@ from pycobertura.utils import (
     extrapolate_coverage,
     reconcile_lines,
     hunkify_lines,
+    get_filenames_that_do_not_match_regex,
     memoize,
 )
 
@@ -243,27 +245,13 @@ class Cobertura:
         )
 
     @memoize
-    def files(self, regex=None, ignore_files_config_filepath=None):
+    def files(self, ignore_regex=None):
         """
         Return the list of available files in the coverage report.
         """
         # maybe replace with a trie at some point? see has_file FIXME
         filenames = list({elem.get("filename") for elem in self.xml.xpath("//class")})
-
-        if ignore_files_config_filepath:
-            with open(ignore_files_config_filepath, 'rb') as f:
-                filtered_out_filenames_line = [line.decode('ascii').strip() for line in f.readlines()]
-                filters_normal = [line for line in filtered_out_filenames_line if not(line=="\n" or line.startswith('#'))]
-                filters_regex = [re.compile(reg) for reg in filters_normal]
-                filenames = [filename for filename in filenames if filename not in filters_normal]
-
-                for filter_regex in filters_regex:
-                    filenames = list(filter(filter_regex), filenames)
-
-        if regex:
-            compiled_regex = re.compile(regex)
-            filenames = list(filter(compiled_regex.match, filenames))
-        return filenames
+        return filenames if not ignore_regex else get_filenames_that_do_not_match_regex(filenames, ignore_regex)
 
     def has_file(self, filename):
         """

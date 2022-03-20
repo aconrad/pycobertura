@@ -19,16 +19,16 @@ headers_with_missing = ["Filename", "Stmts", "Miss", "Cover", "Missing"]
 
 
 class Reporter:
-    def __init__(self, cobertura, regex=None):
+    def __init__(self, cobertura, ignore_regex=None):
         self.cobertura = cobertura
-        self.regex = regex
+        self.ignore_regex = ignore_regex
 
     @staticmethod
     def format_line_rate(line_rate):
         return f"{line_rate:.2%}"
 
     def get_report_lines(self):
-        filenames = self.cobertura.files(regex=self.regex)
+        filenames = self.cobertura.files(ignore_regex=self.ignore_regex)
         lines = {
             "Filename": filenames.copy(),
             "Stmts": [
@@ -134,12 +134,12 @@ class HtmlReporter(Reporter):
 
 class DeltaReporter:
     def __init__(
-        self, cobertura1, cobertura2, regex=None, show_source=True, *args, **kwargs
+        self, cobertura1, cobertura2, ignore_regex=None, show_source=True, *args, **kwargs
     ):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
         self.show_source = show_source
         self.color = kwargs.pop("color", False)
-        self.regex = regex
+        self.ignore_regex = ignore_regex
 
     def format_line_rate(self, line_rate):
         return f"{line_rate:+.2%}" if line_rate else self.not_available
@@ -180,7 +180,7 @@ class DeltaReporter:
         )
 
     def get_report_lines(self):
-        filenames = self.differ().files(regex=self.regex)
+        filenames = self.differ().files(ignore_regex=self.ignore_regex)
         diff_total_stmts = [
             self.differ.diff_total_statements(filename) for filename in filenames
         ]
