@@ -368,11 +368,11 @@ class CoberturaDiff:
                 line_changed.append((line.number, is_new))
         return line_changed
 
-    def files(self):
+    def files(self, ignore_regex=None):
         """
         Return `self.cobertura2.files()`.
         """
-        return self.cobertura2.files()
+        return self.cobertura2.files(ignore_regex)
 
     def file_source(self, filename):
         """

@@ -180,7 +180,7 @@ class DeltaReporter:
         )
 
     def get_report_lines(self):
-        filenames = self.differ().files(ignore_regex=self.ignore_regex)
+        filenames = self.differ.files(ignore_regex=self.ignore_regex)
         diff_total_stmts = [
             self.differ.diff_total_statements(filename) for filename in filenames
         ]
