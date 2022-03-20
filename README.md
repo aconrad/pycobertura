@@ -4,15 +4,15 @@
 
 A code coverage diff tool for Cobertura reports.
 
-[![Travis](http://img.shields.io/travis/aconrad/pycobertura.svg?style=flat)](https://travis-ci.com/aconrad/pycobertura)
+![pycobertura](https://github.com/aconrad/pycobertura/actions/workflows/build-and-test-pycobertura.yml/badge.svg)
 [![PyPI](http://img.shields.io/pypi/v/pycobertura.svg?style=flat)](https://pypi.python.org/pypi/pycobertura)
 
-* [About](#about)
-* [Install](#install)
-* [CLI usage](#cli-usage)
-* [Library usage](#library-usage)
-* [How to contribute?](#how-to-contribute)
-* [FAQ](#faq)
+- [About](#about)
+- [Install](#install)
+- [CLI usage](#cli-usage)
+- [Library usage](#library-usage)
+- [How to contribute?](#how-to-contribute)
+- [FAQ](#faq)
 
 ## About
 
