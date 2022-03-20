@@ -1,7 +1,9 @@
 name: Python package
 
 on:
-  - push
+  - push:
+    branches:
+      - master
   - pull_request
 
 jobs:
