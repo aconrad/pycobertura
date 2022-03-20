@@ -17,6 +17,9 @@
 
   * fix handling of multiple classes in same file - thanks to @smortvedt, @gro1m
 
+* Replace Travis-ci with Github Actions. We were having issues with Travis
+  pipeline not triggering because of quota issues.
+
 ## 2.1.0 (2021-09-23)
 
 * Added the option `show_missing` to `HtmlReporterDelta`, which specifies
