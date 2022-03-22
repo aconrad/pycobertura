@@ -255,7 +255,8 @@ class DeltaReporter:
             + ["TOTAL"]
         }
 
-        for key in set(headers_hideable).difference(set(self.hide_columns)):
+        headers_to_show = set(headers_hideable).difference(set(self.hide_columns))
+        for header_name in headers_to_show:
             lines[key] = self.lines_dict_entry(
                 key,
                 indexes_of_files_with_changes,
