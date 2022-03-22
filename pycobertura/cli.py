@@ -149,10 +149,10 @@ directories (or zip archives). If the source is not available at all, pass
 @click.argument("cobertura_file2")
 @click.option(
     "-hide",
-    "--hidecolumns",
-    default="[]",
-    type=list,
-    help="List to show which columns you want to hide",
+    "--hide-columns",
+    default="",
+    type=str,
+    help="String to show which columns you want to hide",
 )
 @click.option(
     "-delim",
@@ -219,7 +219,7 @@ directories (or zip archives). If the source is not available at all, pass
 def diff(
     cobertura_file1,
     cobertura_file2,
-    hidecolumns,
+    hide_columns,
     delimiter,
     color,
     format,
@@ -255,7 +255,7 @@ def diff(
         color = isatty if color is None else color is True
         reporter_kwargs["color"] = color
 
-    reporter = Reporter(*reporter_args, **reporter_kwargs, hide_columns=hidecolumns)
+    reporter = Reporter(*reporter_args, **reporter_kwargs, hide_columns=hide_columns)
     if format == "csv":
         report = reporter.generate(delimiter)
     else:
