@@ -107,8 +107,7 @@ def show(cobertura_file, format, delimiter, hide_columns, output, source, source
         filesystem=filesystem_factory(source, source_prefix=source_prefix),
     )
     Reporter = reporters[format]
-    print(f"hidecolumns={hidecolumns}")
-    reporter = Reporter(cobertura, hide_columns=hidecolumns)
+    reporter = Reporter(cobertura, hide_columns)
 
     if format == "csv":
         report = reporter.generate(delimiter)
