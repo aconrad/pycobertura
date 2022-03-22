@@ -68,7 +68,7 @@ def get_exit_code(differ, source):
 )
 @click.option(
     "-hide",
-    "--hidecolumns",
+    "--hide-columns",
     default="",
     type=str,
     help="Comma-separated string with columns you want to hide",
