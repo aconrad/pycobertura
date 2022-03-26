@@ -1,4 +1,0 @@
-. #current directory itself, i.e. pycobertura
-coverage>=6.0,<6.4
-mock
-pytest-cov==3.*
