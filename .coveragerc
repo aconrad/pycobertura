@@ -1,4 +1,3 @@
 [run]
 include =
   pycobertura/*
-disable_warnings=include-ignored
