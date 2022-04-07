@@ -323,10 +323,10 @@ pycobertura diff --format yaml tests/dummy.source1/coverage.xml tests/dummy.sour
 
 Upon exit, the `diff` command may return various exit codes:
 
-* 0: all is good
+* 0: all changes are covered, no new uncovered statements have been introduced
 * 1: some exception occurred (likely due to inappropriate usage or a bug in pycobertura)
-* 2: coverage worsened (implies 3)
-* 3: not all changes are covered
+* 2: the changes worsened the overall coverage
+* 3: the changes introduced uncovered statements but the overall coverage is still better than before
 
 ## Library usage
 
