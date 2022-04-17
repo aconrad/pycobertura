@@ -1,3 +1,4 @@
 . #current directory itself, i.e. pycobertura
 coverage>=6.0,<6.4
+pytest==7.*
 mock
