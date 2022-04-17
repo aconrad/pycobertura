@@ -1,3 +1,39 @@
 [run]
 include =
-  pycobertura
+  pycobertura/*
+omit=
+  **/__pycache__
+  **/dummy*
+  */templates
+  build
+  docs/_build
+  *.egg
+  .tox
+  *.venv
+  tests/dummy.source1/test_dummy.py
+  tests/dummy.source2/test_dummy.py
+  tests/dummy.uncovered/test_dummy.py
+  tests/dummy.uncovered.addcode/test_dummy.py
+  tests/dummy.zeroexit1/test_dummy.py
+  tests/dummy.zeroexit2/test_dummy.py 
+
+[report]
+include =
+  pycobertura/*
+omit=
+  **/__pycache__
+  **/dummy*
+  */templates
+    build
+  docs/_build
+  *.egg
+  .tox
+  *.venv
+  tests/dummy.source1/test_dummy.py
+  tests/dummy.source2/test_dummy.py
+  tests/dummy.uncovered/test_dummy.py
+  tests/dummy.uncovered.addcode/test_dummy.py
+  tests/dummy.zeroexit1/test_dummy.py
+  tests/dummy.zeroexit2/test_dummy.py 
+
+[xml]
