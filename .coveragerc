@@ -10,4 +10,3 @@ omit=
   *.egg
   .tox
   *.venv
-  tests/dummy*
