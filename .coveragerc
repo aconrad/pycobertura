@@ -10,12 +10,7 @@ omit=
   *.egg
   .tox
   *.venv
-  tests/dummy.source1/test_dummy.py
-  tests/dummy.source2/test_dummy.py
-  tests/dummy.uncovered/test_dummy.py
-  tests/dummy.uncovered.addcode/test_dummy.py
-  tests/dummy.zeroexit1/test_dummy.py
-  tests/dummy.zeroexit2/test_dummy.py 
+  tests/dummy*
 
 [report]
 include =
@@ -29,11 +24,6 @@ omit=
   *.egg
   .tox
   *.venv
-  tests/dummy.source1/test_dummy.py
-  tests/dummy.source2/test_dummy.py
-  tests/dummy.uncovered/test_dummy.py
-  tests/dummy.uncovered.addcode/test_dummy.py
-  tests/dummy.zeroexit1/test_dummy.py
-  tests/dummy.zeroexit2/test_dummy.py 
+  tests/dummy*
 
 [xml]
