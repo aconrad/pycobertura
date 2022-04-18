@@ -1,12 +1,3 @@
 [run]
 include =
   pycobertura/*
-omit=
-  **/__pycache__
-  **/dummy*
-  */templates
-  build
-  docs/_build
-  *.egg
-  .tox
-  *.venv
