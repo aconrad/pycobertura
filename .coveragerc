@@ -11,19 +11,3 @@ omit=
   .tox
   *.venv
   tests/dummy*
-
-[report]
-include =
-  pycobertura/*
-omit=
-  **/__pycache__
-  **/dummy*
-  */templates
-    build
-  docs/_build
-  *.egg
-  .tox
-  *.venv
-  tests/dummy*
-
-[xml]
