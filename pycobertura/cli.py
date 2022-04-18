@@ -253,8 +253,3 @@ def diff(
 
     exit_code = get_exit_code(reporter.differ, source)
     raise SystemExit(exit_code)
-
-
-if __name__=="__main__":
-    import subprocess
-    subprocess.run(["pycobertura","show","coverage.xml"])
