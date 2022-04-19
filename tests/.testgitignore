@@ -1,0 +1,6 @@
+# Test file for ignore regexes
+
+**/__pycache__
+**/dummy*
+
+*.xml

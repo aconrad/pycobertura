@@ -250,7 +250,16 @@ class Cobertura:
         Return the list of available files in the coverage report.
         """
         # maybe replace with a trie at some point? see has_file FIXME
-        filenames = [elem.get("filename") for elem in self.xml.xpath("//class")]
+        already_seen = set()
+        filenames = []
+
+        for el in self.xml.xpath("//class"):
+            filename = el.get("filename")
+            if filename in already_seen:
+                continue
+            already_seen.add(filename)
+            filenames.append(filename)
+
         return filenames if not ignore_regex else get_filenames_that_do_not_match_regex(filenames, ignore_regex)
 
     def has_file(self, filename):
