@@ -1,6 +1,4 @@
 import lxml.etree as ET
-import os
-import re
 
 from collections import namedtuple
 
