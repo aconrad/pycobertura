@@ -284,7 +284,6 @@ class TextReporterDelta(DeltaReporter):
 
     def generate(self):
         lines = self.get_report_lines()
-        print(lines)
         if self.show_source:
             missed_lines_colored = [
                 self.color_number(line) for line in lines["Missing"]
