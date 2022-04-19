@@ -95,7 +95,9 @@ def get_exit_code(differ, source):
     "the --source is a zip archive and the files were zipped under "
     "a directory prefix that is not part of the source.",
 )
-def show(cobertura_file, ignore_regex, format, delimiter, output, source, source_prefix):
+def show(
+    cobertura_file, ignore_regex, format, delimiter, output, source, source_prefix
+):
     """show coverage summary of a Cobertura report"""
 
     if not source:

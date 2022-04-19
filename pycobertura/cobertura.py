@@ -260,7 +260,11 @@ class Cobertura:
             already_seen.add(filename)
             filenames.append(filename)
 
-        return filenames if not ignore_regex else get_filenames_that_do_not_match_regex(filenames, ignore_regex)
+        return (
+            filenames
+            if not ignore_regex
+            else get_filenames_that_do_not_match_regex(filenames, ignore_regex)
+        )
 
     def has_file(self, filename):
         """

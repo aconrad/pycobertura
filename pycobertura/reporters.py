@@ -134,7 +134,13 @@ class HtmlReporter(Reporter):
 
 class DeltaReporter:
     def __init__(
-        self, cobertura1, cobertura2, ignore_regex=None, show_source=True, *args, **kwargs
+        self,
+        cobertura1,
+        cobertura2,
+        ignore_regex=None,
+        show_source=True,
+        *args,
+        **kwargs,
     ):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
         self.show_source = show_source
