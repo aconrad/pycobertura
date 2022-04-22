@@ -250,10 +250,11 @@ def get_filenames_that_do_not_match_regex(
         ignore_patterns = get_non_empty_non_commented_lines_from_file_in_ascii(
             regex_param, comment_character
         )
-        remove_filenames = []
-        for igp in ignore_patterns:
-            filter_result = fnmatch.filter(filenames, igp)
-            remove_filenames += filter_result
+        remove_filenames = [
+            filename
+            for igp in ignore_patterns
+            for filename in fnmatch.filter(filenames, igp)
+        ]
     else:
         remove_filenames = list(filter(re.compile(regex_param).match, filenames))
     return [fname for fname in filenames if fname not in remove_filenames]
