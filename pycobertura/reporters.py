@@ -146,7 +146,7 @@ class DeltaReporter:
         self.differ = CoberturaDiff(cobertura1, cobertura2)
         self.show_source = show_source
         self.color = kwargs.pop("color", False)
-        self.hide_columns = kwargs.pop("hide_columns", "")
+        self.hide_columns = dict.fromkeys(kwargs.pop("hide_columns", "").split(","))
 
     def format_line_rate(self, line_rate):
         return f"{line_rate:+.2%}" if line_rate else self.not_available
@@ -258,22 +258,23 @@ class DeltaReporter:
 
         columns_to_display = [c for c in headers_hideable if c not in self.hide_columns]
         for column_name in columns_to_display:
-            lines[column_name] = self.lines_dict_entry(
-                column_name,
-                indexes_of_files_with_changes,
-                diff_total_stmts,
-                diff_total_miss,
-                diff_total_cover,
-            )
-
-        if self.show_source:
-            lines["Missing"] = self.lines_dict_entry(
-                "Missing",
-                indexes_of_files_with_changes,
-                diff_total_stmts,
-                diff_total_miss,
-                diff_total_cover,
-            )
+            if column_name != "Missing":
+                lines[column_name] = self.lines_dict_entry(
+                    column_name,
+                    indexes_of_files_with_changes,
+                    diff_total_stmts,
+                    diff_total_miss,
+                    diff_total_cover,
+                )
+            else:
+                if self.show_source:
+                    lines["Missing"] = self.lines_dict_entry(
+                        "Missing",
+                        indexes_of_files_with_changes,
+                        diff_total_stmts,
+                        diff_total_miss,
+                        diff_total_cover,
+                    )
 
         return lines
 
