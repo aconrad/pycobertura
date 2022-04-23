@@ -16,13 +16,13 @@ env.filters["misses_color"] = filters.misses_color
 
 headers_without_missing = ["Filename", "Stmts", "Miss", "Cover"]
 headers_with_missing = ["Filename", "Stmts", "Miss", "Cover", "Missing"]
-headers_hideable = {"Stmts", "Miss", "Cover", "Missing"}
+headers_hideable = dict.fromkeys(["Stmts", "Miss", "Cover", "Missing"])
 
 
 class Reporter:
     def __init__(self, cobertura, *args, **kwargs):
         self.cobertura = cobertura
-        self.hide_columns = kwargs.pop("hide_columns", "")
+        self.hide_columns = dict.fromkeys(kwargs.pop("hide_columns", "").split(","))
 
     @staticmethod
     def format_line_rate(line_rate):
@@ -56,10 +56,9 @@ class Reporter:
 
     def get_report_lines(self):
         lines = {"Filename": self.cobertura.files().copy()+["TOTAL"]}
-        columns_to_display = headers_hideable.difference(self.hide_columns)
+        columns_to_display = [c for c in headers_hideable if c not in self.hide_columns]
         for column in columns_to_display:
             lines[column] = self.lines_dict_entry(column)
-
         return lines
 
 
@@ -257,10 +256,10 @@ class DeltaReporter:
             + ["TOTAL"]
         }
 
-        headers_to_show = set(headers_hideable).difference(set(self.hide_columns))
-        for header_name in headers_to_show:
-            lines[header_name] = self.lines_dict_entry(
-                header_name,
+        columns_to_display = [c for c in headers_hideable if c not in self.hide_columns]
+        for column_name in columns_to_display:
+            lines[column_name] = self.lines_dict_entry(
+                column_name,
                 indexes_of_files_with_changes,
                 diff_total_stmts,
                 diff_total_miss,
