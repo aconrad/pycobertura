@@ -249,14 +249,10 @@ class Cobertura:
         # maybe replace with a trie at some point? see has_file FIXME
         already_seen = set()
         filenames = []
-
-        for el in self.xml.xpath("//class"):
-            filename = el.get("filename")
-            if filename in already_seen:
-                continue
-            already_seen.add(filename)
-            filenames.append(filename)
-
+        for filename in self.xml.xpath("//class/@filename"):
+            if filename not in already_seen:
+                filenames.append(filename)
+                already_seen.add(filename)
         return filenames
 
     def has_file(self, filename):
