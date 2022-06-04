@@ -72,8 +72,8 @@ class Cobertura:
 
     def _make_class_elements_by_filename(self):
         result = {}
-        for elem in self.xml.xpath('./packages//class'):
-            filename = elem.attrib['filename']
+        for elem in self.xml.xpath("./packages//class"):
+            filename = elem.attrib["filename"]
             result.setdefault(filename, []).append(elem)
 
         return result
