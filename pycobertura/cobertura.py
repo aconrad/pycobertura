@@ -362,10 +362,14 @@ class CoberturaDiff:
 
     def diff_missed_lines(self, filename):
         """
-        Return a list of 2-element tuples `(lineno, True)` for uncovered lines. 
+        Return a list of 2-element tuples `(lineno, True)` for uncovered lines.
         The given file `filename` where `lineno` is a missed line number.
         """
-        return [(line.number, True) for line in self.file_source(filename) if line.status is False]
+        return [
+            (line.number, True)
+            for line in self.file_source(filename)
+            if line.status is False
+        ]
 
     def files(self):
         """
