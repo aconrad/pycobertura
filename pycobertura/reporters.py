@@ -55,13 +55,10 @@ class Reporter:
         return lines
 
     def per_file_stats(self, lines):
-        rows = []
         items = lines.items()
         number_of_files = len(self.cobertura.files())
-        for i in range(number_of_files):
-            if i < number_of_files:
-                rows.append({k: v[i] for k, v in items})
-            footer = {k: v[i + 1] for k, v in items if k != "Missing"}
+        rows = [{k: v[i] for k, v in items} for i in range(number_of_files)]
+        footer = {k: v[number_of_files] for k, v in items if k != "Missing"}
         return {"files": rows, "total": footer}
 
 
@@ -252,13 +249,10 @@ class DeltaReporter:
         return lines
 
     def per_file_stats(self, lines):
-        rows = []
         items = lines.items()
         number_of_files = len(self.differ.files()) - 1
-        for i in range(number_of_files):
-            if i < number_of_files:
-                rows.append({k: v[i] for k, v in items})
-            footer = {k: v[i + 1] for k, v in items if k != "Missing"}
+        rows = [{k: v[i] for k, v in items} for i in range(number_of_files)]
+        footer = {k: v[number_of_files] for k, v in items if k != "Missing"}
         return {"files": rows, "total": footer}
 
 
