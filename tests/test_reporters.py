@@ -65,9 +65,9 @@ def test_text_report_delta__colorize_True():
 
     assert report_delta.generate() == """\
 Filename         Stmts      Miss  Cover    Missing
----------------  -------  ------  -------  ----------
-dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
-dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
+---------------  -------  ------  -------  ---------
+dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%
+dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[31m+5\x1b[39m
 dummy/dummy3.py  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
 TOTAL            +4           \x1b[31m+1\x1b[39m  +31.06%"""
 
@@ -82,9 +82,9 @@ def test_text_report_delta__colorize_True__with_missing_range():
 
     assert report_delta.generate() == """\
 Filename         Stmts      Miss  Cover    Missing
----------------  -------  ------  -------  ----------
-dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
-dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
+---------------  -------  ------  -------  ---------
+dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%
+dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[31m+5\x1b[39m
 dummy/dummy3.py  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
 TOTAL            +4           \x1b[31m+1\x1b[39m  +31.06%"""
 
@@ -99,9 +99,9 @@ def test_text_report_delta__colorize_False():
 
     assert report_delta.generate() == """\
 Filename         Stmts      Miss  Cover    Missing
----------------  -------  ------  -------  ----------
-dummy/dummy.py   -            -2  +40.00%  -5, -6
-dummy/dummy2.py  +2           +1  -25.00%  -2, -4, +5
+---------------  -------  ------  -------  ---------
+dummy/dummy.py   -            -2  +40.00%
+dummy/dummy2.py  +2           +1  -25.00%  +5
 dummy/dummy3.py  +2           +2  -        +1, +2
 TOTAL            +4           +1  +31.06%"""
 
@@ -428,7 +428,7 @@ def test_html_report_delta():
             <td>-</td>
             <td><span class="green">-2</span></td>
             <td>+40.00%</td>
-            <td><span class="green">-5</span>, <span class="green">-6</span>
+            <td>
             </td>
           </tr>
           <tr>
@@ -436,7 +436,7 @@ def test_html_report_delta():
             <td>+2</td>
             <td><span class="red">+1</span></td>
             <td>-25.00%</td>
-            <td><span class="green">-2</span>, <span class="green">-4</span>, <span class="red">+5</span>
+            <td><span class="red">+5</span>
             </td>
           </tr>
           <tr>
