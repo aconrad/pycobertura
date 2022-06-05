@@ -161,7 +161,7 @@ def test_show__format_json():
             "Miss": 2,
             "Cover": "50.00%",
             "Missing": "2, 5"
-        },
+        }
     ],
     "total": {
         "Filename": "TOTAL",
@@ -184,7 +184,7 @@ def test_show__format_yaml():
             catch_exceptions=False
         )
         assert result.output == """\
-files:            
+files:
 - Filename: dummy/__init__.py
   Stmts: 0
   Miss: 0
@@ -196,7 +196,7 @@ files:
   Cover: 50.00%
   Missing: 2, 5
 total:
-  Filename: dummy/dummy.py
+  Filename: TOTAL
   Stmts: 4
   Miss: 2
   Cover: 50.00%
@@ -365,7 +365,7 @@ def test_diff__format_json():
         {
             "Filename": "dummy/dummy.py",
             "Stmts": null,
-            "Miss": "\u001b[32m-2",
+            "Miss": "\u001b[32m-2\x1b[39m",
             "Cover": "+40.00%",
             "Missing": "\u001b[32m-5\u001b[39m, \u001b[32m-6\u001b[39m"
         },
@@ -382,13 +382,6 @@ def test_diff__format_json():
             "Miss": "\u001b[31m+2\u001b[39m",
             "Cover": null,
             "Missing": "\u001b[31m+1\u001b[39m, \u001b[31m+2\u001b[39m"
-        },
-        {
-            "Filename": "TOTAL",
-            "Stmts": "+4",
-            "Miss": "\u001b[31m+1\u001b[39m",
-            "Cover": "+31.06%",
-            "Missing": ""
         }
     ],
     "total": {
@@ -397,7 +390,7 @@ def test_diff__format_json():
         "Miss": "\u001b[31m+1\u001b[39m",
         "Cover": "+31.06%"
     }
-}            
+}
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
@@ -420,24 +413,20 @@ files:
   Missing: "\x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m"
 - Filename: dummy/dummy2.py
   Stmts: '+2'
-  Miss: "+1"
+  Miss: "\x1b[31m+1\x1b[39m"
   Cover: -25.00%
   Missing: "\x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m"
 - Filename: dummy/dummy3.py
   Stmts: '+2'
-  Miss: "+2"
+  Miss: "\x1b[31m+2\x1b[39m"
   Cover:
   Missing: "\x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m"
-- Filename: TOTAL
-  Stmts: '+4'
-  Miss: "\x1b[31m+1\x1b[39m"
-  Cover: +31.06%
-  Missing: ''
 total:
   Filename: TOTAL
   Stmts: '+4'
   Miss: "\x1b[31m+1\x1b[39m"
   Cover: +31.06%
+
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
@@ -590,7 +579,7 @@ def test_diff__format_json__with_color():
         {
             "Filename": "dummy/dummy.py",
             "Stmts": null,
-            "Miss": "\u001b[32m-2",
+            "Miss": "\u001b[32m-2\x1b[39m",
             "Cover": "+40.00%",
             "Missing": "\u001b[32m-5\u001b[39m, \u001b[32m-6\u001b[39m"
         },
@@ -607,13 +596,6 @@ def test_diff__format_json__with_color():
             "Miss": "\u001b[31m+2\u001b[39m",
             "Cover": null,
             "Missing": "\u001b[31m+1\u001b[39m, \u001b[31m+2\u001b[39m"
-        },
-        {
-            "Filename": "TOTAL",
-            "Stmts": "+4",
-            "Miss": "\u001b[31m+1\u001b[39m",
-            "Cover": "+31.06%",
-            "Missing": ""
         }
     ],
     "total": {
@@ -622,7 +604,7 @@ def test_diff__format_json__with_color():
         "Miss": "\u001b[31m+1\u001b[39m",
         "Cover": "+31.06%"
     }
-}  
+}
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
@@ -661,13 +643,6 @@ def test_diff__format_json__with_no_color():
             "Miss": "+2",
             "Cover": null,
             "Missing": "+1, +2"
-        },
-        {
-            "Filename": "TOTAL",
-            "Stmts": "+4",
-            "Miss": "+1",
-            "Cover": "+31.06%",
-            "Missing": ""
         }
     ],
     "total": {
@@ -676,7 +651,7 @@ def test_diff__format_json__with_no_color():
         "Miss": "+1",
         "Cover": "+31.06%"
     }
-} 
+}
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
@@ -700,24 +675,20 @@ files:
   Missing: "\x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m"
 - Filename: dummy/dummy2.py
   Stmts: '+2'
-  Miss: "+1"
+  Miss: "\x1b[31m+1\x1b[39m"
   Cover: -25.00%
   Missing: "\x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m"
 - Filename: dummy/dummy3.py
   Stmts: '+2'
-  Miss: "+2"
+  Miss: "\x1b[31m+2\x1b[39m"
   Cover:
   Missing: "\x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m"
-- Filename: TOTAL
-  Stmts: '+4'
-  Miss: "\x1b[31m+1\x1b[39m"
-  Cover: +31.06%
-  Missing: ''
 total:
   Filename: TOTAL
   Stmts: '+4'
   Miss: "\x1b[31m+1\x1b[39m"
   Cover: +31.06%
+
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
@@ -736,28 +707,23 @@ def test_diff__format_yaml_with_no_color():
 files:
 - Filename: dummy/dummy.py
   Stmts:
-  Miss: "-2"
+  Miss: '-2'
   Cover: +40.00%
-  Missing: "-5, -6"
+  Missing: -5, -6
 - Filename: dummy/dummy2.py
   Stmts: '+2'
-  Miss: "+1"
+  Miss: '+1'
   Cover: -25.00%
-  Missing: "-2, -4, +5"
+  Missing: -2, -4, +5
 - Filename: dummy/dummy3.py
   Stmts: '+2'
-  Miss: "+2"
+  Miss: '+2'
   Cover:
-  Missing: "+1, +2"
-- Filename: TOTAL
-  Stmts: '+4'
-  Miss: "+1"
-  Cover: +31.06%
-  Missing: ''
+  Missing: +1, +2
 total:
   Filename: TOTAL
   Stmts: '+4'
-  Miss: "+1"
+  Miss: '+1'
   Cover: +31.06%
 
 """
