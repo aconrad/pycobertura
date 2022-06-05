@@ -54,6 +54,17 @@ class Reporter:
 
         return lines
 
+    def per_file_stats(self, lines):
+        rows = []
+        items = lines.items()
+        number_of_files = len(self.cobertura.files())
+        for i in range(number_of_files):
+            if i < number_of_files:
+                rows.append({k: v[i] for k, v in items})
+            footer = {k: v[i] for k, v in items if k != "Missing"}
+        return {"files": rows, "total": footer}
+
+
 
 class TextReporter(Reporter):
     def generate(self):
@@ -85,20 +96,17 @@ class MarkdownReporter(Reporter):
 class JsonReporter(Reporter):
     def generate(self):
         lines = self.get_report_lines()
-        rows = {k: v[:-1] for k, v in lines.items()}
-        footer = {k: v[-1] for k, v in lines.items() if k != "Missing"}
-
-        return json.dumps({"total": footer, "files": rows}, indent=4)
+        stats_dict = self.per_file_stats(lines)
+        return json.dumps(stats_dict, indent=4)
 
 
 class YamlReporter(Reporter):
     def generate(self):
         lines = self.get_report_lines()
-        rows = {k: v[:-1] for k, v in lines.items()}
-        footer = {k: v[-1] for k, v in lines.items() if k != "Missing"}
+        stats_dict = self.per_file_stats(lines)
         # need to write to a buffer as yml packages are using a streaming interface
         buf = io.BytesIO()
-        yaml.YAML().dump({"total": footer, "files": rows}, buf)
+        yaml.YAML().dump(stats_dict, buf)
         return buf.getvalue()
 
 
@@ -244,6 +252,16 @@ class DeltaReporter:
 
         return lines
 
+    def per_file_stats(self, lines):
+        rows = []
+        items = lines.items()
+        number_of_files = len(self.differ.files())
+        for i in range(number_of_files):
+            if i < number_of_files:
+                rows.append({k: v[i] for k, v in items})
+            footer = {k: v[i] for k, v in items if k != "Missing"}
+        return {"files": rows, "total": footer}
+
 
 class TextReporterDelta(DeltaReporter):
     not_available = "-"
@@ -326,10 +344,9 @@ class JsonReporterDelta(DeltaReporter):
             ]
             lines["Missing"] = missed_lines_colored
 
-        rows = {k: v[:-1] for k, v in lines.items()}
-        footer = {k: v[-1] for k, v in lines.items() if k != "Missing"}
+        stats_dict = self.per_file_stats(lines)
 
-        json_string = json.dumps({"total": footer, "files": rows}, indent=4)
+        json_string = json.dumps(stats_dict, indent=4)
 
         # for colors, explanation see here:
         # https://stackoverflow.com/a/61273717/9698518
@@ -350,11 +367,10 @@ class YamlReporterDelta(DeltaReporter):
             ]
             lines["Missing"] = missed_lines_colored
 
-        rows = {k: v[:-1] for k, v in lines.items()}
-        footer = {k: v[-1] for k, v in lines.items() if k != "Missing"}
+        stats_dict = self.per_file_stats(lines)
         # need to write to a buffer as yml packages are using a streaming interface
         buf = io.BytesIO()
-        yaml.YAML().dump({"total": footer, "files": rows}, buf)
+        yaml.YAML().dump(stats_dict, buf)
         # need to replace \e escape sequence with \x1b,
         # because only the latter is supported, see also
         # the Python docs for supported formats:
