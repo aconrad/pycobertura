@@ -366,9 +366,7 @@ class CoberturaDiff:
         The given file `filename` where `lineno` is a missed line number.
         """
         return [
-            line.number
-            for line in self.file_source(filename)
-            if line.status is False
+            line.number for line in self.file_source(filename) if line.status is False
         ]
 
     def files(self):

@@ -153,7 +153,7 @@ class DeltaReporter:
     @staticmethod
     def determine_ANSI_color_code_function_of_number(number):
         if number.startswith("+") or number[0].isdigit():
-            return red 
+            return red
         return green
 
     @classmethod
