@@ -148,11 +148,13 @@ class DeltaReporter:
 
     @staticmethod
     def format_missed_lines(missed_lines):
-        return [f"+{lno:d}" if is_new else f"-{lno:d}" for lno, is_new in missed_lines]
+        return [f"{lno:d}" for lno in missed_lines]
 
     @staticmethod
     def determine_ANSI_color_code_function_of_number(number):
-        return red if number.startswith("+") else green
+        if number.startswith("+") or number[0].isdigit():
+            return red 
+        return green
 
     @classmethod
     def convert_signed_number_to_ANSI_color_coded_signed_number(cls, number):

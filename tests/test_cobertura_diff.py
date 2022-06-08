@@ -102,7 +102,7 @@ def test_diff_same_report_different_source_dirs():
     cobertura2 = make_cobertura('tests/dummy.uncovered.addcode/coverage.xml', source='tests/dummy.uncovered.addcode/dummy/')
     differ = CoberturaDiff(cobertura1, cobertura2)
 
-    assert differ.diff_missed_lines('dummy.py') == [(3, True)]
+    assert differ.diff_missed_lines('dummy.py') == [3]
 
 
 def test_diff_total_hits():
