@@ -21,6 +21,9 @@
 * Replace Travis-ci with Github Actions. We were having issues with Travis
   pipeline not triggering because of quota issues.
 
+* Changes in Cobertura class. All `"./packages//class"` elements extracted at once now, and this leads to significant speedup.
+* Changes in setup.cfg related to package data. Remove `include_package_data=True`, because it requires `MANIFEST.in` and add `[options.package_data]` instead. This change makes the package installing from archive not miss `*.css` and `*.jinja2` files.
+
 ## 2.1.0 (2021-09-23)
 
 * Added the option `show_missing` to `HtmlReporterDelta`, which specifies
