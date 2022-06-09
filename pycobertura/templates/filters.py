@@ -22,7 +22,9 @@ def is_not_equal_to_dash(arg):
 
 
 def misses_color(arg):
-    return "red" if arg.startswith("+") else "green"
+    if arg.startswith("+") or arg[0].isdigit():
+        return "red"
+    return "green"
 
 
 def line_status(line):
