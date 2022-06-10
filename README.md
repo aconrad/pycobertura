@@ -319,6 +319,48 @@ pycobertura diff --format yaml tests/dummy.source1/coverage.xml tests/dummy.sour
 
 ![Example output of yaml formatted pycobertura diff command](images/example_yaml_output.png)
 
+### Option to exclude files via --ignore-regex-option
+You can specify the --ignore-regex option to exclude files that have a certain pattern either by specifying the path to a .gitignore file or by entering a Python regex.
+Examples:
+```
+pycobertura show tests/cobertura.xml
+Filename                          Stmts    Miss  Cover    Missing
+------------------------------  -------  ------  -------  ---------
+Main.java                            15       0  100.00%
+search/BinarySearch.java             12       1  91.67%   24
+search/ISortedArraySearch.java        0       0  100.00%
+search/LinearSearch.java              7       2  71.43%   19-24
+TOTAL                                34       3  90.00%
+```
+```
+pycobertura show tests/cobertura.xml --ignore-regex ".*Search"
+Filename      Stmts    Miss  Cover    Missing
+----------  -------  ------  -------  ---------
+Main.java        15       0  100.00%
+TOTAL            34       3  90.00%
+```
+> NOTE: Putting just a *, e.g. "*Search" above will lead to an error, you need to really follow Python regex conventions to use this option.
+You can also specify a .testgitignore with the following content:
+```
+# Test file for ignore regexes
+
+**/__pycache__
+**/dummy*
+
+*.xml
+
+**/*Search*
+```
+and then use
+```
+pycobertura show tests/cobertura.xml --ignore-regex "tests/.testgitignore"
+Filename      Stmts    Miss  Cover    Missing
+----------  -------  ------  -------  ---------
+Main.java        15       0  100.00%
+TOTAL            34       3  90.00%
+```
+The same will also work for `diff` commands.
+
 #### `diff` exit codes
 
 Upon exit, the `diff` command may return various exit codes:
