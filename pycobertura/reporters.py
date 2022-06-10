@@ -54,11 +54,44 @@ class Reporter:
 
         return lines
 
-    def per_file_stats(self, lines):
-        items = lines.items()
+    def per_file_stats(self, file_stats_dict):
+        """
+        Returns dict with keys `files` and `total` that contain coverage
+        statistics per file and overall, respectively.
+
+        {
+            "files": [
+                {
+                    "Filename": "dummy/__init__.py",
+                    "Stmts": 0,
+                    "Miss": 0,
+                    "Cover": "0.00%",
+                    "Missing": "9"
+                },
+                ...
+            ],
+            "total": {
+                "Filename": "TOTAL",
+                "Stmts": "...",
+                "Miss": "...",
+                "Cover": "..."
+            }
+        }
+        """
+        file_stats_dict_items = file_stats_dict.items()
         number_of_files = len(self.cobertura.files())
-        rows = [{k: v[i] for k, v in items} for i in range(number_of_files)]
-        footer = {k: v[number_of_files] for k, v in items if k != "Missing"}
+        rows = [
+            {
+                header_name: header_value[file_index]
+                for header_name, header_value in file_stats_dict_items
+            }
+            for file_index in range(number_of_files)
+        ]
+        footer = {
+            header_name: header_value[number_of_files]
+            for header_name, header_value in file_stats_dict_items
+            if header_name != "Missing"
+        }
         return {"files": rows, "total": footer}
 
 
