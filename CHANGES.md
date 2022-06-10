@@ -3,22 +3,40 @@
 ## Unreleased
 
 * BACKWARD INCOMPATIBLE:
-  * Deprecate Python3.5 and 3.6, support Python 3.7 onwards (see python_requires, classifiers in `setup.cfg`)
+  * Deprecate Python3.5 and 3.6, support Python 3.7 onwards (see
+    python_requires, classifiers in `setup.cfg`)
   * Update tests to Python 3.7 through 3.9 (affects `tox.ini` and `.travis.yml`)
-  * Migrate to `setup.cfg` and `pyproject.toml`; empty `setup.py` kept for compatibility reasons
+  * Migrate to `setup.cfg` and `pyproject.toml`; empty `setup.py` kept for
+    compatibility reasons
   * Update `release.sh` script
   * Address markdown lint in `README.md`
-  * Do not use `object` in class inheritance as this is default behaviour in Python3
-  * Move formatting in `reporters.py` into `Reporter` and `DeltaReporter` base classes to have a uniform formatting: new `stringify` in `utils.py` method and corresponding test in `test_stringify.py`. The subclasses and only inherit from these two base classes to ensure a consistent formatting across the reporters
-  * Change datastructure of coverage information from `namedtuple` (immutable) to `dictionary` (mutable) in `reporters.py`. Adjusted `html-delta.jinja2`, `html.jinja2` and `filters.py` accordingly. This change in datastructure leads to a more compact and more readable code
-  * `pycobertura show` and `pycobertura diff` now support output formats: `json`, `markdown`, `csv`, and `yaml`.
+  * Do not use `object` in class inheritance as this is default behaviour in
+    Python3
+  * Move formatting in `reporters.py` into `Reporter` and `DeltaReporter` base
+    classes to have a uniform formatting: new `stringify` in `utils.py` method
+    and corresponding test in `test_stringify.py`. The subclasses and only
+    inherit from these two base classes to ensure a consistent formatting across
+    the reporters
+  * Change datastructure of coverage information from `namedtuple` (immutable)
+    to `dictionary` (mutable) in `reporters.py`. Adjusted `html-delta.jinja2`,
+    `html.jinja2` and `filters.py` accordingly. This change in datastructure
+    leads to a more compact and more readable code
+  * `pycobertura show` and `pycobertura diff` now support output formats:
+    `json`, `markdown`, `csv`, and `yaml`.
+  * Only uncovered lines are reported in `Missing` column (instead of
+    additionally reporting newly covered lines)
 
   Thanks @gro1m
 
-  * fix handling of multiple classes in same file - thanks to @smortvedt, @gro1m
-
+* Fix handling of multiple classes in same file - thanks to @smortvedt, @gro1m
 * Replace Travis-ci with Github Actions. We were having issues with Travis
   pipeline not triggering because of quota issues.
+* Changes in Cobertura class. All `"./packages//class"` elements extracted at
+  once now, and this leads to significant speedup. Thanks @oev81
+* Changes in setup.cfg related to package data. Remove
+  `include_package_data=True`, because it requires `MANIFEST.in` and add
+  `[options.package_data]` instead. This change makes the package installing
+  from archive not miss `*.css` and `*.jinja2` files. Thanks @oev81
 
 ## 2.1.0 (2021-09-23)
 
