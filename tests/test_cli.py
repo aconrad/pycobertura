@@ -410,7 +410,7 @@ files:
   Stmts:
   Miss: "\x1b[32m-2\x1b[39m"
   Cover: +40.00%
-  Missing: ""
+  Missing: ''
 - Filename: dummy/dummy2.py
   Stmts: '+2'
   Miss: "\x1b[31m+1\x1b[39m"
@@ -588,7 +588,7 @@ def test_diff__format_json__with_color():
             "Stmts": "+2",
             "Miss": "\u001b[31m+1\u001b[39m",
             "Cover": "-25.00%",
-            "Missing": "\u001b[31m+5\u001b[39m"
+            "Missing": "\u001b[31m5\u001b[39m"
         },
         {
             "Filename": "dummy/dummy3.py",
@@ -672,7 +672,7 @@ files:
   Stmts:
   Miss: "\x1b[32m-2\x1b[39m"
   Cover: +40.00%
-  Missing: ""
+  Missing: ''
 - Filename: dummy/dummy2.py
   Stmts: '+2'
   Miss: "\x1b[31m+1\x1b[39m"
@@ -709,12 +709,12 @@ files:
   Stmts:
   Miss: '-2'
   Cover: +40.00%
-  Missing: 
+  Missing: ''
 - Filename: dummy/dummy2.py
   Stmts: '+2'
   Miss: '+1'
   Cover: -25.00%
-  Missing: 5
+  Missing: '5'
 - Filename: dummy/dummy3.py
   Stmts: '+2'
   Miss: '+2'
