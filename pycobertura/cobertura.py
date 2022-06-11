@@ -68,6 +68,16 @@ class Cobertura:
         self.filesystem = filesystem
         self.report = report
 
+        self._class_elements_by_file_name = self._make_class_elements_by_filename()
+
+    def _make_class_elements_by_filename(self):
+        result = {}
+        for elem in self.xml.xpath("./packages//class"):
+            filename = elem.attrib["filename"]
+            result.setdefault(filename, []).append(elem)
+
+        return result
+
     def __eq__(self, other):
         return self.report and other.report and self.report == other.report
 
@@ -78,18 +88,8 @@ class Cobertura:
         return ET.fromstring(s)
 
     @memoize
-    def _get_class_elements_by_filename(self, filename):
-        syntax = f"./packages//class[@filename='{filename}']"
-        return [classElement for classElement in self.xml.xpath(syntax)]
-
-    @memoize
-    def _get_class_element_by_filename(self, filename):
-        syntax = f"./packages//class[@filename='{filename}'][1]"
-        return self.xml.xpath(syntax)[0]
-
-    @memoize
     def _get_lines_by_filename(self, filename):
-        classElements = self._get_class_elements_by_filename(filename)
+        classElements = self._class_elements_by_file_name[filename]
         return [
             line
             for classElement in classElements
@@ -110,7 +110,7 @@ class Cobertura:
         if filename is None:
             return float(self.xml.get("line-rate"))
 
-        elements = self._get_class_elements_by_filename(filename)
+        elements = self._class_elements_by_file_name[filename]
         if len(elements) == 1:
             return float(elements[0].get("line-rate"))
         else:
@@ -125,7 +125,7 @@ class Cobertura:
         if filename is None:
             return float(self.xml.get("branch-rate"))
         else:
-            classElement = self._get_class_element_by_filename(filename)
+            classElement = self._class_elements_by_file_name[filename][0]
             return float(classElement.get("branch-rate"))
 
     @memoize
@@ -134,7 +134,7 @@ class Cobertura:
         Return a list of uncovered line numbers for each of the missed
         statements found for the file `filename`.
         """
-        classElements = self._get_class_elements_by_filename(filename)
+        classElements = self._class_elements_by_file_name[filename]
         return [
             int(line.get("number"))
             for classElement in classElements
@@ -147,7 +147,7 @@ class Cobertura:
         Return a list of covered line numbers for each of the hit statements
         found for the file `filename`.
         """
-        classElements = self._get_class_elements_by_filename(filename)
+        classElements = self._class_elements_by_file_name[filename]
         return [
             int(line.get("number"))
             for classElement in classElements
@@ -362,17 +362,12 @@ class CoberturaDiff:
 
     def diff_missed_lines(self, filename):
         """
-        Return a list of 2-element tuples `(lineno, is_new)` for the given
-        file `filename` where `lineno` is a missed line number and `is_new`
-        indicates whether the missed line was introduced (True) or removed
-        (False).
+        Return a list of 2-element tuples `(lineno, True)` for uncovered lines.
+        The given file `filename` where `lineno` is a missed line number.
         """
-        line_changed = []
-        for line in self.file_source(filename):
-            if line.status is not None:
-                is_new = not (line.status)
-                line_changed.append((line.number, is_new))
-        return line_changed
+        return [
+            line.number for line in self.file_source(filename) if line.status is False
+        ]
 
     def files(self):
         """

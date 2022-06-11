@@ -249,10 +249,10 @@ def test_diff__format_default():
     ], catch_exceptions=False)
     assert result.output == """\
 Filename         Stmts      Miss  Cover    Missing
----------------  -------  ------  -------  ----------
-dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
-dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
-dummy/dummy3.py  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
+---------------  -------  ------  -------  ---------
+dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%
+dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[31m5\x1b[39m
+dummy/dummy3.py  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m
 TOTAL            +4           \x1b[31m+1\x1b[39m  +31.06%
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
@@ -270,10 +270,10 @@ def test_diff__format_text():
         ], catch_exceptions=False)
         assert result.output == """\
 Filename         Stmts      Miss  Cover    Missing
----------------  -------  ------  -------  ----------
-dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
-dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
-dummy/dummy3.py  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
+---------------  -------  ------  -------  ---------
+dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%
+dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[31m5\x1b[39m
+dummy/dummy3.py  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m
 TOTAL            +4           \x1b[31m+1\x1b[39m  +31.06%
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
@@ -290,9 +290,9 @@ def test_diff__format_csv():
         ], catch_exceptions=False)
         assert result.output == """\
 Filename;Stmts;Miss;Cover;Missing
-dummy/dummy.py;;\x1b[32m-2\x1b[39m;+40.00%;['\x1b[32m-5\x1b[39m', '\x1b[32m-6\x1b[39m']
-dummy/dummy2.py;+2;\x1b[31m+1\x1b[39m;-25.00%;['\x1b[32m-2\x1b[39m', '\x1b[32m-4\x1b[39m', '\x1b[31m+5\x1b[39m']
-dummy/dummy3.py;+2;\x1b[31m+2\x1b[39m;;['\x1b[31m+1\x1b[39m', '\x1b[31m+2\x1b[39m']
+dummy/dummy.py;;\x1b[32m-2\x1b[39m;+40.00%;[]
+dummy/dummy2.py;+2;\x1b[31m+1\x1b[39m;-25.00%;['\x1b[31m5\x1b[39m']
+dummy/dummy3.py;+2;\x1b[31m+2\x1b[39m;;['\x1b[31m1\x1b[39m', '\x1b[31m2\x1b[39m']
 TOTAL;+4;\x1b[31m+1\x1b[39m;+31.06%;[]
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
@@ -311,9 +311,9 @@ def test_diff__format_csv_delimiter_semicolon():
         ], catch_exceptions=False)
         assert result.output == """\
 Filename;Stmts;Miss;Cover;Missing
-dummy/dummy.py;;\x1b[32m-2\x1b[39m;+40.00%;['\x1b[32m-5\x1b[39m', '\x1b[32m-6\x1b[39m']
-dummy/dummy2.py;+2;\x1b[31m+1\x1b[39m;-25.00%;['\x1b[32m-2\x1b[39m', '\x1b[32m-4\x1b[39m', '\x1b[31m+5\x1b[39m']
-dummy/dummy3.py;+2;\x1b[31m+2\x1b[39m;;['\x1b[31m+1\x1b[39m', '\x1b[31m+2\x1b[39m']
+dummy/dummy.py;;\x1b[32m-2\x1b[39m;+40.00%;[]
+dummy/dummy2.py;+2;\x1b[31m+1\x1b[39m;-25.00%;['\x1b[31m5\x1b[39m']
+dummy/dummy3.py;+2;\x1b[31m+2\x1b[39m;;['\x1b[31m1\x1b[39m', '\x1b[31m2\x1b[39m']
 TOTAL;+4;\x1b[31m+1\x1b[39m;+31.06%;[]
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
@@ -332,9 +332,9 @@ def test_diff__format_csv_delimiter_tab():
             ], catch_exceptions=False)
         assert result.output == """\
 Filename\tStmts\tMiss\tCover\tMissing
-dummy/dummy.py\t\t\x1b[32m-2\x1b[39m\t+40.00%\t['\x1b[32m-5\x1b[39m', '\x1b[32m-6\x1b[39m']
-dummy/dummy2.py\t+2\t\x1b[31m+1\x1b[39m\t-25.00%\t['\x1b[32m-2\x1b[39m', '\x1b[32m-4\x1b[39m', '\x1b[31m+5\x1b[39m']
-dummy/dummy3.py\t+2\t\x1b[31m+2\x1b[39m\t\t['\x1b[31m+1\x1b[39m', '\x1b[31m+2\x1b[39m']
+dummy/dummy.py\t\t\x1b[32m-2\x1b[39m\t+40.00%\t[]
+dummy/dummy2.py\t+2\t\x1b[31m+1\x1b[39m\t-25.00%\t['\x1b[31m5\x1b[39m']
+dummy/dummy3.py\t+2\t\x1b[31m+2\x1b[39m\t\t['\x1b[31m1\x1b[39m', '\x1b[31m2\x1b[39m']
 TOTAL\t+4\t\x1b[31m+1\x1b[39m\t+31.06%\t[]
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
@@ -350,12 +350,12 @@ def test_diff__format_markdown():
             'tests/dummy.source2/coverage.xml',
         ], catch_exceptions=False)
     assert result.output == """\
-| Filename        | Stmts   |   Miss | Cover   | Missing    |
-|-----------------|---------|--------|---------|------------|
-| dummy/dummy.py  | -       |     \x1b[32m-2\x1b[39m | +40.00% | \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m     |
-| dummy/dummy2.py | +2      |     \x1b[31m+1\x1b[39m | -25.00% | \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m |
-| dummy/dummy3.py | +2      |     \x1b[31m+2\x1b[39m | -       | \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m     |
-| TOTAL           | +4      |     \x1b[31m+1\x1b[39m | +31.06% |            |
+| Filename        | Stmts   |   Miss | Cover   | Missing   |
+|-----------------|---------|--------|---------|-----------|
+| dummy/dummy.py  | -       |     \x1b[32m-2\x1b[39m | +40.00% |           |
+| dummy/dummy2.py | +2      |     \x1b[31m+1\x1b[39m | -25.00% | \x1b[31m5\x1b[39m         |
+| dummy/dummy3.py | +2      |     \x1b[31m+2\x1b[39m | -       | \x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m      |
+| TOTAL           | +4      |     \x1b[31m+1\x1b[39m | +31.06% |           |
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
@@ -400,9 +400,9 @@ def test_diff__format_json():
             null
         ],
         "Missing": [
-            "\u001b[32m-5\u001b[39m, \u001b[32m-6\u001b[39m",
-            "\u001b[32m-2\u001b[39m, \u001b[32m-4\u001b[39m, \u001b[31m+5\u001b[39m",
-            "\u001b[31m+1\u001b[39m, \u001b[31m+2\u001b[39m"
+            "",
+            "\u001b[31m5\u001b[39m",
+            "\u001b[31m1\u001b[39m, \u001b[31m2\u001b[39m"
         ]
     }
 }
@@ -443,9 +443,9 @@ files:
   - -25.00%
   - 
   Missing:
-  - "\x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m"
-  - "\x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m"
-  - "\x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m"
+  - ''
+  - "\x1b[31m5\x1b[39m"
+  - "\x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m"
 
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
@@ -468,10 +468,10 @@ def test_diff__output_to_file():
         assert result.output == ""
         assert report == """\
 Filename         Stmts      Miss  Cover    Missing
----------------  -------  ------  -------  ----------
-dummy/dummy.py   -            -2  +40.00%  -5, -6
-dummy/dummy2.py  +2           +1  -25.00%  -2, -4, +5
-dummy/dummy3.py  +2           +2  -        +1, +2
+---------------  -------  ------  -------  ---------
+dummy/dummy.py   -            -2  +40.00%
+dummy/dummy2.py  +2           +1  -25.00%  5
+dummy/dummy3.py  +2           +2  -        1, 2
 TOTAL            +4           +1  +31.06%"""
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
@@ -492,10 +492,10 @@ def test_diff__output_to_file__force_color():
     assert result.output == ""
     assert report == """\
 Filename         Stmts      Miss  Cover    Missing
----------------  -------  ------  -------  ----------
-dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
-dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
-dummy/dummy3.py  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
+---------------  -------  ------  -------  ---------
+dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%
+dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[31m5\x1b[39m
+dummy/dummy3.py  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m
 TOTAL            +4           \x1b[31m+1\x1b[39m  +31.06%"""
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
@@ -511,10 +511,10 @@ def test_diff__format_text__with_color():
     ], catch_exceptions=False)
     assert result.output == """\
 Filename         Stmts      Miss  Cover    Missing
----------------  -------  ------  -------  ----------
-dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%  \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m
-dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m
-dummy/dummy3.py  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m
+---------------  -------  ------  -------  ---------
+dummy/dummy.py   -            \x1b[32m-2\x1b[39m  +40.00%
+dummy/dummy2.py  +2           \x1b[31m+1\x1b[39m  -25.00%  \x1b[31m5\x1b[39m
+dummy/dummy3.py  +2           \x1b[31m+2\x1b[39m  -        \x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m
 TOTAL            +4           \x1b[31m+1\x1b[39m  +31.06%
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
@@ -531,10 +531,10 @@ def test_diff__format_text__with_no_color():
     ], catch_exceptions=False)
     assert result.output == """\
 Filename         Stmts      Miss  Cover    Missing
----------------  -------  ------  -------  ----------
-dummy/dummy.py   -            -2  +40.00%  -5, -6
-dummy/dummy2.py  +2           +1  -25.00%  -2, -4, +5
-dummy/dummy3.py  +2           +2  -        +1, +2
+---------------  -------  ------  -------  ---------
+dummy/dummy.py   -            -2  +40.00%
+dummy/dummy2.py  +2           +1  -25.00%  5
+dummy/dummy3.py  +2           +2  -        1, 2
 TOTAL            +4           +1  +31.06%
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
@@ -551,12 +551,12 @@ def test_diff__format_markdown__with_color():
         'markdown',
     ], catch_exceptions=False)
     assert result.output == """\
-| Filename        | Stmts   |   Miss | Cover   | Missing    |
-|-----------------|---------|--------|---------|------------|
-| dummy/dummy.py  | -       |     \x1b[32m-2\x1b[39m | +40.00% | \x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m     |
-| dummy/dummy2.py | +2      |     \x1b[31m+1\x1b[39m | -25.00% | \x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m |
-| dummy/dummy3.py | +2      |     \x1b[31m+2\x1b[39m | -       | \x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m     |
-| TOTAL           | +4      |     \x1b[31m+1\x1b[39m | +31.06% |            |
+| Filename        | Stmts   |   Miss | Cover   | Missing   |
+|-----------------|---------|--------|---------|-----------|
+| dummy/dummy.py  | -       |     \x1b[32m-2\x1b[39m | +40.00% |           |
+| dummy/dummy2.py | +2      |     \x1b[31m+1\x1b[39m | -25.00% | \x1b[31m5\x1b[39m         |
+| dummy/dummy3.py | +2      |     \x1b[31m+2\x1b[39m | -       | \x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m      |
+| TOTAL           | +4      |     \x1b[31m+1\x1b[39m | +31.06% |           |
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
@@ -572,12 +572,12 @@ def test_diff__format_markdown__with_no_color():
         'markdown',
     ], catch_exceptions=False)
     assert result.output == """\
-| Filename        | Stmts   |   Miss | Cover   | Missing    |
-|-----------------|---------|--------|---------|------------|
-| dummy/dummy.py  | -       |     -2 | +40.00% | -5, -6     |
-| dummy/dummy2.py | +2      |     +1 | -25.00% | -2, -4, +5 |
-| dummy/dummy3.py | +2      |     +2 | -       | +1, +2     |
-| TOTAL           | +4      |     +1 | +31.06% |            |
+| Filename        | Stmts   |   Miss | Cover   | Missing   |
+|-----------------|---------|--------|---------|-----------|
+| dummy/dummy.py  | -       |     -2 | +40.00% |           |
+| dummy/dummy2.py | +2      |     +1 | -25.00% | 5         |
+| dummy/dummy3.py | +2      |     +2 | -       | 1, 2      |
+| TOTAL           | +4      |     +1 | +31.06% |           |
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
@@ -623,9 +623,9 @@ def test_diff__format_json__with_color():
             null
         ],
         "Missing": [
-            "\u001b[32m-5\u001b[39m, \u001b[32m-6\u001b[39m",
-            "\u001b[32m-2\u001b[39m, \u001b[32m-4\u001b[39m, \u001b[31m+5\u001b[39m",
-            "\u001b[31m+1\u001b[39m, \u001b[31m+2\u001b[39m"
+            "",
+            "\u001b[31m5\u001b[39m",
+            "\u001b[31m1\u001b[39m, \u001b[31m2\u001b[39m"
         ]
     }
 }
@@ -674,9 +674,9 @@ def test_diff__format_json__with_no_color():
             null
         ],
         "Missing": [
-            "-5, -6",
-            "-2, -4, +5",
-            "+1, +2"
+            "",
+            "5",
+            "1, 2"
         ]
     }
 }
@@ -718,9 +718,9 @@ files:
   - -25.00%
   - 
   Missing:
-  - "\x1b[32m-5\x1b[39m, \x1b[32m-6\x1b[39m"
-  - "\x1b[32m-2\x1b[39m, \x1b[32m-4\x1b[39m, \x1b[31m+5\x1b[39m"
-  - "\x1b[31m+1\x1b[39m, \x1b[31m+2\x1b[39m"
+  - ''
+  - "\x1b[31m5\x1b[39m"
+  - "\x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m"
 
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
@@ -760,9 +760,9 @@ files:
   - -25.00%
   - 
   Missing:
-  - -5, -6
-  - -2, -4, +5
-  - +1, +2
+  - ''
+  - '5'
+  - 1, 2
 
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
