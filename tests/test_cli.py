@@ -775,8 +775,8 @@ def test_diff__format_html__no_source_on_disk():
     runner = CliRunner()
     pytest.raises(FileSystem.FileNotFound, runner.invoke, diff, [
         '--format', 'html',
-        'tests/dummy.with-dummy2-better-cov.xml',
-        'tests/dummy.with-dummy2-better-and-worse.xml',
+        'tests/dummy1.xml',
+        'tests/dummy2.xml',
     ], catch_exceptions=False)
 
 
