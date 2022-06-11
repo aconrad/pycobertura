@@ -107,7 +107,10 @@ def show(cobertura_file, format, delimiter, hide_columns, output, source, source
         filesystem=filesystem_factory(source, source_prefix=source_prefix),
     )
     Reporter = reporters[format]
-    reporter = Reporter(cobertura, hide_columns)
+    reporter_args = [cobertura]
+    reporter_kwargs = {}
+    reporter_kwargs["hide_columns"] = hide_columns
+    reporter = Reporter(*reporter_args, **reporter_kwargs)
 
     if format == "csv":
         report = reporter.generate(delimiter)
@@ -255,7 +258,9 @@ def diff(
         color = isatty if color is None else color is True
         reporter_kwargs["color"] = color
 
-    reporter = Reporter(*reporter_args, **reporter_kwargs, hide_columns=hide_columns)
+    reporter_kwargs["hide_columns"]  = hide_columns
+
+    reporter = Reporter(*reporter_args, **reporter_kwargs)
     if format == "csv":
         report = reporter.generate(delimiter)
     else:
