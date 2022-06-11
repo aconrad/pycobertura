@@ -96,7 +96,9 @@ def get_exit_code(differ, source):
     "the --source is a zip archive and the files were zipped under "
     "a directory prefix that is not part of the source.",
 )
-def show(cobertura_file, format, delimiter, hide_columns, output, source, source_prefix):
+def show(
+    cobertura_file, format, delimiter, hide_columns, output, source, source_prefix
+):
     """show coverage summary of a Cobertura report"""
 
     if not source:
@@ -258,7 +260,7 @@ def diff(
         color = isatty if color is None else color is True
         reporter_kwargs["color"] = color
 
-    reporter_kwargs["hide_columns"]  = hide_columns
+    reporter_kwargs["hide_columns"] = hide_columns
 
     reporter = Reporter(*reporter_args, **reporter_kwargs)
     if format == "csv":

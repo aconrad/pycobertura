@@ -39,7 +39,8 @@ class Reporter:
                 for filename in self.cobertura.files()
             ],
             "Cover": [
-                self.format_line_rate(self.cobertura.line_rate(filename)) for filename in self.cobertura.files()
+                self.format_line_rate(self.cobertura.line_rate(filename))
+                for filename in self.cobertura.files()
             ],
             "Missing": [
                 stringify(self.cobertura.missed_lines(filename))
@@ -55,7 +56,7 @@ class Reporter:
         return rows_func_dict[key] + footer_func_dict[key]
 
     def get_report_lines(self):
-        lines = {"Filename": self.cobertura.files().copy()+["TOTAL"]}
+        lines = {"Filename": self.cobertura.files().copy() + ["TOTAL"]}
         columns_to_display = [c for c in headers_hideable if c not in self.hide_columns]
         for column in columns_to_display:
             lines[column] = self.lines_dict_entry(column)
