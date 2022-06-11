@@ -14,8 +14,8 @@ env.filters["line_reason"] = filters.line_reason_icon
 env.filters["is_not_equal_to_dash"] = filters.is_not_equal_to_dash
 env.filters["misses_color"] = filters.misses_color
 
-headers_without_missing = ["Filename", "Stmts", "Miss", "Cover"]
 headers_with_missing = ["Filename", "Stmts", "Miss", "Cover", "Missing"]
+headers_without_missing = ["Filename", "Stmts", "Miss", "Cover"]
 
 
 class Reporter:
@@ -79,20 +79,19 @@ class Reporter:
         }
         """
         file_stats_dict_items = file_stats_dict.items()
-        number_of_files = len(self.cobertura.files())
-        rows = [
+        number_of_files = len(self.cobertura.files()) + 1
+        file_stats_list = [
             {
                 header_name: header_value[file_index]
                 for header_name, header_value in file_stats_dict_items
             }
             for file_index in range(number_of_files)
         ]
-        footer = {
-            header_name: header_value[number_of_files]
-            for header_name, header_value in file_stats_dict_items
-            if header_name != "Missing"
+        file_stats_list[-1].pop("Missing", "No key Missing found")
+        return {
+            "files": file_stats_list[:-1],
+            "total": file_stats_list[-1],
         }
-        return {"files": rows, "total": footer}
 
 
 class TextReporter(Reporter):
@@ -283,12 +282,21 @@ class DeltaReporter:
 
         return lines
 
-    def per_file_stats(self, lines):
-        items = lines.items()
-        number_of_files = len(self.differ.files()) - 1
-        rows = [{k: v[i] for k, v in items} for i in range(number_of_files)]
-        footer = {k: v[number_of_files] for k, v in items if k != "Missing"}
-        return {"files": rows, "total": footer}
+    def per_file_stats(self, file_stats_dict):
+        file_stats_dict_items = file_stats_dict.items()
+        number_of_files = len(self.differ.files())
+        file_stats_list = [
+            {
+                header_name: header_value[file_index]
+                for header_name, header_value in file_stats_dict_items
+            }
+            for file_index in range(number_of_files)
+        ]
+        file_stats_list[-1].pop("Missing", "No key Missing found")
+        return {
+            "files": file_stats_list[:-1],
+            "total": file_stats_list[-1],
+        }
 
 
 class TextReporterDelta(DeltaReporter):
