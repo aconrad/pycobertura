@@ -174,11 +174,7 @@ class DeltaReporter:
         return numbers if isinstance(numbers, str) else ", ".join(numbers)
 
     def format_total_misses(self, total_misses):
-        return (
-            self.color_number(f"{total_misses:+d}")
-            if total_misses
-            else "0"
-        )
+        return self.color_number(f"{total_misses:+d}") if total_misses else "0"
 
     def get_report_lines(self):
         diff_total_stmts = [
@@ -248,7 +244,6 @@ class DeltaReporter:
 
 
 class TextReporterDelta(DeltaReporter):
-
     def generate(self):
         lines = self.get_report_lines()
         headers = headers_without_missing
@@ -263,7 +258,6 @@ class TextReporterDelta(DeltaReporter):
 
 
 class CsvReporterDelta(DeltaReporter):
-
     def generate(self, delimiter):
         lines = self.get_report_lines()
 
@@ -299,7 +293,6 @@ class CsvReporterDelta(DeltaReporter):
 
 
 class MarkdownReporterDelta(DeltaReporter):
-
     def generate(self):
         lines = self.get_report_lines()
         headers = headers_without_missing
@@ -314,7 +307,6 @@ class MarkdownReporterDelta(DeltaReporter):
 
 
 class JsonReporterDelta(DeltaReporter):
-
     def generate(self):
         lines = self.get_report_lines()
 
@@ -337,7 +329,6 @@ class JsonReporterDelta(DeltaReporter):
 
 
 class YamlReporterDelta(DeltaReporter):
-
     def generate(self):
         lines = self.get_report_lines()
 
@@ -361,7 +352,6 @@ class YamlReporterDelta(DeltaReporter):
 
 
 class HtmlReporterDelta(DeltaReporter):
-
     def __init__(self, *args, **kwargs):
         """
         Takes the same arguments as `TextReporterDelta` but also takes the keyword
