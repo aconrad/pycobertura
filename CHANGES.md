@@ -25,7 +25,7 @@
     `json`, `markdown`, `csv`, and `yaml`.
   * Only uncovered lines are reported in `Missing` column (instead of
     additionally reporting newly covered lines)
-  * Add option `--ignore-regex` to ignore some files using either a Python regex pattern or a path to a .gitignore file.
+  * Add option `--ignore-regex` to ignore some files using either a Python regex pattern or a path to a `.gitignore` file.
 
   Thanks @gro1m
 
