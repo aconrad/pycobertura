@@ -25,6 +25,9 @@
     `json`, `markdown`, `csv`, and `yaml`.
   * Only uncovered lines are reported in `Missing` column (instead of
     additionally reporting newly covered lines)
+  * Coverage diff for new files now make the assumption that "previous files"
+    were covered at 100% and will no longer show an empty value represented by
+    a dash "-".
 
   Thanks @gro1m
 
