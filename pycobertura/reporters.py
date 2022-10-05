@@ -87,7 +87,7 @@ class Reporter:
             }
             for file_index in range(number_of_files)
         ]
-        file_stats_list[-1].pop("Missing", "No key Missing found")
+        file_stats_list[-1].pop("Missing", 'Key "Missing" not found')
         return {
             "files": file_stats_list[:-1],
             "total": file_stats_list[-1],
