@@ -177,10 +177,10 @@ class DeltaReporter:
         self.color = kwargs.pop("color", False)
 
     def format_line_rate(self, line_rate):
-        return f"{line_rate:+.2%}" if line_rate else self.not_available
+        return f"{line_rate:+.2%}" if line_rate else "+100.00%"
 
     def format_total_statements(self, total_statements):
-        return f"{total_statements:+d}" if total_statements else self.not_available
+        return f"{total_statements:+d}" if total_statements else "0"
 
     @staticmethod
     def format_missed_lines(missed_lines):
@@ -210,11 +210,7 @@ class DeltaReporter:
         return numbers if isinstance(numbers, str) else ", ".join(numbers)
 
     def format_total_misses(self, total_misses):
-        return (
-            self.color_number(f"{total_misses:+d}")
-            if total_misses
-            else self.not_available
-        )
+        return self.color_number(f"{total_misses:+d}") if total_misses else "0"
 
     def get_report_lines(self):
         diff_total_stmts = [
@@ -300,8 +296,6 @@ class DeltaReporter:
 
 
 class TextReporterDelta(DeltaReporter):
-    not_available = "-"
-
     def generate(self):
         lines = self.get_report_lines()
         headers = headers_without_missing
@@ -316,8 +310,6 @@ class TextReporterDelta(DeltaReporter):
 
 
 class CsvReporterDelta(DeltaReporter):
-    not_available = ""
-
     def generate(self, delimiter):
         lines = self.get_report_lines()
 
@@ -353,8 +345,6 @@ class CsvReporterDelta(DeltaReporter):
 
 
 class MarkdownReporterDelta(DeltaReporter):
-    not_available = "-"
-
     def generate(self):
         lines = self.get_report_lines()
         headers = headers_without_missing
@@ -369,8 +359,6 @@ class MarkdownReporterDelta(DeltaReporter):
 
 
 class JsonReporterDelta(DeltaReporter):
-    not_available = None
-
     def generate(self):
         lines = self.get_report_lines()
 
@@ -392,8 +380,6 @@ class JsonReporterDelta(DeltaReporter):
 
 
 class YamlReporterDelta(DeltaReporter):
-    not_available = None
-
     def generate(self):
         lines = self.get_report_lines()
 
@@ -416,8 +402,6 @@ class YamlReporterDelta(DeltaReporter):
 
 
 class HtmlReporterDelta(DeltaReporter):
-    not_available = "-"
-
     def __init__(self, *args, **kwargs):
         """
         Takes the same arguments as `TextReporterDelta` but also takes the keyword

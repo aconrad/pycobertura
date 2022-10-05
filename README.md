@@ -279,6 +279,14 @@ Upon exit, the `diff` command may return various exit codes:
 * 2: the changes worsened the overall coverage
 * 3: the changes introduced uncovered statements but the overall coverage is still better than before
 
+You can capture the exit code by using the `$?` syntax from your shell:
+
+```bash
+pycobertura ...
+PYCOBERTURA_EXIT_CODE=$?
+echo $PYCOBERTURA_EXIT_CODE
+```
+
 ## Library usage
 
 Using it as a library in your Python application is easy:
