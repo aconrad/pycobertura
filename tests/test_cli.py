@@ -83,7 +83,7 @@ dummy/__init__.py;0;0;0.00%;
 dummy/dummy.py;4;2;50.00%;2, 5
 TOTAL;4;2;50.00%;
 """
-    assert result.exit_code == ExitCodes.OK    
+    assert result.exit_code == ExitCodes.OK
 
 def test_show__format_csv_delimiter_tab():
     from pycobertura.cli import show, ExitCodes
@@ -101,7 +101,7 @@ dummy/__init__.py\t0\t0\t0.00%\t
 dummy/dummy.py\t4\t2\t50.00%\t2, 5
 TOTAL\t4\t2\t50.00%\t
 """
-    assert result.exit_code == ExitCodes.OK  
+    assert result.exit_code == ExitCodes.OK
 
 def test_show__format_markdown():
     from pycobertura.cli import show, ExitCodes
@@ -364,7 +364,7 @@ def test_diff__format_json():
     "files": [
         {
             "Filename": "dummy/dummy.py",
-            "Stmts": null,
+            "Stmts": "0",
             "Miss": "\u001b[32m-2\x1b[39m",
             "Cover": "+40.00%",
             "Missing": ""
@@ -380,7 +380,7 @@ def test_diff__format_json():
             "Filename": "dummy/dummy3.py",
             "Stmts": "+2",
             "Miss": "\u001b[31m+2\u001b[39m",
-            "Cover": null,
+            "Cover": "+100.00%",
             "Missing": "\u001b[31m1\u001b[39m, \u001b[31m2\u001b[39m"
         }
     ],
@@ -407,7 +407,7 @@ def test_diff__format_yaml():
         assert result.output == """\
 files:
 - Filename: dummy/dummy.py
-  Stmts:
+  Stmts: '0'
   Miss: "\x1b[32m-2\x1b[39m"
   Cover: +40.00%
   Missing: ''
@@ -419,7 +419,7 @@ files:
 - Filename: dummy/dummy3.py
   Stmts: '+2'
   Miss: "\x1b[31m+2\x1b[39m"
-  Cover:
+  Cover: +100.00%
   Missing: "\x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m"
 total:
   Filename: TOTAL
@@ -578,7 +578,7 @@ def test_diff__format_json__with_color():
     "files": [
         {
             "Filename": "dummy/dummy.py",
-            "Stmts": null,
+            "Stmts": "0",
             "Miss": "\u001b[32m-2\x1b[39m",
             "Cover": "+40.00%",
             "Missing": ""
@@ -594,7 +594,7 @@ def test_diff__format_json__with_color():
             "Filename": "dummy/dummy3.py",
             "Stmts": "+2",
             "Miss": "\u001b[31m+2\u001b[39m",
-            "Cover": null,
+            "Cover": "+100.00%",
             "Missing": "\u001b[31m1\u001b[39m, \u001b[31m2\u001b[39m"
         }
     ],
@@ -625,7 +625,7 @@ def test_diff__format_json__with_no_color():
     "files": [
         {
             "Filename": "dummy/dummy.py",
-            "Stmts": null,
+            "Stmts": "0",
             "Miss": "-2",
             "Cover": "+40.00%",
             "Missing": ""
@@ -641,7 +641,7 @@ def test_diff__format_json__with_no_color():
             "Filename": "dummy/dummy3.py",
             "Stmts": "+2",
             "Miss": "+2",
-            "Cover": null,
+            "Cover": "+100.00%",
             "Missing": "1, 2"
         }
     ],
@@ -669,7 +669,7 @@ def test_diff__format_yaml_with_color():
         assert result.output == """\
 files:
 - Filename: dummy/dummy.py
-  Stmts:
+  Stmts: '0'
   Miss: "\x1b[32m-2\x1b[39m"
   Cover: +40.00%
   Missing: ''
@@ -681,7 +681,7 @@ files:
 - Filename: dummy/dummy3.py
   Stmts: '+2'
   Miss: "\x1b[31m+2\x1b[39m"
-  Cover:
+  Cover: +100.00%
   Missing: "\x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m"
 total:
   Filename: TOTAL
@@ -706,7 +706,7 @@ def test_diff__format_yaml_with_no_color():
         assert result.output == """\
 files:
 - Filename: dummy/dummy.py
-  Stmts:
+  Stmts: '0'
   Miss: '-2'
   Cover: +40.00%
   Missing: ''
@@ -718,7 +718,7 @@ files:
 - Filename: dummy/dummy3.py
   Stmts: '+2'
   Miss: '+2'
-  Cover:
+  Cover: +100.00%
   Missing: 1, 2
 total:
   Filename: TOTAL
