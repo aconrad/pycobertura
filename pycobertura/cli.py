@@ -58,6 +58,12 @@ def get_exit_code(differ, source):
 
 @pycobertura.command()
 @click.argument("cobertura_file")
+@click.option(
+    "--ignore-regex",
+    default=None,
+    type=str,
+    help="Regex for which files to ignore in output\n\t",
+)
 @click.option("-f", "--format", default="text", type=click.Choice(list(reporters)))
 @click.option(
     "-delim",
@@ -89,7 +95,9 @@ def get_exit_code(differ, source):
     "the --source is a zip archive and the files were zipped under "
     "a directory prefix that is not part of the source.",
 )
-def show(cobertura_file, format, delimiter, output, source, source_prefix):
+def show(
+    cobertura_file, ignore_regex, format, delimiter, output, source, source_prefix
+):
     """show coverage summary of a Cobertura report"""
 
     if not source:
@@ -100,7 +108,7 @@ def show(cobertura_file, format, delimiter, output, source, source_prefix):
         filesystem=filesystem_factory(source, source_prefix=source_prefix),
     )
     Reporter = reporters[format]
-    reporter = Reporter(cobertura)
+    reporter = Reporter(cobertura, ignore_regex)
 
     if format == "csv":
         report = reporter.generate(delimiter)
@@ -140,6 +148,12 @@ directories (or zip archives). If the source is not available at all, pass
 )
 @click.argument("cobertura_file1")
 @click.argument("cobertura_file2")
+@click.option(
+    "--ignore-regex",
+    default=None,
+    type=str,
+    help="Regex for which files to ignore in output\n\t",
+)
 @click.option(
     "-delim",
     "--delimiter",
@@ -205,6 +219,7 @@ directories (or zip archives). If the source is not available at all, pass
 def diff(
     cobertura_file1,
     cobertura_file2,
+    ignore_regex,
     delimiter,
     color,
     format,
@@ -231,7 +246,7 @@ def diff(
     cobertura2 = Cobertura(cobertura_file2, filesystem=filesystem2)
 
     Reporter = delta_reporters[format]
-    reporter_args = [cobertura1, cobertura2]
+    reporter_args = [cobertura1, cobertura2, ignore_regex]
     reporter_kwargs = {"show_source": source}
 
     isatty = True if output is None else output.isatty()

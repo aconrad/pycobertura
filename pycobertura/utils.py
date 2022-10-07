@@ -1,5 +1,7 @@
 import difflib
 import os
+import re
+import fnmatch
 
 from functools import partial
 
@@ -229,3 +231,30 @@ def hunkify_lines(lines, context=3):
 
 def get_dir_from_file_path(file_path):
     return os.path.dirname(file_path) or "."
+
+
+def get_non_empty_non_commented_lines_from_file_in_ascii(file_path, comment_character):
+    with open(file_path, "rb") as f:  # read in binary (more secure)
+        result = [
+            line.decode("ascii").strip()
+            for line in f.readlines()
+            if not line.decode("ascii").startswith(comment_character)
+        ]
+        return [res for res in result if res != ""]
+
+
+def get_filenames_that_do_not_match_regex(
+    filenames, regex_param, comment_character="#"
+):
+    if os.path.isfile(regex_param):
+        ignore_patterns = get_non_empty_non_commented_lines_from_file_in_ascii(
+            regex_param, comment_character
+        )
+        remove_filenames = [
+            filename
+            for igp in ignore_patterns
+            for filename in fnmatch.filter(filenames, igp)
+        ]
+    else:
+        remove_filenames = list(filter(re.compile(regex_param).match, filenames))
+    return [fname for fname in filenames if fname not in remove_filenames]

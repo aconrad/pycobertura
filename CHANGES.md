@@ -28,6 +28,7 @@
   * Coverage diff for new files now make the assumption that "previous files"
     were covered at 100% and will no longer show an empty value represented by
     a dash "-".
+  * Add option `--ignore-regex` to ignore some files using either a Python regex pattern or a path to a `.gitignore` file.
 
   Thanks @gro1m
 
