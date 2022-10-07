@@ -14,8 +14,8 @@ env.filters["line_reason"] = filters.line_reason_icon
 env.filters["is_not_equal_to_dash"] = filters.is_not_equal_to_dash
 env.filters["misses_color"] = filters.misses_color
 
-headers_without_missing = ["Filename", "Stmts", "Miss", "Cover"]
 headers_with_missing = ["Filename", "Stmts", "Miss", "Cover", "Missing"]
+headers_without_missing = ["Filename", "Stmts", "Miss", "Cover"]
 
 
 class Reporter:
@@ -52,6 +52,45 @@ class Reporter:
 
         return lines
 
+    def per_file_stats(self, file_stats_dict):
+        """
+        Returns dict with keys `files` and `total` that contain coverage
+        statistics per file and overall, respectively.
+
+        {
+            "files": [
+                {
+                    "Filename": "dummy/__init__.py",
+                    "Stmts": 0,
+                    "Miss": 0,
+                    "Cover": "0.00%",
+                    "Missing": "9"
+                },
+                ...
+            ],
+            "total": {
+                "Filename": "TOTAL",
+                "Stmts": "...",
+                "Miss": "...",
+                "Cover": "..."
+            }
+        }
+        """
+        file_stats_dict_items = file_stats_dict.items()
+        number_of_files = len(self.cobertura.files()) + 1
+        file_stats_list = [
+            {
+                header_name: header_value[file_index]
+                for header_name, header_value in file_stats_dict_items
+            }
+            for file_index in range(number_of_files)
+        ]
+        file_stats_list[-1].pop("Missing", 'Key "Missing" not found')
+        return {
+            "files": file_stats_list[:-1],
+            "total": file_stats_list[-1],
+        }
+
 
 class TextReporter(Reporter):
     def generate(self):
@@ -83,20 +122,17 @@ class MarkdownReporter(Reporter):
 class JsonReporter(Reporter):
     def generate(self):
         lines = self.get_report_lines()
-        rows = {k: v[:-1] for k, v in lines.items()}
-        footer = {k: v[-1] for k, v in lines.items() if k != "Missing"}
-
-        return json.dumps({"total": footer, "files": rows}, indent=4)
+        stats_dict = self.per_file_stats(lines)
+        return json.dumps(stats_dict, indent=4)
 
 
 class YamlReporter(Reporter):
     def generate(self):
         lines = self.get_report_lines()
-        rows = {k: v[:-1] for k, v in lines.items()}
-        footer = {k: v[-1] for k, v in lines.items() if k != "Missing"}
+        stats_dict = self.per_file_stats(lines)
         # need to write to a buffer as yml packages are using a streaming interface
         buf = io.BytesIO()
-        yaml.YAML().dump({"total": footer, "files": rows}, buf)
+        yaml.YAML().dump(stats_dict, buf)
         return buf.getvalue()
 
 
@@ -148,10 +184,10 @@ class DeltaReporter:
         self.ignore_regex = ignore_regex
 
     def format_line_rate(self, line_rate):
-        return f"{line_rate:+.2%}" if line_rate else self.not_available
+        return f"{line_rate:+.2%}" if line_rate else "+100.00%"
 
     def format_total_statements(self, total_statements):
-        return f"{total_statements:+d}" if total_statements else self.not_available
+        return f"{total_statements:+d}" if total_statements else "0"
 
     @staticmethod
     def format_missed_lines(missed_lines):
@@ -181,11 +217,7 @@ class DeltaReporter:
         return numbers if isinstance(numbers, str) else ", ".join(numbers)
 
     def format_total_misses(self, total_misses):
-        return (
-            self.color_number(f"{total_misses:+d}")
-            if total_misses
-            else self.not_available
-        )
+        return self.color_number(f"{total_misses:+d}") if total_misses else "0"
 
     def get_report_lines(self):
         filenames = self.differ.files(ignore_regex=self.ignore_regex)
@@ -253,10 +285,24 @@ class DeltaReporter:
 
         return lines
 
+    def per_file_stats(self, file_stats_dict):
+        file_stats_dict_items = file_stats_dict.items()
+        number_of_files = len(self.differ.files())
+        file_stats_list = [
+            {
+                header_name: header_value[file_index]
+                for header_name, header_value in file_stats_dict_items
+            }
+            for file_index in range(number_of_files)
+        ]
+        file_stats_list[-1].pop("Missing", 'Key "Missing" not found')
+        return {
+            "files": file_stats_list[:-1],
+            "total": file_stats_list[-1],
+        }
+
 
 class TextReporterDelta(DeltaReporter):
-    not_available = "-"
-
     def generate(self):
         lines = self.get_report_lines()
         headers = headers_without_missing
@@ -271,8 +317,6 @@ class TextReporterDelta(DeltaReporter):
 
 
 class CsvReporterDelta(DeltaReporter):
-    not_available = ""
-
     def generate(self, delimiter):
         lines = self.get_report_lines()
 
@@ -308,8 +352,6 @@ class CsvReporterDelta(DeltaReporter):
 
 
 class MarkdownReporterDelta(DeltaReporter):
-    not_available = "-"
-
     def generate(self):
         lines = self.get_report_lines()
         headers = headers_without_missing
@@ -324,8 +366,6 @@ class MarkdownReporterDelta(DeltaReporter):
 
 
 class JsonReporterDelta(DeltaReporter):
-    not_available = None
-
     def generate(self):
         lines = self.get_report_lines()
 
@@ -335,10 +375,9 @@ class JsonReporterDelta(DeltaReporter):
             ]
             lines["Missing"] = missed_lines_colored
 
-        rows = {k: v[:-1] for k, v in lines.items()}
-        footer = {k: v[-1] for k, v in lines.items() if k != "Missing"}
+        stats_dict = self.per_file_stats(lines)
 
-        json_string = json.dumps({"total": footer, "files": rows}, indent=4)
+        json_string = json.dumps(stats_dict, indent=4)
 
         # for colors, explanation see here:
         # https://stackoverflow.com/a/61273717/9698518
@@ -348,8 +387,6 @@ class JsonReporterDelta(DeltaReporter):
 
 
 class YamlReporterDelta(DeltaReporter):
-    not_available = None
-
     def generate(self):
         lines = self.get_report_lines()
 
@@ -359,11 +396,10 @@ class YamlReporterDelta(DeltaReporter):
             ]
             lines["Missing"] = missed_lines_colored
 
-        rows = {k: v[:-1] for k, v in lines.items()}
-        footer = {k: v[-1] for k, v in lines.items() if k != "Missing"}
+        stats_dict = self.per_file_stats(lines)
         # need to write to a buffer as yml packages are using a streaming interface
         buf = io.BytesIO()
-        yaml.YAML().dump({"total": footer, "files": rows}, buf)
+        yaml.YAML().dump(stats_dict, buf)
         # need to replace \e escape sequence with \x1b,
         # because only the latter is supported, see also
         # the Python docs for supported formats:
@@ -373,8 +409,6 @@ class YamlReporterDelta(DeltaReporter):
 
 
 class HtmlReporterDelta(DeltaReporter):
-    not_available = "-"
-
     def __init__(self, *args, **kwargs):
         """
         Takes the same arguments as `TextReporterDelta` but also takes the keyword

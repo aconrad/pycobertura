@@ -128,125 +128,76 @@ pycobertura show --format html --output coverage.html coverage.xml
 The following shows how to generate a JSON version of another coverage file.
 
 ```shell
-$ pycobertura show --format json --output coverage.json coverage.xml
+$ pycobertura show --format json --output coverage.json tests/cobertura.xml
 {
+    "files": [
+        {
+            "Filename": "Main.java",
+            "Stmts": 15,
+            "Miss": 0,
+            "Cover": "100.00%",
+            "Missing": ""
+        },
+        {
+            "Filename": "search/BinarySearch.java",
+            "Stmts": 12,
+            "Miss": 1,
+            "Cover": "91.67%",
+            "Missing": "24"
+        },
+        {
+            "Filename": "search/ISortedArraySearch.java",
+            "Stmts": 0,
+            "Miss": 0,
+            "Cover": "100.00%",
+            "Missing": ""
+        },
+        {
+            "Filename": "search/LinearSearch.java",
+            "Stmts": 7,
+            "Miss": 2,
+            "Cover": "71.43%",
+            "Missing": "19-24"
+        }
+    ],
     "total": {
         "Filename": "TOTAL",
-        "Stmts": 794,
-        "Miss": 264,
-        "Cover": "66.75%"
-    },
-    "files": {
-        "Filename": [
-            "pycobertura/__init__.py",
-            "pycobertura/cli.py",
-            "pycobertura/cobertura.py",
-            "pycobertura/filesystem.py",
-            "pycobertura/reporters.py",
-            "pycobertura/utils.py",
-            "pycobertura/templates/__init__.py",
-            "pycobertura/templates/filters.py"
-        ],
-        "Stmts": [
-            2,
-            132,
-            216,
-            91,
-            214,
-            122,
-            0,
-            17
-        ],
-        "Miss": [
-            0,
-            88,
-            35,
-            6,
-            110,
-            15,
-            0,
-            10
-        ],
-        "Cover": [
-            "100.00%",
-            "33.33%",
-            "83.80%",
-            "93.41%",
-            "48.60%",
-            "87.70%",
-            "100.00%",
-            "41.18%"
-        ],
-        "Missing": [
-            "",
-            "274-3758",
-            "423, 648-696",
-            "343-625",
-            "291, 295-3284",
-            "38, 262-486",
-            "",
-            "261-544"
-        ]
+        "Stmts": 34,
+        "Miss": 3,
+        "Cover": "90.00%"
     }
 }
 ```
 
 ```shell
-$ pycobertura show --format yaml --output coverage.yaml coverage.xml
+$ pycobertura show --format yaml --output coverage.yaml tests/cobertura.xml
+files:
+- Filename: Main.java
+  Stmts: 15
+  Miss: 0
+  Cover: 100.00%
+  Missing: ''
+- Filename: search/BinarySearch.java
+  Stmts: 12
+  Miss: 1
+  Cover: 91.67%
+  Missing: '24'
+- Filename: search/ISortedArraySearch.java
+  Stmts: 0
+  Miss: 0
+  Cover: 100.00%
+  Missing: ''
+- Filename: search/LinearSearch.java
+  Stmts: 7
+  Miss: 2
+  Cover: 71.43%
+  Missing: 19-24
 total:
   Filename: TOTAL
-  Stmts: 683
-  Miss: 261
-  Cover: 61.79%
-files:
-  Filename:
-  - __init__.py
-  - cli.py
-  - cobertura.py
-  - filesystem.py
-  - reporters.py
-  - utils.py
-  - templates/__init__.py
-  - templates/filters.py
-  Stmts:
-  - 2
-  - 72
-  - 222
-  - 87
-  - 170
-  - 118
-  - 0
-  - 12
-  Miss:
-  - 0
-  - 16
-  - 63
-  - 44
-  - 72
-  - 60
-  - 0
-  - 6
-  Cover:
-  - 100.00%
-  - 77.78%
-  - 71.62%
-  - 49.43%
-  - 57.65%
-  - 49.15%
-  - 100.00%
-  - 50.00%
-  Missing:
-  - ''
-  - 47-53, 84-99, 223
-  - 63-66, 78, 93, 112-117, 135-137, 161-163, 166, 179-194, 205-209, 217-224, 236-241,
-    255, 275, 285, 307, 313-320, 359, 410-412, 449-451
-  - 14-15, 25, 43, 51-52, 55-58, 62, 66-73, 78-83, 86-87, 92-100, 103-113, 122-133,
-    148, 151
-  - 23, 27, 30-55, 60-61, 66-67, 72-76, 81-87, 92-97, 100-113, 238-247, 254-263, 270-287,
-    320-321, 324-346
-  - 38, 70-83, 88-93, 122-137, 186-227
-  - ''
-  - 21, 25, 29, 33-35
+  Stmts: 34
+  Miss: 3
+  Cover: 90.00%
+
 ```
 
 ### Command `diff`
@@ -369,6 +320,14 @@ Upon exit, the `diff` command may return various exit codes:
 * 1: some exception occurred (likely due to inappropriate usage or a bug in pycobertura)
 * 2: the changes worsened the overall coverage
 * 3: the changes introduced uncovered statements but the overall coverage is still better than before
+
+You can capture the exit code by using the `$?` syntax from your shell:
+
+```bash
+pycobertura ...
+PYCOBERTURA_EXIT_CODE=$?
+echo $PYCOBERTURA_EXIT_CODE
+```
 
 ## Library usage
 
