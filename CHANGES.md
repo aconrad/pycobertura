@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.0.0 (2022-10-08)
+
 * BACKWARD INCOMPATIBLE:
   * Deprecate Python3.5 and 3.6, support Python 3.7 onwards (see
     python_requires, classifiers in `setup.cfg`)
@@ -21,14 +23,11 @@
     to `dictionary` (mutable) in `reporters.py`. Adjusted `html-delta.jinja2`,
     `html.jinja2` and `filters.py` accordingly. This change in datastructure
     leads to a more compact and more readable code
-  * `pycobertura show` and `pycobertura diff` now support output formats:
-    `json`, `markdown`, `csv`, and `yaml`.
   * Only uncovered lines are reported in `Missing` column (instead of
     additionally reporting newly covered lines)
   * Coverage diff for new files now make the assumption that "previous files"
     were covered at 100% and will no longer show an empty value represented by
     a dash "-".
-  * Add option `--ignore-regex` to ignore some files using either a Python regex pattern or a path to a `.gitignore` file.
 
   Thanks @gro1m
 
@@ -41,6 +40,10 @@
   `include_package_data=True`, because it requires `MANIFEST.in` and add
   `[options.package_data]` instead. This change makes the package installing
   from archive not miss `*.css` and `*.jinja2` files. Thanks @oev81
+* Add option `--ignore-regex` to ignore some files using either a Python regex
+  pattern or a path to a `.gitignore` file. Thanks @gro1m
+* `pycobertura show` and `pycobertura diff` now support output formats:
+  `json`, `markdown`, `csv`, and `yaml`. Thanks @gro1m
 
 ## 2.1.0 (2021-09-23)
 
