@@ -612,4 +612,4 @@ ticket](https://github.com/SurveyMonkey/pycobertura/issues).
 
 The pycobertura logo, Aysha, was graciously
 [donated](https://github.com/arasatasaygin/openlogos/issues/19) by
-[Open Logos](http://openlogos.org/). Check them out!
+[Open Logos](http://openlogos.org/). 🙇‍ Check them out!
