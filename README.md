@@ -1,6 +1,6 @@
 # pycobertura
 
-<img src="aysha-logo.svg" alt="pycobertura logo" width="100">
+![pycobertura logo](https://raw.githubusercontent.com/aconrad/pycobertura/master/aysha-logo.svg)
 
 A code coverage diff tool for Cobertura reports.
 
