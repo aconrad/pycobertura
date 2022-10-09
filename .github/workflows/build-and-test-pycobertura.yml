@@ -36,4 +36,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cobertura-coverage-${{ github.sha }}-${{ matrix.python-version }}
-          path: coverage/cobertura-coverage.xml
+          path: coverage.xml
