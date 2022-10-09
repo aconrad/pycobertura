@@ -5,7 +5,6 @@
 # - commit the changes to master and push
 
 PKG_NAME=pycobertura
-# from importlib import metadata is unfortunately only available from Python 3.8 onwards
 PKG_VERSION=$(cat __version__)
 
 git tag -am "release v${PKG_VERSION}" "v${PKG_VERSION}"
