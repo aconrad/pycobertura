@@ -1,4 +1,5 @@
 import lxml.etree as ET
+import os
 
 from collections import namedtuple
 
@@ -63,6 +64,8 @@ class Cobertura:
             except BaseException:
                 pass
         else:
+            if not os.path.exists(report) and filesystem:
+                 raise filesystem.FileNotFound(f"File {report} not found")
             raise self.InvalidCoverageReport("Invalid coverage file: {}".format(report))
 
         self.filesystem = filesystem

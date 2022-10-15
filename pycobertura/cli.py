@@ -89,7 +89,14 @@ def get_exit_code(differ, source):
     "the --source is a zip archive and the files were zipped under "
     "a directory prefix that is not part of the source.",
 )
-def show(cobertura_file, format, delimiter, output, source, source_prefix):
+@click.option(
+     "-hide",
+     "--hide-columns",
+     default="",
+     type=str,
+     help="Comma-separated string with columns you want to hide",
+ )
+def show(cobertura_file, format, delimiter, output, source, source_prefix, hide_columns):
     """show coverage summary of a Cobertura report"""
 
     if not source:
@@ -100,7 +107,7 @@ def show(cobertura_file, format, delimiter, output, source, source_prefix):
         filesystem=filesystem_factory(source, source_prefix=source_prefix),
     )
     Reporter = reporters[format]
-    reporter = Reporter(cobertura)
+    reporter = Reporter(cobertura, hide_columns)
 
     if format == "csv":
         report = reporter.generate(delimiter)
@@ -202,6 +209,13 @@ directories (or zip archives). If the source is not available at all, pass
     "`--no-source` is passed, missing lines and the source code will "
     "not be displayed.",
 )
+@click.option(
+     "-hide",
+     "--hide-columns",
+     default="",
+     type=str,
+     help="Comma-separated string with columns you want to hide",
+ )
 def diff(
     cobertura_file1,
     cobertura_file2,
@@ -214,6 +228,7 @@ def diff(
     source_prefix1,
     source_prefix2,
     source,
+    hide_columns
 ):
     """compare coverage of two Cobertura reports"""
     # Assume that the source is located in the same directory as the provided
@@ -231,7 +246,7 @@ def diff(
     cobertura2 = Cobertura(cobertura_file2, filesystem=filesystem2)
 
     Reporter = delta_reporters[format]
-    reporter_args = [cobertura1, cobertura2]
+    reporter_args = [cobertura1, cobertura2, hide_columns]
     reporter_kwargs = {"show_source": source}
 
     isatty = True if output is None else output.isatty()
