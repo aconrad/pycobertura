@@ -7,6 +7,7 @@ from pycobertura.utils import (
     extrapolate_coverage,
     reconcile_lines,
     hunkify_lines,
+    get_filenames_that_do_not_match_regex,
     memoize,
 )
 
@@ -245,7 +246,7 @@ class Cobertura:
         )
 
     @memoize
-    def files(self):
+    def files(self, ignore_regex=None):
         """
         Return the list of available files in the coverage report.
         """
@@ -260,7 +261,11 @@ class Cobertura:
             already_seen.add(filename)
             filenames.append(filename)
 
-        return filenames
+        return (
+            filenames
+            if not ignore_regex
+            else get_filenames_that_do_not_match_regex(filenames, ignore_regex)
+        )
 
     def has_file(self, filename):
         """
@@ -372,11 +377,11 @@ class CoberturaDiff:
             line.number for line in self.file_source(filename) if line.status is False
         ]
 
-    def files(self):
+    def files(self, ignore_regex=None):
         """
         Return `self.cobertura2.files()`.
         """
-        return self.cobertura2.files()
+        return self.cobertura2.files(ignore_regex)
 
     def file_source(self, filename):
         """
