@@ -66,7 +66,7 @@ class Cobertura:
                 pass
         else:
             if not os.path.exists(report) and filesystem:
-                raise filesystem.FileNotFound(f"File {report} not found")
+                 raise filesystem.FileNotFound(f"File {report} not found")
             raise self.InvalidCoverageReport("Invalid coverage file: {}".format(report))
 
         self.filesystem = filesystem

@@ -96,22 +96,13 @@ def get_exit_code(differ, source):
     "a directory prefix that is not part of the source.",
 )
 @click.option(
-    "-hide",
-    "--hide-columns",
-    default="",
-    type=str,
-    help="Comma-separated string with columns you want to hide",
-)
-def show(
-    cobertura_file,
-    ignore_regex,
-    format,
-    delimiter,
-    output,
-    source,
-    source_prefix,
-    hide_columns,
-):
+     "-hide",
+     "--hide-columns",
+     default="",
+     type=str,
+     help="Comma-separated string with columns you want to hide",
+ )
+def show(cobertura_file, ignore_regex, format, delimiter, output, source, source_prefix, hide_columns):
     """show coverage summary of a Cobertura report"""
 
     if not source:
@@ -231,12 +222,12 @@ directories (or zip archives). If the source is not available at all, pass
     "not be displayed.",
 )
 @click.option(
-    "-hide",
-    "--hide-columns",
-    default="",
-    type=str,
-    help="Comma-separated string with columns you want to hide",
-)
+     "-hide",
+     "--hide-columns",
+     default="",
+     type=str,
+     help="Comma-separated string with columns you want to hide",
+ )
 def diff(
     cobertura_file1,
     cobertura_file2,
@@ -250,7 +241,7 @@ def diff(
     source_prefix1,
     source_prefix2,
     source,
-    hide_columns,
+    hide_columns
 ):
     """compare coverage of two Cobertura reports"""
     # Assume that the source is located in the same directory as the provided

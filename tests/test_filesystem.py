@@ -8,13 +8,13 @@ FIRST_PYCOBERTURA_COMMIT_SHA = "d1fe88da6b18340762b24bb1f89067a3439c4041"
 def test_filesystem_directory__file_not_found():
     from pycobertura.filesystem import DirectoryFileSystem
 
-    fs = DirectoryFileSystem("foo/bar/baz")
+    fs = DirectoryFileSystem('foo/bar/baz')
 
     expected_filepaths = {
-        "Main.java": "foo/bar/baz/Main.java",
-        "search/BinarySearch.java": "foo/bar/baz/search/BinarySearch.java",
-        "search/ISortedArraySearch.java": "foo/bar/baz/search/ISortedArraySearch.java",
-        "search/LinearSearch.java": "foo/bar/baz/search/LinearSearch.java",
+        'Main.java': 'foo/bar/baz/Main.java',
+        'search/BinarySearch.java': 'foo/bar/baz/search/BinarySearch.java',
+        'search/ISortedArraySearch.java': 'foo/bar/baz/search/ISortedArraySearch.java',
+        'search/LinearSearch.java': 'foo/bar/baz/search/LinearSearch.java',
     }
 
     for filename in expected_filepaths:
@@ -28,31 +28,32 @@ def test_filesystem_directory__file_not_found():
 def test_filesystem_directory__returns_fileobject():
     from pycobertura.filesystem import DirectoryFileSystem
 
-    fs = DirectoryFileSystem("tests/dummy")
+    fs = DirectoryFileSystem('tests/dummy')
 
     expected_filepaths = {
-        "dummy/dummy.py": "dummy/dummy/dummy.py",
+        'dummy/dummy.py': 'dummy/dummy/dummy.py',
     }
 
     for filename in expected_filepaths:
         with fs.open(filename) as f:
-            assert hasattr(f, "read")
+            assert hasattr(f, 'read')
 
 
 def test_filesystem_directory__with_source_prefix():
     from pycobertura.filesystem import DirectoryFileSystem
 
     fs = DirectoryFileSystem(
-        "tests/", source_prefix="dummy"  # should resolve to tests/dummy/
+        'tests/',
+        source_prefix='dummy'  # should resolve to tests/dummy/
     )
 
     expected_filepaths = {
-        "dummy/dummy.py": "dummy/dummy/dummy.py",
+        'dummy/dummy.py': 'dummy/dummy/dummy.py',
     }
 
     for filename in expected_filepaths:
         with fs.open(filename) as f:
-            assert hasattr(f, "read")
+            assert hasattr(f, 'read')
 
 
 def test_filesystem_zip__file_not_found():
@@ -60,7 +61,7 @@ def test_filesystem_zip__file_not_found():
 
     fs = ZipFileSystem("tests/dummy/dummy.zip")
 
-    dummy_source_file = "foo/non-existent-file.py"
+    dummy_source_file = 'foo/non-existent-file.py'
     try:
         with fs.open(dummy_source_file) as f:
             pass
@@ -74,13 +75,13 @@ def test_filesystem_zip__returns_fileobject():
     fs = ZipFileSystem("tests/dummy/dummy.zip")
 
     source_files_in_zip = [
-        "dummy/dummy.py",
-        "dummy/dummy2.py",
+        'dummy/dummy.py',
+        'dummy/dummy2.py',
     ]
 
     for source_file in source_files_in_zip:
         with fs.open(source_file) as f:
-            assert hasattr(f, "read")
+            assert hasattr(f, 'read')
 
 
 def test_filesystem_zip__with_source_prefix():
@@ -92,13 +93,13 @@ def test_filesystem_zip__with_source_prefix():
     )
 
     source_files_in_zip = [
-        "dummy/dummy.py",
-        "dummy/dummy2.py",
+        'dummy/dummy.py',
+        'dummy/dummy2.py',
     ]
 
     for source_file in source_files_in_zip:
         with fs.open(source_file) as f:
-            assert hasattr(f, "read")
+            assert hasattr(f, 'read')
 
 
 def test_filesystem_git():
@@ -112,7 +113,7 @@ def test_filesystem_git():
         fs = fsm.GitFileSystem(folder, branch)
 
         with fs.open(filename) as f:
-            assert hasattr(f, "read")
+            assert hasattr(f, 'read')
 
         expected_git_filename = "master:tests/dummy/test-file"
         git_filename = fs.real_filename(filename)
@@ -129,13 +130,13 @@ def test_filesystem_git_integration():
 
     # Files included in pycobertura's first commit.
     source_files = [
-        "README.md",
-        ".gitignore",
+        'README.md',
+        '.gitignore',
     ]
 
     for source_file in source_files:
         with fs.open(source_file) as f:
-            assert hasattr(f, "read")
+            assert hasattr(f, 'read')
 
 
 def test_filesystem_git_integration__not_found():

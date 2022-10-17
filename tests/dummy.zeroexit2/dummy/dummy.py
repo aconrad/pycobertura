@@ -1,9 +1,9 @@
 def foo(value=False):
-    a = "a"
-    b = "b"
+    a = 'a'
+    b = 'b'
     if value:
-        c = "c"
-        d = "d"
-        e = "e"
+        c = 'c'
+        d = 'd'
+        e = 'e'
     else:
-        f = "f"
+        f = 'f'

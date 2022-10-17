@@ -23,11 +23,7 @@ class Reporter:
     def __init__(self, cobertura, ignore_regex=None, hide_columns=""):
         self.cobertura = cobertura
         self.ignore_regex = ignore_regex
-        self.show_columns = (
-            headers_with_missing
-            if hide_columns == ""
-            else [col for col in headers_hideable if col not in hide_columns.split(",")]
-        )
+        self.show_columns = headers_with_missing if hide_columns=="" else [col for col in headers_hideable if col not in hide_columns.split(",")]
 
     @staticmethod
     def format_line_rate(line_rate):
@@ -193,11 +189,7 @@ class DeltaReporter:
         **kwargs,
     ):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
-        self.show_columns = (
-            headers_with_missing
-            if hide_columns == ""
-            else [col for col in headers_hideable if col not in hide_columns.split(",")]
-        )
+        self.show_columns = headers_with_missing if hide_columns=="" else [col for col in headers_hideable if col not in hide_columns.split(",")]
         self.show_source = show_source
         self.color = kwargs.pop("color", False)
         self.ignore_regex = ignore_regex
@@ -246,6 +238,9 @@ class DeltaReporter:
         diff_total_miss,
         diff_total_cover,
     ):
+        diff_total_missing = [
+            self.differ.diff_missed_lines(filename) for filename in self.differ.files()
+        ]
         rows_func_dict = {
             "Filename": [self.differ.files()[i] for i in indexes_of_files_with_changes],
             "Stmts": [
@@ -260,6 +255,10 @@ class DeltaReporter:
                 self.format_line_rate(diff_total_cover[i])
                 for i in indexes_of_files_with_changes
             ],
+            "Missing": [
+                self.format_missed_lines(diff_total_missing[i])
+                for i in indexes_of_files_with_changes
+            ],
         }
         footer_func_dict = {
             "Filename": ["TOTAL"],
@@ -268,18 +267,9 @@ class DeltaReporter:
             ],
             "Miss": [self.format_total_misses(self.differ.diff_total_misses())],
             "Cover": [self.format_line_rate(self.differ.diff_line_rate())],
+            "Missing": [""],
         }
-        if self.show_source:
-            diff_total_missing = [
-                self.differ.diff_missed_lines(filename)
-                for filename in self.differ.files()
-            ]
-            rows_func_dict["Missing"] = [
-                self.format_missed_lines(diff_total_missing[i])
-                for i in indexes_of_files_with_changes
-            ]
-            footer_func_dict["Missing"] = [""]
-        return rows_func_dict[key] + footer_func_dict[key]
+        return rows_func_dict[key] + footer_func_dict[key]    
 
     def get_summary_lines(self):
         filenames = self.differ.files(ignore_regex=self.ignore_regex)
