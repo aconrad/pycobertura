@@ -1,5 +1,6 @@
 def test_extrapolate_coverage():
     from pycobertura.utils import extrapolate_coverage
+
     lines_w_status = [
         (1, True),
         (4, True),

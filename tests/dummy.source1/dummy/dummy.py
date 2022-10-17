@@ -1,6 +1,7 @@
 def foo():
     pass
 
+
 def bar():
-    a = 'a'
-    b = 'b'
+    a = "a"
+    b = "b"

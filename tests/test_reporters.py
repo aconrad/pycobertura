@@ -2,8 +2,8 @@ from .utils import make_cobertura
 
 
 def remove_style_tag(html):
-    style_pattern_start = '\n    <style>'
-    style_pattern_stop = '\n    </style>'
+    style_pattern_start = "\n    <style>"
+    style_pattern_stop = "\n    </style>"
     style_starts = html.find(style_pattern_start)
     style_stops = html.find(style_pattern_stop) + len(style_pattern_stop)
     html_nostyle = html[:style_starts] + html[style_stops:]
@@ -16,7 +16,9 @@ def test_text_report():
     cobertura = make_cobertura()
     report = TextReporter(cobertura)
 
-    assert report.generate() == """\
+    assert (
+        report.generate()
+        == """\
 Filename                          Stmts    Miss  Cover    Missing
 ------------------------------  -------  ------  -------  ---------
 Main.java                            15       0  100.00%
@@ -24,86 +26,102 @@ search/BinarySearch.java             12       1  91.67%   24
 search/ISortedArraySearch.java        0       0  100.00%
 search/LinearSearch.java              7       2  71.43%   19-24
 TOTAL                                34       3  90.00%"""
+    )
 
 
 def test_text_report__with_missing_range():
     from pycobertura.reporters import TextReporter
 
-    cobertura = make_cobertura('tests/dummy.with-dummy2-no-cov.xml')
+    cobertura = make_cobertura("tests/dummy.with-dummy2-no-cov.xml")
     report = TextReporter(cobertura)
 
-    assert report.generate() == """\
+    assert (
+        report.generate()
+        == """\
 Filename             Stmts    Miss  Cover    Missing
 -----------------  -------  ------  -------  ---------
 dummy/__init__.py        0       0  0.00%
 dummy/dummy.py           4       0  100.00%
 dummy/dummy2.py          2       2  0.00%    1-2
 TOTAL                    6       2  66.67%"""
+    )
 
 
 def test_text_report_delta__no_diff():
     from pycobertura.reporters import TextReporterDelta
 
-    cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
-    cobertura2 = make_cobertura('tests/dummy.source1/coverage.xml')
+    cobertura1 = make_cobertura("tests/dummy.source1/coverage.xml")
+    cobertura2 = make_cobertura("tests/dummy.source1/coverage.xml")
 
     report_delta = TextReporterDelta(cobertura1, cobertura2)
 
-    assert report_delta.generate() == """\
+    assert (
+        report_delta.generate()
+        == """\
 Filename      Stmts    Miss  Cover     Missing
 ----------  -------  ------  --------  ---------
 TOTAL             0       0  +100.00%"""
+    )
 
 
 def test_text_report_delta__colorize_True():
     from pycobertura.reporters import TextReporterDelta
 
-    cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
-    cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
+    cobertura1 = make_cobertura("tests/dummy.source1/coverage.xml")
+    cobertura2 = make_cobertura("tests/dummy.source2/coverage.xml")
 
     report_delta = TextReporterDelta(cobertura1, cobertura2, color=True)
 
-    assert report_delta.generate() == """\
+    assert (
+        report_delta.generate()
+        == """\
 Filename           Stmts    Miss  Cover     Missing
 ---------------  -------  ------  --------  ---------
 dummy/dummy.py         0      \x1b[32m-2\x1b[39m  +40.00%
 dummy/dummy2.py       +2      \x1b[31m+1\x1b[39m  -25.00%   \x1b[31m5\x1b[39m
 dummy/dummy3.py       +2      \x1b[31m+2\x1b[39m  +100.00%  \x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m
 TOTAL                 +4      \x1b[31m+1\x1b[39m  +31.06%"""
+    )
 
 
 def test_text_report_delta__colorize_True__with_missing_range():
     from pycobertura.reporters import TextReporterDelta
 
-    cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
-    cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
+    cobertura1 = make_cobertura("tests/dummy.source1/coverage.xml")
+    cobertura2 = make_cobertura("tests/dummy.source2/coverage.xml")
 
     report_delta = TextReporterDelta(cobertura1, cobertura2, color=True)
 
-    assert report_delta.generate() == """\
+    assert (
+        report_delta.generate()
+        == """\
 Filename           Stmts    Miss  Cover     Missing
 ---------------  -------  ------  --------  ---------
 dummy/dummy.py         0      \x1b[32m-2\x1b[39m  +40.00%
 dummy/dummy2.py       +2      \x1b[31m+1\x1b[39m  -25.00%   \x1b[31m5\x1b[39m
 dummy/dummy3.py       +2      \x1b[31m+2\x1b[39m  +100.00%  \x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m
 TOTAL                 +4      \x1b[31m+1\x1b[39m  +31.06%"""
+    )
 
 
 def test_text_report_delta__colorize_False():
     from pycobertura.reporters import TextReporterDelta
 
-    cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
-    cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
+    cobertura1 = make_cobertura("tests/dummy.source1/coverage.xml")
+    cobertura2 = make_cobertura("tests/dummy.source2/coverage.xml")
 
     report_delta = TextReporterDelta(cobertura1, cobertura2, color=False)
 
-    assert report_delta.generate() == """\
+    assert (
+        report_delta.generate()
+        == """\
 Filename           Stmts    Miss  Cover     Missing
 ---------------  -------  ------  --------  ---------
 dummy/dummy.py         0      -2  +40.00%
 dummy/dummy2.py       +2      +1  -25.00%   5
 dummy/dummy3.py       +2      +2  +100.00%  1, 2
 TOTAL                 +4      +1  +31.06%"""
+    )
 
 
 def test_html_report():
@@ -116,7 +134,9 @@ def test_html_report():
     assert "normalize.css" in html_output
     assert "Skeleton V2.0" in html_output
 
-    assert remove_style_tag(html_output) == """\
+    assert (
+        remove_style_tag(html_output)
+        == """\
 <html>
   <head>
     <title>pycobertura report</title>
@@ -235,6 +255,7 @@ def test_html_report():
     </div>
   </body>
 </html>"""
+    )
 
 
 def test_html_report__no_source_files_message():
@@ -247,7 +268,9 @@ def test_html_report__no_source_files_message():
     assert "normalize.css" in html_output
     assert "Skeleton V2.0" in html_output
 
-    assert remove_style_tag(html_output) == """\
+    assert (
+        remove_style_tag(html_output)
+        == """\
 <html>
   <head>
     <title>test report</title>
@@ -310,37 +333,43 @@ def test_html_report__no_source_files_message():
     </div>
   </body>
 </html>"""
+    )
 
 
 def test_text_report_delta__no_source():
     from pycobertura.reporters import TextReporterDelta
 
-    cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
-    cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
+    cobertura1 = make_cobertura("tests/dummy.source1/coverage.xml")
+    cobertura2 = make_cobertura("tests/dummy.source2/coverage.xml")
 
     report_delta = TextReporterDelta(cobertura1, cobertura2, show_source=False)
     output = report_delta.generate()
-    assert output == """\
+    assert (
+        output
+        == """\
 Filename           Stmts    Miss  Cover
 ---------------  -------  ------  --------
 dummy/dummy.py         0      -2  +40.00%
 dummy/dummy2.py       +2      +1  -25.00%
 dummy/dummy3.py       +2      +2  +100.00%
 TOTAL                 +4      +1  +31.06%"""
+    )
 
 
 def test_html_report_delta__no_source():
     from pycobertura.reporters import HtmlReporterDelta
 
-    cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
-    cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
+    cobertura1 = make_cobertura("tests/dummy.source1/coverage.xml")
+    cobertura2 = make_cobertura("tests/dummy.source2/coverage.xml")
 
     report_delta = HtmlReporterDelta(cobertura1, cobertura2, show_source=False)
     html_output = report_delta.generate()
-    assert 'Missing' not in html_output
-    assert '<h4 id=' not in html_output
+    assert "Missing" not in html_output
+    assert "<h4 id=" not in html_output
 
-    assert remove_style_tag(html_output) == """\
+    assert (
+        remove_style_tag(html_output)
+        == """\
 <html>
   <head>
     <title>pycobertura report</title>
@@ -389,22 +418,25 @@ def test_html_report_delta__no_source():
     </div>
   </body>
 </html>"""
+    )
 
 
 def test_html_report_delta():
     from pycobertura.reporters import HtmlReporterDelta
 
-    cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
-    cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
+    cobertura1 = make_cobertura("tests/dummy.source1/coverage.xml")
+    cobertura2 = make_cobertura("tests/dummy.source2/coverage.xml")
 
     report_delta = HtmlReporterDelta(cobertura1, cobertura2)
     html_output = report_delta.generate()
-    assert '.red {color: red}' in html_output
-    assert '.green {color: green}' in html_output
+    assert ".red {color: red}" in html_output
+    assert ".green {color: green}" in html_output
     assert "normalize.css" in html_output
     assert "Skeleton V2.0" in html_output
 
-    assert remove_style_tag(html_output) == u"""\
+    assert (
+        remove_style_tag(html_output)
+        == """\
 <html>
   <head>
     <title>pycobertura report</title>
@@ -531,18 +563,21 @@ def test_html_report_delta():
     </div>
   </body>
 </html>"""
+    )
 
 
 def test_html_report_delta__show_missing_False():
     from pycobertura.reporters import HtmlReporterDelta
 
-    cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
-    cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
+    cobertura1 = make_cobertura("tests/dummy.source1/coverage.xml")
+    cobertura2 = make_cobertura("tests/dummy.source2/coverage.xml")
 
     report_delta = HtmlReporterDelta(cobertura1, cobertura2, show_missing=False)
     html_output = report_delta.generate()
 
-    assert remove_style_tag(html_output) == u"""\
+    assert (
+        remove_style_tag(html_output)
+        == """\
 <html>
   <head>
     <title>pycobertura report</title>
@@ -661,3 +696,4 @@ def test_html_report_delta__show_missing_False():
     </div>
   </body>
 </html>"""
+    )

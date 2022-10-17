@@ -1,5 +1,6 @@
 def baz():
-    c = 'c'
+    c = "c"
+
 
 def bat():
     pass
