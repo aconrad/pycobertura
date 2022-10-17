@@ -98,9 +98,9 @@ def get_exit_code(differ, source):
 @click.option(
     "-hide",
     "--hide-columns",
-    default="",
-    type=str,
-    help="Comma-separated string with columns you want to hide",
+    default=[],
+    type=list,
+    help="Comma-separated list of column names you want to hide",
 )
 def show(
     cobertura_file,
@@ -233,9 +233,9 @@ directories (or zip archives). If the source is not available at all, pass
 @click.option(
     "-hide",
     "--hide-columns",
-    default="",
-    type=str,
-    help="Comma-separated string with columns you want to hide",
+    default=[],
+    type=list,
+    help="Comma-separated list of column names you want to hide",
 )
 def diff(
     cobertura_file1,

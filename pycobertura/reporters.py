@@ -20,14 +20,13 @@ headers_hideable = headers_without_missing.remove("Filename")
 
 
 class Reporter:
-    def __init__(self, cobertura, ignore_regex=None, hide_columns=""):
+    def __init__(self, cobertura, ignore_regex=None, hide_columns=[]):
         self.cobertura = cobertura
         self.ignore_regex = ignore_regex
-        self.show_columns = (
-            headers_with_missing
-            if hide_columns == ""
-            else [col for col in headers_hideable if col not in hide_columns.split(",")]
-        )
+        self.set_hide_columns = set(hide_columns)
+        self.show_columns = [
+            col for col in headers_with_missing if col not in self.set_hide_columns
+        ]
 
     @staticmethod
     def format_line_rate(line_rate):
@@ -193,11 +192,10 @@ class DeltaReporter:
         **kwargs,
     ):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
-        self.show_columns = (
-            headers_with_missing
-            if hide_columns == ""
-            else [col for col in headers_hideable if col not in hide_columns.split(",")]
-        )
+        self.set_hide_columns = set(hide_columns)
+        self.show_columns = [
+            col for col in headers_with_missing if col not in self.set_hide_columns
+        ]
         self.show_source = show_source
         self.color = kwargs.pop("color", False)
         self.ignore_regex = ignore_regex
