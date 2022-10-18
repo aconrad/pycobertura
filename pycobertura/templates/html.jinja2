@@ -16,37 +16,31 @@ pre {line-height: 1.3}
       <h1>{{ title }}</h1>
       <table class="u-full-width">
         <thead>
-          <tr>
-            <th>Filename</th>
-            <th>Stmts</th>
-            <th>Miss</th>
-            <th>Cover</th>
-            <th>Missing</th>
+{%- for key in lines.keys() %}  
+          <tr>        
+            <th>key</th>
           </tr>
+{%- endfor %}
         </thead>
         <tbody>
-{%- for line in lines["Filename"] %}
+{%- for row_num in range(lines.values()|length) %}
+{%- for key in lines.keys() %}    
           <tr>
-            {%- if sources %}
-            <td><a href="#{{ lines["Filename"][loop.index0] }}">{{ lines["Filename"][loop.index0] }}</a></td>
+            {%- if sources and key=="Filename"%}
+            <td><a href="#{{ lines[key][row_num] }}">{{ lines[key][row_num] }}</a></td>
             {%- else %}
-            <td>{{ lines["Filename"][loop.index0] }}</td>
+            <td>{{ lines[key][row_num] }}</td>
             {%- endif %}
-            <td>{{ lines["Stmts"][loop.index0] }}</td>
-            <td>{{ lines["Miss"][loop.index0] }}</td>
-            <td>{{ lines["Cover"][loop.index0] }}</td>
-            <td>{{ lines["Missing"][loop.index0] }}</td>
           </tr>
+{%- endfor %}
 {%- endfor %}
         </tbody>
         <tfoot>
+{%- for key in lines.keys() %} 
           <tr>
-            <td>{{ footer["Filename"] }}</td>
-            <td>{{ footer["Stmts"] }}</td>
-            <td>{{ footer["Miss"] }}</td>
-            <td>{{ footer["Cover"] }}</td>
-            <td>{{ footer["Missing"] }}</td>
+            <td>{{ footer[key] }}</td>
           </tr>
+{%- endfor %}
         </tfoot>
       </table>
 {%- if sources %}

@@ -23,7 +23,7 @@ class Reporter:
     def __init__(self, cobertura, ignore_regex=None, hide_columns=[]):
         self.cobertura = cobertura
         self.ignore_regex = ignore_regex
-        self.set_hide_columns = set(hide_columns)
+        self.set_hide_columns = set(''.join([x for x in hide_columns if x not in ('[',']')]).split(','))
         self.show_columns = [
             col for col in headers_with_missing if col not in self.set_hide_columns
         ]
@@ -107,13 +107,13 @@ class Reporter:
 class TextReporter(Reporter):
     def generate(self):
         lines = self.get_summary_lines()
-        return tabulate(lines, headers=headers_with_missing)
+        return tabulate(lines, headers=self.show_columns)
 
 
 class CsvReporter(Reporter):
     def generate(self, delimiter):
         lines = self.get_summary_lines()
-        list_of_lines = [headers_with_missing]
+        list_of_lines = [self.show_columns]
         list_of_lines.extend(
             [[f"{item}" for item in row] for row in zip(*lines.values())]
         )
@@ -128,7 +128,7 @@ class CsvReporter(Reporter):
 class MarkdownReporter(Reporter):
     def generate(self):
         lines = self.get_summary_lines()
-        return tabulate(lines, headers=headers_with_missing, tablefmt="github")
+        return tabulate(lines, headers=self.show_columns, tablefmt="github")
 
 
 class JsonReporter(Reporter):
@@ -192,7 +192,7 @@ class DeltaReporter:
         **kwargs,
     ):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
-        self.set_hide_columns = set(hide_columns)
+        self.set_hide_columns = set(''.join([x for x in hide_columns if x not in ('[',']')]).split(','))
         self.show_columns = [
             col for col in headers_with_missing if col not in self.set_hide_columns
         ]
@@ -354,7 +354,7 @@ class TextReporterDelta(DeltaReporter):
                 self.color_number(line) for line in lines["Missing"]
             ]
             lines["Missing"] = missed_lines_colored
-        return tabulate(lines, headers=lines.keys())
+        return tabulate(lines, headers=self.show_columns)
 
 
 class CsvReporterDelta(DeltaReporter):
@@ -367,14 +367,14 @@ class CsvReporterDelta(DeltaReporter):
 
         # Stringify every item in Table row values without using the Missing column
         # and store in the list list_of_lines
-        list_of_lines = [lines.keys()]
+        list_of_lines = [self.show_columns]
         list_of_lines.extend([[f"{item}" for item in row[:-1]] for row in lines_values])
 
         if self.show_source:
             # Add the Missing header to list_of_lines first inner list
             # This is a direct assignment to avoid appending an additional "Missing"
             # header in every iteration of the tests which would fail them
-            list_of_lines[0] = lines.keys()
+            list_of_lines[0] = self.show_columns
             # Add to every list inside the list_of_lines the Missing column value
             for line_index, missing_line in enumerate(lines["Missing"]):
                 # for colors, explanation see here:
@@ -395,15 +395,14 @@ class CsvReporterDelta(DeltaReporter):
 class MarkdownReporterDelta(DeltaReporter):
     def generate(self):
         lines = self.get_summary_lines()
-        headers = headers_without_missing
-
-        if self.show_source:
+        
+        if self.show_source and "Missing" in self.show_columns:
             missed_lines_colored = [
                 self.color_number(line) for line in lines["Missing"]
             ]
             lines["Missing"] = missed_lines_colored
-            headers = headers_with_missing
-        return tabulate(lines, headers=headers, tablefmt="github")
+            headers = headers.append("Missing")
+        return tabulate(lines, headers=self.show_columns, tablefmt="github")
 
 
 class JsonReporterDelta(DeltaReporter):
