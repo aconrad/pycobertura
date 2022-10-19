@@ -23,43 +23,40 @@ table.code td.lineno pre {margin-right: 1rem;}
     <div class="container">
       <table class="u-full-width">
         <thead>
-{%- for key in lines.keys() %}  
-          <tr>
-{%- if key!="Missing" %}          
-            <th> {{ key }} </th>
-{%- elif show_source and show_missing %}
-            <th>Missing</th>
-{%- endif %}
-          </tr>
-{%- endfor %}
         </thead>
         <tbody>
 {%- for key,vals in lines.items() %} 
+{%- if key!="Missing" or show_source and show_missing %}          
+            <th> {{ key }} </th>
+{%- endif %}
+{%- endfor %}
+{%- for idx in range(lines.values() | length) %} 
+{%- for key in lines %} 
           <tr>
 {%- if key in ("Stmts", "Cover") %}
-            <td>{{ vals }}</td>   
-{%- elif key == "Filename" %}        
-            <td><a href="#{{ vals }}">{{ vals }}</a></td>
-{%- elif key == "Miss" %}  
-{%- for val in vals %}   
-            <td><span{% if val | is_not_equal_to_dash %} class="{{ val | misses_color }}"{% endif %}>{{ val }}</span></td>
-{%- endfor %}
+            <td>{{ lines[key][idx] }}</td> 
+{%- elif key == "Filename" %}      
+            <td><a href="#{{ lines[key][idx] }}">{{ lines[key][idx]  }}</a></td>
+{%- elif key == "Miss" %}   
+            <td><span{% if lines[key][idx]  | is_not_equal_to_dash %} class="{{ lines[key][idx]  | misses_color }}"{% endif %}>{{ lines[key][idx]  }}</span></td>
 {%- elif key == "Missing" and show_source and show_missing %}
             <td>
-{%- for val in vals %} 
-{%- for missed_line in val %}
+{%- for missed_line in lines[key][idx]  %}       
             {%- if not loop.first %}, {% endif %}<span class="{{ missed_line | misses_color }}">{{ missed_line }}</span>
-{%- endfor %}
 {%- endfor %}
             </td>
 {%- endif %}
           </tr>
 {%- endfor %}
+{%- endfor %}
         </tbody>
         <tfoot>
 {%- for key, vals in footer.items() %} 
           <tr>
-{%- if key in ("Filename", "Stmts", "Cover") %}          
+{%- if key in ("Filename") %} 
+<th>{{ vals }}</a></th>
+{%- endif %}
+{%- if key in ("Stmts", "Cover") %}         
             <td>{{ vals }}</td>
 {%- elif key=="Miss" %}  
             <td><span{% if vals | is_not_equal_to_dash %} class="{{ vals | misses_color }}"{% endif %}>{{ vals }}</span></td>
