@@ -13,6 +13,7 @@ env.filters["line_status"] = filters.line_status
 env.filters["line_reason"] = filters.line_reason_icon
 env.filters["is_not_equal_to_dash"] = filters.is_not_equal_to_dash
 env.filters["misses_color"] = filters.misses_color
+env.filters['debug']=filters.debug
 
 headers_with_missing = ["Filename", "Stmts", "Miss", "Cover", "Missing"]
 headers_without_missing = ["Filename", "Stmts", "Miss", "Cover"]
@@ -23,7 +24,9 @@ class Reporter:
     def __init__(self, cobertura, ignore_regex=None, hide_columns=[]):
         self.cobertura = cobertura
         self.ignore_regex = ignore_regex
-        self.set_hide_columns = set(''.join([x for x in hide_columns if x not in ('[',']')]).split(','))
+        self.set_hide_columns = set(
+            "".join([x for x in hide_columns if x not in ("[", "]")]).split(",")
+        )
         self.show_columns = [
             col for col in headers_with_missing if col not in self.set_hide_columns
         ]
@@ -192,7 +195,9 @@ class DeltaReporter:
         **kwargs,
     ):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
-        self.set_hide_columns = set(''.join([x for x in hide_columns if x not in ('[',']')]).split(','))
+        self.set_hide_columns = set(
+            "".join([x for x in hide_columns if x not in ("[", "]")]).split(",")
+        )
         self.show_columns = [
             col for col in headers_with_missing if col not in self.set_hide_columns
         ]
@@ -395,7 +400,7 @@ class CsvReporterDelta(DeltaReporter):
 class MarkdownReporterDelta(DeltaReporter):
     def generate(self):
         lines = self.get_summary_lines()
-        
+
         if self.show_source and "Missing" in self.show_columns:
             missed_lines_colored = [
                 self.color_number(line) for line in lines["Missing"]
