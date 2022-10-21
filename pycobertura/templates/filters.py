@@ -15,6 +15,8 @@ line_reason_html_icon = {
     None: "&nbsp;",
 }
 
+def debug(x):
+    print(x)
 
 def is_not_equal_to_dash(arg):
     return not (arg == "-")
@@ -34,3 +36,6 @@ def line_reason_icon(line):
     if line.status is None:
         return "&nbsp;"
     return line_reason_html_icon[line.reason]
+
+def get_max_number_of_values_in_dict(dict_):
+    return max([len(v) for v in dict_.values()])
