@@ -8,7 +8,6 @@ line_status_style = {
     None: "noop",
 }
 
-
 line_reason_html_icon = {
     "line-edit": "+",
     "cov-up": "&nbsp;",

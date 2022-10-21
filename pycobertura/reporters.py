@@ -13,7 +13,6 @@ env.filters["line_status"] = filters.line_status
 env.filters["line_reason"] = filters.line_reason_icon
 env.filters["is_not_equal_to_dash"] = filters.is_not_equal_to_dash
 env.filters["misses_color"] = filters.misses_color
-env.filters['debug']=filters.debug
 
 headers_with_missing = ["Filename", "Stmts", "Miss", "Cover", "Missing"]
 headers_without_missing = ["Filename", "Stmts", "Miss", "Cover"]
@@ -406,7 +405,6 @@ class MarkdownReporterDelta(DeltaReporter):
                 self.color_number(line) for line in lines["Missing"]
             ]
             lines["Missing"] = missed_lines_colored
-            headers = headers.append("Missing")
         return tabulate(lines, headers=self.show_columns, tablefmt="github")
 
 
