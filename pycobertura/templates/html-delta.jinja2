@@ -23,21 +23,21 @@ table.code td.lineno pre {margin-right: 1rem;}
     <div class="container">
       <table class="u-full-width">
         <thead>
-          <tr>               
-{%- for key in lines if key!="Missing" or (show_source and show_missing) %}         
+          <tr>
+{%- for key in lines if key!="Missing" or (show_source and show_missing) %}
             <th>{{ key }}</th>
 {%- endfor %}
           </tr>
         </thead>
         <tbody>
 {%- for idx in range(lines | get_max_number_of_values_in_dict) %} 
-          <tr>      
+          <tr>     
           {%- for key in lines -%} 
             {%- if key in ("Stmts", "Cover") %}
-            <td>{{ lines[key][idx] }}</td> 
+            <td>{{ lines[key][idx] }}</td>
             {%- elif key == "Filename" %}      
             <td><a href="#{{ lines[key][idx] }}">{{ lines[key][idx]  }}</a></td>
-            {%- elif key == "Miss" %}        
+            {%- elif key == "Miss" %}       
             <td><span{% if miss_lines | is_not_equal_to_dash %} class="{{ lines[key][idx] | misses_color }}"{% endif %}>{{ lines[key][idx] }}</span></td>
             {%- elif key == "Missing" and show_source and show_missing %}
             <td>
@@ -55,7 +55,7 @@ table.code td.lineno pre {margin-right: 1rem;}
           {%- for key, vals in footer.items() %} 
             {%- if key in ("Filename", "Stmts", "Cover") %}         
             <td>{{ vals }}</td>
-            {%- elif key=="Miss" %} 
+            {%- elif key=="Miss" %}
             <td><span{% if vals | is_not_equal_to_dash %} class="{{ vals | misses_color }}"{% endif %}>{{ vals }}</span></td>
             {%- elif key=="Missing" and show_source and show_missing %}
             <td></td>

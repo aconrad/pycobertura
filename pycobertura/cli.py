@@ -237,6 +237,10 @@ directories (or zip archives). If the source is not available at all, pass
     type=list,
     help="Comma-separated list of column names you want to hide",
 )
+@click.option(
+    "--show-missing",
+    default=True,
+)
 def diff(
     cobertura_file1,
     cobertura_file2,
@@ -251,6 +255,7 @@ def diff(
     source_prefix2,
     source,
     hide_columns,
+    show_missing
 ):
     """compare coverage of two Cobertura reports"""
     # Assume that the source is located in the same directory as the provided
@@ -269,7 +274,7 @@ def diff(
 
     Reporter = delta_reporters[format]
     reporter_args = [cobertura1, cobertura2, ignore_regex, hide_columns]
-    reporter_kwargs = {"show_source": source}
+    reporter_kwargs = {"show_source": source, "show_missing": show_missing}
 
     isatty = True if output is None else output.isatty()
 
