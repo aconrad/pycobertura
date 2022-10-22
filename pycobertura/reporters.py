@@ -26,13 +26,15 @@ class Reporter:
     def __init__(self, cobertura, ignore_regex=None, hide_columns=[]):
         self.cobertura = cobertura
         self.ignore_regex = ignore_regex
-        self.sep = "" if ',' in hide_columns else ","
-        self.hide_columns = self.sep.join([x for x in hide_columns if x not in ("[","]")]).split(",")
-        
+        self.sep = "" if "," in hide_columns else ","
+        self.hide_columns = self.sep.join(
+            [x for x in hide_columns if x not in ("[", "]")]
+        ).split(",")
+
         self.set_hide_columns = set(
             ",".join([x for x in self.hide_columns if x not in ("[", "]")]).split(",")
         )
-        
+
         self.show_columns = [
             col for col in headers_with_missing if col not in self.set_hide_columns
         ]
@@ -201,11 +203,11 @@ class DeltaReporter:
         **kwargs,
     ):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
-        self.sep = "" if ',' in hide_columns else ","
-        self.hide_columns = self.sep.join([x for x in hide_columns if x not in ("[","]")]).split(",")
-        self.set_hide_columns = set(
-            ",".join([x for x in self.hide_columns]).split(",")
-        )
+        self.sep = "" if "," in hide_columns else ","
+        self.hide_columns = self.sep.join(
+            [x for x in hide_columns if x not in ("[", "]")]
+        ).split(",")
+        self.set_hide_columns = set(",".join([x for x in self.hide_columns]).split(","))
         self.show_columns = [
             col for col in headers_with_missing if col not in self.set_hide_columns
         ]
