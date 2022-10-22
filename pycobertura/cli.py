@@ -255,7 +255,7 @@ def diff(
     source_prefix2,
     source,
     hide_columns,
-    show_missing
+    show_missing,
 ):
     """compare coverage of two Cobertura reports"""
     # Assume that the source is located in the same directory as the provided

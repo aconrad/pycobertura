@@ -13,7 +13,9 @@ env.filters["line_status"] = filters.line_status
 env.filters["line_reason"] = filters.line_reason_icon
 env.filters["is_not_equal_to_dash"] = filters.is_not_equal_to_dash
 env.filters["misses_color"] = filters.misses_color
-env.filters["get_max_number_of_values_in_dict"] = filters.get_max_number_of_values_in_dict
+env.filters[
+    "get_max_number_of_values_in_dict"
+] = filters.get_max_number_of_values_in_dict
 
 headers_with_missing = ["Filename", "Stmts", "Miss", "Cover", "Missing"]
 headers_without_missing = ["Filename", "Stmts", "Miss", "Cover"]
