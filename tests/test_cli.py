@@ -110,6 +110,21 @@ dummy/dummy.py          2  50.00%
 TOTAL                   2  50.00%
 """
 
+    assert result.exit_code == ExitCodes.OK
+
+    result = runner.invoke(
+        show, ['tests/dummy.original.xml', '--hide-columns', ["Stmts,Miss"]], catch_exceptions=False
+    )
+    assert result.output == """\
+Filename           Cover    Missing
+-----------------  -------  ---------
+dummy/__init__.py  0.00%
+dummy/dummy.py     50.00%   2, 5
+TOTAL              50.00%
+"""
+
+    assert result.exit_code == ExitCodes.OK
+
 
 def test_show__format_text():
     for opt in ('-f', '--format'):
