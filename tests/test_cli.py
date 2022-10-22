@@ -389,6 +389,70 @@ TOTAL                 +4      \x1b[31m+1\x1b[39m  +31.06%
 """
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
+def test_diff__format_default_hide_columns_combinations_1():
+    result = runner.invoke(diff, [
+        'tests/dummy.source1/coverage.xml',
+        'tests/dummy.source2/coverage.xml',
+        '--hide-columns', ["Missing"]
+    ], catch_exceptions=False)
+    assert result.output == """\
+Filename           Stmts    Miss  Cover
+---------------  -------  ------  --------
+dummy/dummy.py         0      \x1b[32m-2\x1b[39m  +40.00%
+dummy/dummy2.py       +2      \x1b[31m+1\x1b[39m  -25.00%
+dummy/dummy3.py       +2      \x1b[31m+2\x1b[39m  +100.00%
+TOTAL                 +4      \x1b[31m+1\x1b[39m  +31.06%
+"""
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
+
+def test_diff__format_default_hide_columns_combinations_2():
+    result = runner.invoke(diff, [
+        'tests/dummy.source1/coverage.xml',
+        'tests/dummy.source2/coverage.xml',
+        '--hide-columns', ["Cover","Missing"]
+    ], catch_exceptions=False)
+    assert result.output == """\
+Filename           Stmts    Miss
+---------------  -------  ------
+dummy/dummy.py         0      \x1b[32m-2\x1b[39m
+dummy/dummy2.py       +2      \x1b[31m+1\x1b[39m
+dummy/dummy3.py       +2      \x1b[31m+2\x1b[39m
+TOTAL                 +4      \x1b[31m+1\x1b[39m
+"""
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
+
+def test_diff__format_default_hide_columns_combinations_3():
+    result = runner.invoke(diff, [
+        'tests/dummy.source1/coverage.xml',
+        'tests/dummy.source2/coverage.xml',
+        '--hide-columns', ["Cover","Miss","Missing"]
+    ], catch_exceptions=False)
+    assert result.output == """\
+Filename           Stmts
+---------------  -------
+dummy/dummy.py         0
+dummy/dummy2.py       +2
+dummy/dummy3.py       +2
+TOTAL                 +4
+"""
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
+
+def test_diff__format_default_hide_columns_combinations_5():
+    result = runner.invoke(diff, [
+        'tests/dummy.source1/coverage.xml',
+        'tests/dummy.source2/coverage.xml',
+        '--hide-columns', ["Stmts","Cover","Miss","Missing"]
+    ], catch_exceptions=False)
+    assert result.output == """\
+Filename
+---------------
+dummy/dummy.py
+dummy/dummy2.py
+dummy/dummy3.py
+TOTAL
+"""
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
+
 
 def test_diff__format_text():
     

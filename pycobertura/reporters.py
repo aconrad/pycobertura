@@ -26,15 +26,16 @@ class Reporter:
     def __init__(self, cobertura, ignore_regex=None, hide_columns=[]):
         self.cobertura = cobertura
         self.ignore_regex = ignore_regex
-        # print(f"hide columns = {hide_columns}")
+        self.sep = "" if ',' in hide_columns else ","
+        self.hide_columns = self.sep.join([x for x in hide_columns if x not in ("[","]")]).split(",")
+        
         self.set_hide_columns = set(
-            ",".join([x for x in hide_columns if x not in ("[", "]")]).split(",")
+            ",".join([x for x in self.hide_columns if x not in ("[", "]")]).split(",")
         )
-        # print(f"hide columns = {self.set_hide_columns}")
+        
         self.show_columns = [
             col for col in headers_with_missing if col not in self.set_hide_columns
         ]
-        # print(f"show columns = {self.show_columns}")
 
     @staticmethod
     def format_line_rate(line_rate):
@@ -194,14 +195,16 @@ class DeltaReporter:
         cobertura1,
         cobertura2,
         ignore_regex=None,
-        hide_columns="",
+        hide_columns=[],
         show_source=True,
         *args,
         **kwargs,
     ):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
+        self.sep = "" if ',' in hide_columns else ","
+        self.hide_columns = self.sep.join([x for x in hide_columns if x not in ("[","]")]).split(",")
         self.set_hide_columns = set(
-            "".join([x for x in hide_columns if x not in ("[", "]")]).split(",")
+            ",".join([x for x in self.hide_columns]).split(",")
         )
         self.show_columns = [
             col for col in headers_with_missing if col not in self.set_hide_columns
@@ -359,7 +362,7 @@ class TextReporterDelta(DeltaReporter):
     def generate(self):
         lines = self.get_summary_lines()
 
-        if self.show_source:
+        if self.show_source and "Missing" in self.show_columns:
             missed_lines_colored = [
                 self.color_number(line) for line in lines["Missing"]
             ]
