@@ -126,6 +126,83 @@ TOTAL              50.00%
     assert result.exit_code == ExitCodes.OK
 
 
+def test_show__format_default_hide_columns_combinations_3():
+    result = runner.invoke(
+        show, ['tests/dummy.original.xml', '--hide-columns',["Stmts","Cover","Missing"]],catch_exceptions=False
+    )
+    assert result.output == """\
+Filename             Miss
+-----------------  ------
+dummy/__init__.py       0
+dummy/dummy.py          2
+TOTAL                   2
+"""
+    assert result.exit_code == ExitCodes.OK
+
+    result = runner.invoke(
+        show, ['tests/dummy.original.xml', '--hide-columns', ["Stmts,Missing","Miss"]], catch_exceptions=False
+    )
+    assert result.output == """\
+Filename           Cover
+-----------------  -------
+dummy/__init__.py  0.00%
+dummy/dummy.py     50.00%
+TOTAL              50.00%
+"""
+
+    assert result.exit_code == ExitCodes.OK
+
+    result = runner.invoke(
+        show, ['tests/dummy.original.xml', '--hide-columns', ["Stmts","Miss","Filename"]], catch_exceptions=False
+    )
+    assert result.output == """\
+Cover    Missing
+-------  ---------
+0.00%
+50.00%   2, 5
+50.00%
+"""
+
+    assert result.exit_code == ExitCodes.OK
+
+    result = runner.invoke(
+        show, ['tests/dummy.original.xml', '--hide-columns', ["Cover","Miss","Missing"]], catch_exceptions=False
+    )
+    assert result.output == """\
+Filename             Stmts
+-----------------  -------
+dummy/__init__.py        0
+dummy/dummy.py           4
+TOTAL                    4
+"""
+
+    assert result.exit_code == ExitCodes.OK
+
+def test_show__format_default_hide_columns_combinations_4():
+    result = runner.invoke(
+        show, ['tests/dummy.original.xml', '--hide-columns', ["Stmts","Cover","Miss","Missing"]], catch_exceptions=False
+    )
+    assert result.output == """\
+Filename
+-----------------
+dummy/__init__.py
+dummy/dummy.py
+TOTAL
+"""
+
+    assert result.exit_code == ExitCodes.OK
+
+def test_show__format_default_hide_columns_combinations_5():
+    result = runner.invoke(
+        show, ['tests/dummy.original.xml', '--hide-columns', ["Filename","Stmts","Cover","Miss","Missing"]], catch_exceptions=False
+    )
+    assert result.output == """\
+
+"""
+
+    assert result.exit_code == ExitCodes.OK
+
+
 def test_show__format_text():
     for opt in ('-f', '--format'):
         result = runner.invoke(
