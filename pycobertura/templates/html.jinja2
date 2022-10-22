@@ -15,17 +15,17 @@ pre {line-height: 1.3}
     <div class="container">
       <h1>{{ title }}</h1>
       <table class="u-full-width">
-        <thead> 
+        <thead>
           <tr>
-          {%- for key in lines %}         
+          {%- for key in lines %}
             <th>{{ key }}</th>
           {%- endfor %}
           </tr>
         </thead>
         <tbody>
           <tr>
-          {%- for row_num in range(lines | get_max_number_of_values_in_dict) %} 
-          {%- for key in lines %}  
+          {%- for row_num in range(lines | get_max_number_of_values_in_dict) %}
+          {%- for key in lines %}
             {%- if sources and key=="Filename"%}
             <td><a href="#{{ lines[key][row_num] }}">{{ lines[key][row_num] }}</a></td>
             {%- else %}
@@ -37,7 +37,7 @@ pre {line-height: 1.3}
         </tbody>
         <tfoot>
           <tr>
-            {%- for key in lines %} 
+            {%- for key in lines %}
             <td>{{ footer[key] }}</td>
             {%- endfor %}
           </tr>
