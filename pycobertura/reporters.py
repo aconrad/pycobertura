@@ -23,21 +23,25 @@ headers_hideable = headers_without_missing.remove("Filename")
 
 
 class Reporter:
-    def __init__(self, cobertura, ignore_regex=None, hide_columns=[]):
+    def __init__(self, cobertura, ignore_regex=None, show_columns=None):
         self.cobertura = cobertura
         self.ignore_regex = ignore_regex
-        self.sep = "" if "," in hide_columns else ","
-        self.hide_columns = self.sep.join(
-            [x for x in hide_columns if x not in ("[", "]")]
-        ).split(",")
+        self.show_columns = self.compute_show_columns(show_columns)
 
-        self.set_hide_columns = set(
-            ",".join([x for x in self.hide_columns if x not in ("[", "]")]).split(",")
-        )
-
-        self.show_columns = [
-            col for col in headers_with_missing if col not in self.set_hide_columns
-        ]
+    @staticmethod
+    def compute_show_columns(show_columns_):
+        if show_columns_ is None:
+            return headers_with_missing
+        elif "," or "[" or "]" in show_columns_:
+            list_show_columns = "".join(
+                [x for x in show_columns_ if x not in ("[", "]")]
+            ).split(",")
+            print(list_show_columns)
+            print([col for col in headers_with_missing if col in list_show_columns])
+            return [col for col in headers_with_missing if col in list_show_columns]
+        else:
+            print([col for col in headers_with_missing if col in show_columns_])
+            return [col for col in headers_with_missing if col in show_columns_]
 
     @staticmethod
     def format_line_rate(line_rate):
@@ -197,28 +201,35 @@ class DeltaReporter:
         cobertura1,
         cobertura2,
         ignore_regex=None,
-        hide_columns=[],
+        show_columns=None,
         show_source=True,
         *args,
         **kwargs,
     ):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
-        self.sep = "" if "," in hide_columns else ","
-        self.hide_columns = self.sep.join(
-            [x for x in hide_columns if x not in ("[", "]")]
-        ).split(",")
-        self.set_hide_columns = set(",".join([x for x in self.hide_columns]).split(","))
-        self.show_columns = [
-            col for col in headers_with_missing if col not in self.set_hide_columns
-        ]
+        self.show_columns = self.compute_show_columns(show_columns)
         self.show_source = show_source
         self.color = kwargs.pop("color", False)
         self.ignore_regex = ignore_regex
 
-    def format_line_rate(self, line_rate):
+    @staticmethod
+    def compute_show_columns(show_columns_):
+        if show_columns_ is None:
+            return headers_with_missing
+        elif "," in show_columns_:
+            list_show_columns = "".join(
+                [x for x in show_columns_ if x not in ("[", "]")]
+            ).split(",")
+            return [col for col in headers_with_missing if col in list_show_columns]
+        else:
+            return [col for col in headers_with_missing if col in show_columns_]
+
+    @staticmethod
+    def format_line_rate(line_rate):
         return f"{line_rate:+.2%}" if line_rate else "+100.00%"
 
-    def format_total_statements(self, total_statements):
+    @staticmethod
+    def format_total_statements(total_statements):
         return f"{total_statements:+d}" if total_statements else "0"
 
     @staticmethod

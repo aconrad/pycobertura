@@ -96,11 +96,11 @@ def get_exit_code(differ, source):
     "a directory prefix that is not part of the source.",
 )
 @click.option(
-    "-hide",
-    "--hide-columns",
-    default=[],
+    "-onlycols",
+    "--only-show-columns",
+    default=None,
     type=list,
-    help="Comma-separated list of column names you want to hide",
+    help="Comma-separated list of column names you want to show",
 )
 def show(
     cobertura_file,
@@ -110,7 +110,7 @@ def show(
     output,
     source,
     source_prefix,
-    hide_columns,
+    only_show_columns,
 ):
     """show coverage summary of a Cobertura report"""
 
@@ -122,7 +122,7 @@ def show(
         filesystem=filesystem_factory(source, source_prefix=source_prefix),
     )
     Reporter = reporters[format]
-    reporter = Reporter(cobertura, ignore_regex, hide_columns)
+    reporter = Reporter(cobertura, ignore_regex, only_show_columns)
 
     if format == "csv":
         report = reporter.generate(delimiter)
@@ -231,11 +231,11 @@ directories (or zip archives). If the source is not available at all, pass
     "not be displayed.",
 )
 @click.option(
-    "-hide",
-    "--hide-columns",
-    default=[],
+    "-onlycols",
+    "--only-show-columns",
+    default=None,
     type=list,
-    help="Comma-separated list of column names you want to hide",
+    help="Comma-separated list of column names you want to show",
 )
 @click.option(
     "--show-missing",
@@ -254,7 +254,7 @@ def diff(
     source_prefix1,
     source_prefix2,
     source,
-    hide_columns,
+    only_show_columns,
     show_missing,
 ):
     """compare coverage of two Cobertura reports"""
@@ -273,7 +273,7 @@ def diff(
     cobertura2 = Cobertura(cobertura_file2, filesystem=filesystem2)
 
     Reporter = delta_reporters[format]
-    reporter_args = [cobertura1, cobertura2, ignore_regex, hide_columns]
+    reporter_args = [cobertura1, cobertura2, ignore_regex, only_show_columns]
     reporter_kwargs = {"show_source": source, "show_missing": show_missing}
 
     isatty = True if output is None else output.isatty()

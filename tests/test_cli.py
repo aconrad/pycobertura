@@ -25,110 +25,31 @@ TOTAL                    4       2  50.00%
 """
     assert result.exit_code == ExitCodes.OK
 
-def test_show__format_default_hide_columns_combinations_1():
+def test_show__format_default_show_columns_combinations_0():
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--hide-columns', ["Stmts"]], catch_exceptions=False
+        show, ['tests/dummy.original.xml', '--only-show-columns', []], catch_exceptions=False
     )
     assert result.output == """\
-Filename             Miss  Cover    Missing
------------------  ------  -------  ---------
-dummy/__init__.py       0  0.00%
-dummy/dummy.py          2  50.00%   2, 5
-TOTAL                   2  50.00%
-"""
-    assert result.exit_code == ExitCodes.OK
-    
-    result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--hide-columns',["Cover"]],catch_exceptions=False
-    )
-    assert result.output == """\
-Filename             Stmts    Miss  Missing
------------------  -------  ------  ---------
-dummy/__init__.py        0       0
-dummy/dummy.py           4       2  2, 5
-TOTAL                    4       2
+
 """
     assert result.exit_code == ExitCodes.OK
 
+def test_show__format_default_show_columns_combinations_1():
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--hide-columns', ["Miss"]], catch_exceptions=False
+        show, ['tests/dummy.original.xml', '--only-show-columns', ["Filename"]], catch_exceptions=False
     )
     assert result.output == """\
-Filename             Stmts  Cover    Missing
------------------  -------  -------  ---------
-dummy/__init__.py        0  0.00%
-dummy/dummy.py           4  50.00%   2, 5
-TOTAL                    4  50.00%
+Filename
+-----------------
+dummy/__init__.py
+dummy/dummy.py
+TOTAL
 """
     assert result.exit_code == ExitCodes.OK
 
+def test_show__format_default_show_columns_combinations_2():
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--hide-columns', ["Missing"]], catch_exceptions=False
-    )
-    assert result.output == """\
-Filename             Stmts    Miss  Cover
------------------  -------  ------  -------
-dummy/__init__.py        0       0  0.00%
-dummy/dummy.py           4       2  50.00%
-TOTAL                    4       2  50.00%
-"""
-    assert result.exit_code == ExitCodes.OK
-
-    result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--hide-columns', ["Filename"]], catch_exceptions=False
-    )
-    assert result.output == """\
-  Stmts    Miss  Cover    Missing
--------  ------  -------  ---------
-      0       0  0.00%
-      4       2  50.00%   2, 5
-      4       2  50.00%
-"""
-    assert result.exit_code == ExitCodes.OK
-
-def test_show__format_default_hide_columns_combinations_2():
-    result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--hide-columns',["Stmts","Cover"]],catch_exceptions=False
-    )
-    assert result.output == """\
-Filename             Miss  Missing
------------------  ------  ---------
-dummy/__init__.py       0
-dummy/dummy.py          2  2, 5
-TOTAL                   2
-"""
-    assert result.exit_code == ExitCodes.OK
-
-    result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--hide-columns', ["Stmts,Missing"]], catch_exceptions=False
-    )
-    assert result.output == """\
-Filename             Miss  Cover
------------------  ------  -------
-dummy/__init__.py       0  0.00%
-dummy/dummy.py          2  50.00%
-TOTAL                   2  50.00%
-"""
-
-    assert result.exit_code == ExitCodes.OK
-
-    result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--hide-columns', ["Stmts,Miss"]], catch_exceptions=False
-    )
-    assert result.output == """\
-Filename           Cover    Missing
------------------  -------  ---------
-dummy/__init__.py  0.00%
-dummy/dummy.py     50.00%   2, 5
-TOTAL              50.00%
-"""
-
-    assert result.exit_code == ExitCodes.OK
-
-
-def test_show__format_default_hide_columns_combinations_3():
-    result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--hide-columns',["Stmts","Cover","Missing"]],catch_exceptions=False
+        show, ['tests/dummy.original.xml', '--only-show-columns',["Filename","Miss"]],catch_exceptions=False
     )
     assert result.output == """\
 Filename             Miss
@@ -140,7 +61,7 @@ TOTAL                   2
     assert result.exit_code == ExitCodes.OK
 
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--hide-columns', ["Stmts,Missing","Miss"]], catch_exceptions=False
+        show, ['tests/dummy.original.xml', '--only-show-columns',["Filename","Cover"]], catch_exceptions=False
     )
     assert result.output == """\
 Filename           Cover
@@ -153,7 +74,7 @@ TOTAL              50.00%
     assert result.exit_code == ExitCodes.OK
 
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--hide-columns', ["Stmts","Miss","Filename"]], catch_exceptions=False
+        show, ['tests/dummy.original.xml', '--only-show-columns',["Cover","Missing"]], catch_exceptions=False
     )
     assert result.output == """\
 Cover    Missing
@@ -166,7 +87,7 @@ Cover    Missing
     assert result.exit_code == ExitCodes.OK
 
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--hide-columns', ["Cover","Miss","Missing"]], catch_exceptions=False
+        show, ['tests/dummy.original.xml', '--only-show-columns',["Filename","Stmts"]], catch_exceptions=False
     )
     assert result.output == """\
 Filename             Stmts
@@ -178,28 +99,92 @@ TOTAL                    4
 
     assert result.exit_code == ExitCodes.OK
 
-def test_show__format_default_hide_columns_combinations_4():
+def test_show__format_default_show_columns_combinations_3():
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--hide-columns', ["Stmts","Cover","Miss","Missing"]], catch_exceptions=False
+        show, ['tests/dummy.original.xml', '--only-show-columns', ["Filename", "Miss", "Missing"]],catch_exceptions=False
     )
     assert result.output == """\
-Filename
------------------
-dummy/__init__.py
-dummy/dummy.py
-TOTAL
+Filename             Miss  Missing
+-----------------  ------  ---------
+dummy/__init__.py       0
+dummy/dummy.py          2  2, 5
+TOTAL                   2
+"""
+    assert result.exit_code == ExitCodes.OK
+
+    result = runner.invoke(
+        show, ['tests/dummy.original.xml', '--only-show-columns', ["Filename","Miss","Cover"]], catch_exceptions=False
+    )
+    assert result.output == """\
+Filename             Miss  Cover
+-----------------  ------  -------
+dummy/__init__.py       0  0.00%
+dummy/dummy.py          2  50.00%
+TOTAL                   2  50.00%
 """
 
     assert result.exit_code == ExitCodes.OK
 
-def test_show__format_default_hide_columns_combinations_5():
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--hide-columns', ["Filename","Stmts","Cover","Miss","Missing"]], catch_exceptions=False
+        show, ['tests/dummy.original.xml', '--only-show-columns', ["Filename","Cover","Missing"]], catch_exceptions=False
     )
     assert result.output == """\
-
+Filename           Cover    Missing
+-----------------  -------  ---------
+dummy/__init__.py  0.00%
+dummy/dummy.py     50.00%   2, 5
+TOTAL              50.00%
 """
 
+    assert result.exit_code == ExitCodes.OK
+
+def test_show__format_default_show_columns_combinations_4():  
+    result = runner.invoke(
+        show, ['tests/dummy.original.xml', '--only-show-columns', ["Filename", "Stmts", "Miss", "Missing"]],catch_exceptions=False
+    )
+    assert result.output == """\
+Filename             Stmts    Miss  Missing
+-----------------  -------  ------  ---------
+dummy/__init__.py        0       0
+dummy/dummy.py           4       2  2, 5
+TOTAL                    4       2
+"""
+    assert result.exit_code == ExitCodes.OK
+
+    result = runner.invoke(
+        show, ['tests/dummy.original.xml', '--only-show-columns', ["Filename", "Stmts", "Cover", "Missing"]], catch_exceptions=False
+    )
+    assert result.output == """\
+Filename             Stmts  Cover    Missing
+-----------------  -------  -------  ---------
+dummy/__init__.py        0  0.00%
+dummy/dummy.py           4  50.00%   2, 5
+TOTAL                    4  50.00%
+"""
+    assert result.exit_code == ExitCodes.OK
+
+    result = runner.invoke(
+        show, ['tests/dummy.original.xml', '--only-show-columns', ["Filename", "Stmts", "Miss", "Cover"]], catch_exceptions=False
+    )
+    assert result.output == """\
+Filename             Stmts    Miss  Cover
+-----------------  -------  ------  -------
+dummy/__init__.py        0       0  0.00%
+dummy/dummy.py           4       2  50.00%
+TOTAL                    4       2  50.00%
+"""
+    assert result.exit_code == ExitCodes.OK
+
+    result = runner.invoke(
+        show, ['tests/dummy.original.xml', '--only-show-columns', ["Stmts", "Miss", "Cover", "Missing"]], catch_exceptions=False
+    )
+    assert result.output == """\
+  Stmts    Miss  Cover    Missing
+-------  ------  -------  ---------
+      0       0  0.00%
+      4       2  50.00%   2, 5
+      4       2  50.00%
+"""
     assert result.exit_code == ExitCodes.OK
 
 
