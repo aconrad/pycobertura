@@ -32,15 +32,12 @@ class Reporter:
     def compute_show_columns(show_columns_):
         if show_columns_ is None:
             return headers_with_missing
-        elif "," or "[" or "]" in show_columns_:
+        elif any(substr in [",", "[", "]"] for substr in show_columns_):
             list_show_columns = "".join(
                 [x for x in show_columns_ if x not in ("[", "]")]
             ).split(",")
-            print(list_show_columns)
-            print([col for col in headers_with_missing if col in list_show_columns])
             return [col for col in headers_with_missing if col in list_show_columns]
         else:
-            print([col for col in headers_with_missing if col in show_columns_])
             return [col for col in headers_with_missing if col in show_columns_]
 
     @staticmethod
@@ -216,7 +213,7 @@ class DeltaReporter:
     def compute_show_columns(show_columns_):
         if show_columns_ is None:
             return headers_with_missing
-        elif "," in show_columns_:
+        elif any(substr in [",", "[", "]"] for substr in show_columns_):
             list_show_columns = "".join(
                 [x for x in show_columns_ if x not in ("[", "]")]
             ).split(",")
