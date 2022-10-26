@@ -98,7 +98,7 @@ def get_exit_code(differ, source):
 @click.option(
     "-onlycols",
     "--only-show-columns",
-    default=None,
+    default=[None],
     type=list,
     help="Comma-separated list of column names you want to show",
 )
@@ -233,7 +233,7 @@ directories (or zip archives). If the source is not available at all, pass
 @click.option(
     "-onlycols",
     "--only-show-columns",
-    default=None,
+    default=[None],
     type=list,
     help="Comma-separated list of column names you want to show",
 )

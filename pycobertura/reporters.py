@@ -23,22 +23,12 @@ headers_hideable = headers_without_missing.remove("Filename")
 
 
 class Reporter:
-    def __init__(self, cobertura, ignore_regex=None, show_columns=None):
+    def __init__(self, cobertura, ignore_regex=None, show_columns=[None]):
         self.cobertura = cobertura
         self.ignore_regex = ignore_regex
-        self.show_columns = self.compute_show_columns(show_columns)
-
-    @staticmethod
-    def compute_show_columns(show_columns_):
-        if show_columns_ is None:
-            return headers_with_missing
-        elif any(substr in [",", "[", "]"] for substr in show_columns_):
-            list_show_columns = "".join(
-                [x for x in show_columns_ if x not in ("[", "]")]
-            ).split(",")
-            return [col for col in headers_with_missing if col in list_show_columns]
-        else:
-            return [col for col in headers_with_missing if col in show_columns_]
+        self.show_columns = (
+            headers_with_missing if None in show_columns else show_columns
+        )
 
     @staticmethod
     def format_line_rate(line_rate):
@@ -198,28 +188,18 @@ class DeltaReporter:
         cobertura1,
         cobertura2,
         ignore_regex=None,
-        show_columns=None,
+        show_columns=[None],
         show_source=True,
         *args,
         **kwargs,
     ):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
-        self.show_columns = self.compute_show_columns(show_columns)
+        self.show_columns = (
+            headers_with_missing if None in show_columns else show_columns
+        )
         self.show_source = show_source
         self.color = kwargs.pop("color", False)
         self.ignore_regex = ignore_regex
-
-    @staticmethod
-    def compute_show_columns(show_columns_):
-        if show_columns_ is None:
-            return headers_with_missing
-        elif any(substr in [",", "[", "]"] for substr in show_columns_):
-            list_show_columns = "".join(
-                [x for x in show_columns_ if x not in ("[", "]")]
-            ).split(",")
-            return [col for col in headers_with_missing if col in list_show_columns]
-        else:
-            return [col for col in headers_with_missing if col in show_columns_]
 
     @staticmethod
     def format_line_rate(line_rate):
