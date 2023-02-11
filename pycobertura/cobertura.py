@@ -17,14 +17,14 @@ except NameError:  # pragma: no cover
     basestring = (str, bytes)
 
 ## CONSTANTS
-PACKAGES_LIST = 'packages//package'
-PACKAGES_ROOT = 'packages'
-CLASSES_LIST = 'classes//class'
-CLASSES_ROOT = 'classes'
-METHODS_LIST = 'methods//method'
-METHODS_ROOT = 'methods'
-LINES_LIST = 'lines//line'
-LINES_ROOT = 'lines'
+PACKAGES_LIST = "packages//package"
+PACKAGES_ROOT = "packages"
+CLASSES_LIST = "classes//class"
+CLASSES_ROOT = "classes"
+METHODS_LIST = "methods//method"
+METHODS_ROOT = "methods"
+LINES_LIST = "lines//line"
+LINES_ROOT = "lines"
 
 
 class Line(namedtuple("Line", ["number", "source", "status", "reason"])):
@@ -97,7 +97,6 @@ class Cobertura:
 
         return result
 
-
     def _make_method_elements_by_filename(self):
         result = {}
         for elem in self.xml.xpath(f"./{METHOD_LIST}"):
@@ -129,7 +128,7 @@ class Cobertura:
         return [
             line
             for classElement in classElements
-            for line in classElement.xpath(f"./{LINES_LIST})
+            for line in classElement.xpath(f"./{LINES_LIST}")
         ]
 
     @memoize
@@ -138,7 +137,7 @@ class Cobertura:
         return [
             line
             for classElement in classElements
-            for line in classElement.xpath(f"./{LINES_ROOT})
+            for line in classElement.xpath(f"./{LINES_ROOT}")
         ]
 
     @property
