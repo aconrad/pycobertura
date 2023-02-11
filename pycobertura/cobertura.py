@@ -16,6 +16,16 @@ except NameError:  # pragma: no cover
     # PY3 basestring
     basestring = (str, bytes)
 
+## CONSTANTS
+PACKAGES_LIST = 'packages//package'
+PACKAGES_ROOT = 'packages'
+CLASSES_LIST = 'classes//class'
+CLASSES_ROOT = 'classes'
+METHODS_LIST = 'methods//method'
+METHODS_ROOT = 'methods'
+LINES_LIST = 'lines//line'
+LINES_ROOT = 'lines'
+
 
 class Line(namedtuple("Line", ["number", "source", "status", "reason"])):
     """
@@ -79,6 +89,31 @@ class Cobertura:
 
         return result
 
+    def _get_class_root_by_filename(self):
+        result = {}
+        for elem in self.xml.xpath(f"./{CLASSES_ROOT}"):
+            filename = elem.attrib["filename"]
+            result.setdefault(filename, []).append(elem)
+
+        return result
+
+
+    def _make_method_elements_by_filename(self):
+        result = {}
+        for elem in self.xml.xpath(f"./{METHOD_LIST}"):
+            filename = elem.attrib["filename"]
+            result.setdefault(filename, []).append(elem)
+
+        return result
+
+    def _make_method_root_by_filename(self):
+        result = {}
+        for elem in self.xml.xpath(f"./{METHOD_ROOT}"):
+            filename = elem.attrib["filename"]
+            result.setdefault(filename, []).append(elem)
+
+        return result
+
     def __eq__(self, other):
         return self.report and other.report and self.report == other.report
 
@@ -94,7 +129,16 @@ class Cobertura:
         return [
             line
             for classElement in classElements
-            for line in classElement.xpath("./lines/line")
+            for line in classElement.xpath(f"./{LINES_LIST})
+        ]
+
+    @memoize
+    def _get_lines_root_by_filename(self, filename):
+        classElements = self._class_elements_by_file_name[filename]
+        return [
+            line
+            for classElement in classElements
+            for line in classElement.xpath(f"./{LINES_ROOT})
         ]
 
     @property
@@ -289,6 +333,13 @@ class Cobertura:
         Return the list of available packages in the coverage report.
         """
         return [el.get("name") for el in self.xml.xpath("//package")]
+
+    @memoize
+    def root_package(self):
+        """
+        Return the root package in the coverage report.
+        """
+        return [el.get("name") for el in self.xml.xpath("//")]
 
 
 class CoberturaDiff:
