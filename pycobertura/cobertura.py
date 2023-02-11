@@ -19,16 +19,16 @@ except NameError:  # pragma: no cover
 # CONSTANTS
 XML_SEP = "//"
 PACKAGE_ROOT = "packages"
-PACKAGE_LIST = f"{PACKAGE_ROOT}{XML_SEP}package"
+PACKAGE_LIST = PACKAGE_ROOT + XML_SEP + "package"
 
-CLASSES_ROOT = "classes"
-CLASSES_LIST = f"{PACKAGE_ROOT}{XML_SEP}class"
+CLASSES_ROOT = PACKAGE_LIST + XML_SEP + "classes"
+CLASSES_LIST = CLASSES_ROOT + XML_SEP + "class"
 
-METHOD_ROOT = "methods"
-METHOD_LIST = f"{METHOD_ROOT}{XML_SEP}method"
+METHOD_ROOT = CLASSES_LIST + XML_SEP + "methods"
+METHOD_LIST = METHOD_ROOT + XML_SEP + "method"
 
-LINES_ROOT = "lines"
-LINES_LIST = f"{METHOD_ROOT}{XML_SEP}line"
+LINES_ROOT = METHOD_LIST + XML_SEP + "lines"
+LINES_LIST = LINES_ROOT + XML_SEP + "line"
 
 
 class Line(namedtuple("Line", ["number", "source", "status", "reason"])):
