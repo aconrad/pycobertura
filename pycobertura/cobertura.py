@@ -17,14 +17,18 @@ except NameError:  # pragma: no cover
     basestring = (str, bytes)
 
 # CONSTANTS
-PACKAGE_LIST = "packages//package"
+XML_SEP = "//"
 PACKAGE_ROOT = "packages"
-CLASSES_LIST = "classes//class"
+PACKAGE_LIST = f"{PACKAGE_ROOT}{XML_SEP}package"
+
 CLASSES_ROOT = "classes"
-METHOD_LIST = "methods//method"
+CLASSES_LIST = f"{PACKAGE_ROOT}{XML_SEP}class"
+
 METHOD_ROOT = "methods"
-LINES_LIST = "lines//line"
+METHOD_LIST = f"{METHOD_ROOT}{XML_SEP}method"
+
 LINES_ROOT = "lines"
+LINES_LIST = f"{METHOD_ROOT}{XML_SEP}line"
 
 
 class Line(namedtuple("Line", ["number", "source", "status", "reason"])):
