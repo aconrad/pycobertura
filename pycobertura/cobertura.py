@@ -16,13 +16,13 @@ except NameError:  # pragma: no cover
     # PY3 basestring
     basestring = (str, bytes)
 
-## CONSTANTS
-PACKAGES_LIST = "packages//package"
-PACKAGES_ROOT = "packages"
+# CONSTANTS
+PACKAGE_LIST = "packages//package"
+PACKAGE_ROOT = "packages"
 CLASSES_LIST = "classes//class"
 CLASSES_ROOT = "classes"
-METHODS_LIST = "methods//method"
-METHODS_ROOT = "methods"
+METHOD_LIST = "methods//method"
+METHOD_ROOT = "methods"
 LINES_LIST = "lines//line"
 LINES_ROOT = "lines"
 
@@ -83,7 +83,7 @@ class Cobertura:
 
     def _make_class_elements_by_filename(self):
         result = {}
-        for elem in self.xml.xpath("./packages//class"):
+        for elem in self.xml.xpath(f"./{CLASSES_LIST}"):
             filename = elem.attrib["filename"]
             result.setdefault(filename, []).append(elem)
 
@@ -331,14 +331,14 @@ class Cobertura:
         """
         Return the list of available packages in the coverage report.
         """
-        return [el.get("name") for el in self.xml.xpath("//package")]
+        return [el.get("name") for el in self.xml.xpath(f"//{PACKAGE_LIST}")]
 
     @memoize
     def root_package(self):
         """
         Return the root package in the coverage report.
         """
-        return [el.get("name") for el in self.xml.xpath("//")]
+        return [el.get("name") for el in self.xml.xpath(f"//{PACKAGE_ROOT}")]
 
 
 class CoberturaDiff:

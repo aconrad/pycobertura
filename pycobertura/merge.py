@@ -37,7 +37,7 @@ class CoberturaMerge:
             for xml_filepath in self.xml_filepaths
         }
 
-        dict_class_root = {
+        dict_classes_root = {
             xml_filepath: dict_cobertura.get(xml_filepath)._get_root_class_by_filename
             for xml_filepath in self.xml_filepaths
         }
@@ -52,14 +52,15 @@ class CoberturaMerge:
             xml_filepath: dict_cobertura.get(xml_filepath)._get_method_root_by_filename
             for xml_filepath in self.xml_filepaths
         }
-        dict_methods_list = {
+
+        dict_method_list = {
             xml_filepath: dict_cobertura.get(
                 xml_filepath
             )._make_method_elements_by_filename
             for xml_filepath in self.xml_filepaths
         }
 
-        dict_line_root = {
+        dict_lines_root = {
             xml_filepath: dict_cobertura.get(xml_filepath)._get_line_root_by_filename
             for xml_filepath in self.xml_filepaths
         }
@@ -80,7 +81,7 @@ class CoberturaMerge:
         output_cobertura.append(set(dict_method_list.values()))
 
         output_cobertura.append(set(dict_lines_root.values()))
-        self.merge_lines(dict_lines, output_cobertura)
+        self.merge_lines(dict_lines_list, output_cobertura)
 
         return output_cobertura
 
