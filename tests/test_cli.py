@@ -2,7 +2,9 @@ import os
 import pytest
 from click.testing import CliRunner
 from pycobertura.cli import show, diff, ExitCodes
+
 runner = CliRunner()
+
 
 def test_exit_codes():
     # We shouldn't change exit codes so that clients can rely on them
@@ -13,276 +15,388 @@ def test_exit_codes():
 
 
 def test_show__format_default():
-    result = runner.invoke(
-        show, ['tests/dummy.original.xml'], catch_exceptions=False
-    )
-    assert result.output == """\
+    result = runner.invoke(show, ["tests/dummy.original.xml"], catch_exceptions=False)
+    assert (
+        result.output
+        == """\
 Filename             Stmts    Miss  Cover    Missing
 -----------------  -------  ------  -------  ---------
 dummy/__init__.py        0       0  0.00%
 dummy/dummy.py           4       2  50.00%   2, 5
 TOTAL                    4       2  50.00%
 """
+    )
     assert result.exit_code == ExitCodes.OK
+
 
 def test_show__format_default_show_columns_combinations_0():
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--only-show-columns', []], catch_exceptions=False
+        show,
+        ["tests/dummy.original.xml", "--only-show-columns", "[]"],
+        catch_exceptions=False,
     )
-    assert result.output == """\
+    assert (
+        result.output
+        == """\
 
 """
+    )
     assert result.exit_code == ExitCodes.OK
+
 
 def test_show__format_default_show_columns_combinations_1():
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--only-show-columns', ["Filename"]], catch_exceptions=False
+        show,
+        ["tests/dummy.original.xml", "--only-show-columns", '["Filename"]'],
+        catch_exceptions=False,
     )
-    assert result.output == """\
+    assert (
+        result.output
+        == """\
 Filename
 -----------------
 dummy/__init__.py
 dummy/dummy.py
 TOTAL
 """
+    )
     assert result.exit_code == ExitCodes.OK
+
 
 def test_show__format_default_show_columns_combinations_2():
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--only-show-columns',["Filename","Miss"]],catch_exceptions=False
+        show,
+        ["tests/dummy.original.xml", "--only-show-columns", '["Filename","Miss"]'],
+        catch_exceptions=False,
     )
-    assert result.output == """\
+    assert (
+        result.output
+        == """\
 Filename             Miss
 -----------------  ------
 dummy/__init__.py       0
 dummy/dummy.py          2
 TOTAL                   2
 """
+    )
     assert result.exit_code == ExitCodes.OK
 
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--only-show-columns',["Filename","Cover"]], catch_exceptions=False
+        show,
+        ["tests/dummy.original.xml", "--only-show-columns", '["Filename","Cover"]'],
+        catch_exceptions=False,
     )
-    assert result.output == """\
+    assert (
+        result.output
+        == """\
 Filename           Cover
 -----------------  -------
 dummy/__init__.py  0.00%
 dummy/dummy.py     50.00%
 TOTAL              50.00%
 """
+    )
 
     assert result.exit_code == ExitCodes.OK
 
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--only-show-columns',["Cover","Missing"]], catch_exceptions=False
+        show,
+        ["tests/dummy.original.xml", "--only-show-columns", '["Cover","Missing"]'],
+        catch_exceptions=False,
     )
-    assert result.output == """\
+    assert (
+        result.output
+        == """\
 Cover    Missing
 -------  ---------
 0.00%
 50.00%   2, 5
 50.00%
 """
+    )
 
     assert result.exit_code == ExitCodes.OK
 
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--only-show-columns',["Filename","Stmts"]], catch_exceptions=False
+        show,
+        ["tests/dummy.original.xml", "--only-show-columns", '["Filename","Stmts"]'],
+        catch_exceptions=False,
     )
-    assert result.output == """\
+    assert (
+        result.output
+        == """\
 Filename             Stmts
 -----------------  -------
 dummy/__init__.py        0
 dummy/dummy.py           4
 TOTAL                    4
 """
+    )
 
     assert result.exit_code == ExitCodes.OK
 
+
 def test_show__format_default_show_columns_combinations_3():
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--only-show-columns', ["Filename", "Miss", "Missing"]],catch_exceptions=False
+        show,
+        [
+            "tests/dummy.original.xml",
+            "--only-show-columns",
+            '["Filename", "Miss", "Missing"]',
+        ],
+        catch_exceptions=False,
     )
-    assert result.output == """\
+    assert (
+        result.output
+        == """\
 Filename             Miss  Missing
 -----------------  ------  ---------
 dummy/__init__.py       0
 dummy/dummy.py          2  2, 5
 TOTAL                   2
 """
+    )
     assert result.exit_code == ExitCodes.OK
 
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--only-show-columns', ["Filename","Miss","Cover"]], catch_exceptions=False
+        show,
+        [
+            "tests/dummy.original.xml",
+            "--only-show-columns",
+            '["Filename","Miss","Cover"]',
+        ],
+        catch_exceptions=False,
     )
-    assert result.output == """\
+    assert (
+        result.output
+        == """\
 Filename             Miss  Cover
 -----------------  ------  -------
 dummy/__init__.py       0  0.00%
 dummy/dummy.py          2  50.00%
 TOTAL                   2  50.00%
 """
+    )
 
     assert result.exit_code == ExitCodes.OK
 
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--only-show-columns', ["Filename","Cover","Missing"]], catch_exceptions=False
+        show,
+        [
+            "tests/dummy.original.xml",
+            "--only-show-columns",
+            '["Filename","Cover","Missing"]',
+        ],
+        catch_exceptions=False,
     )
-    assert result.output == """\
+    assert (
+        result.output
+        == """\
 Filename           Cover    Missing
 -----------------  -------  ---------
 dummy/__init__.py  0.00%
 dummy/dummy.py     50.00%   2, 5
 TOTAL              50.00%
 """
+    )
 
     assert result.exit_code == ExitCodes.OK
 
-def test_show__format_default_show_columns_combinations_4():  
+
+def test_show__format_default_show_columns_combinations_4():
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--only-show-columns', ["Filename", "Stmts", "Miss", "Missing"]],catch_exceptions=False
+        show,
+        [
+            "tests/dummy.original.xml",
+            "--only-show-columns",
+            '["Filename", "Stmts", "Miss", "Missing"]',
+        ],
+        catch_exceptions=False,
     )
-    assert result.output == """\
+    assert (
+        result.output
+        == """\
 Filename             Stmts    Miss  Missing
 -----------------  -------  ------  ---------
 dummy/__init__.py        0       0
 dummy/dummy.py           4       2  2, 5
 TOTAL                    4       2
 """
+    )
     assert result.exit_code == ExitCodes.OK
 
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--only-show-columns', ["Filename", "Stmts", "Cover", "Missing"]], catch_exceptions=False
+        show,
+        [
+            "tests/dummy.original.xml",
+            "--only-show-columns",
+            '["Filename", "Stmts", "Cover", "Missing"]',
+        ],
+        catch_exceptions=False,
     )
-    assert result.output == """\
+    assert (
+        result.output
+        == """\
 Filename             Stmts  Cover    Missing
 -----------------  -------  -------  ---------
 dummy/__init__.py        0  0.00%
 dummy/dummy.py           4  50.00%   2, 5
 TOTAL                    4  50.00%
 """
+    )
     assert result.exit_code == ExitCodes.OK
 
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--only-show-columns', ["Filename", "Stmts", "Miss", "Cover"]], catch_exceptions=False
+        show,
+        [
+            "tests/dummy.original.xml",
+            "--only-show-columns",
+            '["Filename", "Stmts", "Miss", "Cover"]',
+        ],
+        catch_exceptions=False,
     )
-    assert result.output == """\
+    assert (
+        result.output
+        == """\
 Filename             Stmts    Miss  Cover
 -----------------  -------  ------  -------
 dummy/__init__.py        0       0  0.00%
 dummy/dummy.py           4       2  50.00%
 TOTAL                    4       2  50.00%
 """
+    )
     assert result.exit_code == ExitCodes.OK
 
     result = runner.invoke(
-        show, ['tests/dummy.original.xml', '--only-show-columns', ["Stmts", "Miss", "Cover", "Missing"]], catch_exceptions=False
+        show,
+        [
+            "tests/dummy.original.xml",
+            "--only-show-columns",
+            '["Stmts", "Miss", "Cover", "Missing"]',
+        ],
+        catch_exceptions=False,
     )
-    assert result.output == """\
+    assert (
+        result.output
+        == """\
   Stmts    Miss  Cover    Missing
 -------  ------  -------  ---------
       0       0  0.00%
       4       2  50.00%   2, 5
       4       2  50.00%
 """
+    )
     assert result.exit_code == ExitCodes.OK
 
 
 def test_show__format_text():
-    for opt in ('-f', '--format'):
+    for opt in ("-f", "--format"):
         result = runner.invoke(
-            show,
-            ['tests/dummy.original.xml', opt, 'text'],
-            catch_exceptions=False
+            show, ["tests/dummy.original.xml", opt, "text"], catch_exceptions=False
         )
-        assert result.output == """\
+        assert (
+            result.output
+            == """\
 Filename             Stmts    Miss  Cover    Missing
 -----------------  -------  ------  -------  ---------
 dummy/__init__.py        0       0  0.00%
 dummy/dummy.py           4       2  50.00%   2, 5
 TOTAL                    4       2  50.00%
 """
+        )
     assert result.exit_code == ExitCodes.OK
+
 
 def test_show__format_csv():
-    for opt in ('-f', '--format'):
+    for opt in ("-f", "--format"):
         result = runner.invoke(
-            show,
-            ['tests/dummy.original.xml', opt, 'csv'],
-            catch_exceptions=False
+            show, ["tests/dummy.original.xml", opt, "csv"], catch_exceptions=False
         )
-        assert result.output == """\
+        assert (
+            result.output
+            == """\
 Filename;Stmts;Miss;Cover;Missing
 dummy/__init__.py;0;0;0.00%;
 dummy/dummy.py;4;2;50.00%;2, 5
 TOTAL;4;2;50.00%;
 """
+        )
     assert result.exit_code == ExitCodes.OK
+
 
 def test_show__format_csv_delimiter_semicolon():
-    for opt in ('-f', '--format'):
+    for opt in ("-f", "--format"):
         result = runner.invoke(
             show,
-            ['tests/dummy.original.xml', opt, 'csv', '--delimiter', ';'],
-            catch_exceptions=False
+            ["tests/dummy.original.xml", opt, "csv", "--delimiter", ";"],
+            catch_exceptions=False,
         )
-        assert result.output == """\
+        assert (
+            result.output
+            == """\
 Filename;Stmts;Miss;Cover;Missing
 dummy/__init__.py;0;0;0.00%;
 dummy/dummy.py;4;2;50.00%;2, 5
 TOTAL;4;2;50.00%;
 """
+        )
     assert result.exit_code == ExitCodes.OK
 
+
 def test_show__format_csv_delimiter_tab():
-    for opt in ('-f', '--format'):
+    for opt in ("-f", "--format"):
         result = runner.invoke(
             show,
-            ['tests/dummy.original.xml', opt, 'csv', '--delimiter', '\t'],
-            catch_exceptions=False
+            ["tests/dummy.original.xml", opt, "csv", "--delimiter", "\t"],
+            catch_exceptions=False,
         )
-        assert result.output == """\
+        assert (
+            result.output
+            == """\
 Filename\tStmts\tMiss\tCover\tMissing
 dummy/__init__.py\t0\t0\t0.00%\t
 dummy/dummy.py\t4\t2\t50.00%\t2, 5
 TOTAL\t4\t2\t50.00%\t
 """
+        )
     assert result.exit_code == ExitCodes.OK
 
+
 def test_show__format_markdown():
-    for opt in ('-f', '--format'):
+    for opt in ("-f", "--format"):
         result = runner.invoke(
-            show,
-            ['tests/dummy.original.xml', opt, 'markdown'],
-            catch_exceptions=False
+            show, ["tests/dummy.original.xml", opt, "markdown"], catch_exceptions=False
         )
-        assert result.output == """\
+        assert (
+            result.output
+            == """\
 | Filename          |   Stmts |   Miss | Cover   | Missing   |
 |-------------------|---------|--------|---------|-----------|
 | dummy/__init__.py |       0 |      0 | 0.00%   |           |
 | dummy/dummy.py    |       4 |      2 | 50.00%  | 2, 5      |
 | TOTAL             |       4 |      2 | 50.00%  |           |
 """
+        )
     assert result.exit_code == ExitCodes.OK
 
 
 def test_show__format_html():
-    result = runner.invoke(show, [
-        'tests/dummy.original.xml', '--format', 'html'
-    ], catch_exceptions=False)
-    assert result.output.startswith('<html>')
-    assert result.output.endswith('</html>\n')
+    result = runner.invoke(
+        show, ["tests/dummy.original.xml", "--format", "html"], catch_exceptions=False
+    )
+    assert result.output.startswith("<html>")
+    assert result.output.endswith("</html>\n")
     assert result.exit_code == ExitCodes.OK
 
 
 def test_show__format_json():
-    for opt in ('-f', '--format'):
+    for opt in ("-f", "--format"):
         result = runner.invoke(
-            show,
-            ['tests/dummy.original.xml', opt, 'json'],
-            catch_exceptions=False
+            show, ["tests/dummy.original.xml", opt, "json"], catch_exceptions=False
         )
-        assert result.output == """\
+        assert (
+            result.output
+            == """\
 {
     "files": [
         {
@@ -308,16 +422,18 @@ def test_show__format_json():
     }
 }
 """
+        )
     assert result.exit_code == ExitCodes.OK
 
+
 def test_show__format_yaml():
-    for opt in ('-f', '--format'):
+    for opt in ("-f", "--format"):
         result = runner.invoke(
-            show,
-            ['tests/dummy.original.xml', opt, 'yaml'],
-            catch_exceptions=False
+            show, ["tests/dummy.original.xml", opt, "yaml"], catch_exceptions=False
         )
-        assert result.output == """\
+        assert (
+            result.output
+            == """\
 files:
 - Filename: dummy/__init__.py
   Stmts: 0
@@ -336,19 +452,22 @@ total:
   Cover: 50.00%
 
 """
+        )
     assert result.exit_code == ExitCodes.OK
 
 
 def test_show__output_to_file():
-    for opt in ('-o', '--output'):
-        result = runner.invoke(show, [
-            'tests/cobertura.xml', opt, 'report.out'
-        ], catch_exceptions=False)
-        with open('report.out') as f:
+    for opt in ("-o", "--output"):
+        result = runner.invoke(
+            show, ["tests/cobertura.xml", opt, "report.out"], catch_exceptions=False
+        )
+        with open("report.out") as f:
             report = f.read()
-        os.remove('report.out')
+        os.remove("report.out")
         assert result.output == ""
-        assert report == """\
+        assert (
+            report
+            == """\
 Filename                          Stmts    Miss  Cover    Missing
 ------------------------------  -------  ------  -------  ---------
 Main.java                            15       0  100.00%
@@ -356,15 +475,22 @@ search/BinarySearch.java             12       1  91.67%   24
 search/ISortedArraySearch.java        0       0  100.00%
 search/LinearSearch.java              7       2  71.43%   19-24
 TOTAL                                34       3  90.00%"""
+        )
     assert result.exit_code == ExitCodes.OK
 
 
 def test_diff__format_default():
-    result = runner.invoke(diff, [
-        'tests/dummy.source1/coverage.xml',
-        'tests/dummy.source2/coverage.xml',
-    ], catch_exceptions=False)
-    assert result.output == """\
+    result = runner.invoke(
+        diff,
+        [
+            "tests/dummy.source1/coverage.xml",
+            "tests/dummy.source2/coverage.xml",
+        ],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
 Filename           Stmts    Miss  Cover     Missing
 ---------------  -------  ------  --------  ---------
 dummy/dummy.py         0      \x1b[32m-2\x1b[39m  +40.00%
@@ -372,15 +498,24 @@ dummy/dummy2.py       +2      \x1b[31m+1\x1b[39m  -25.00%   \x1b[31m5\x1b[39m
 dummy/dummy3.py       +2      \x1b[31m+2\x1b[39m  +100.00%  \x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m
 TOTAL                 +4      \x1b[31m+1\x1b[39m  +31.06%
 """
+    )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
+
 def test_diff__format_default_hide_columns_combinations_1():
-    result = runner.invoke(diff, [
-        'tests/dummy.source1/coverage.xml',
-        'tests/dummy.source2/coverage.xml',
-        '--only-show-columns', ["Filename"]
-    ], catch_exceptions=False)
-    assert result.output == """\
+    result = runner.invoke(
+        diff,
+        [
+            "tests/dummy.source1/coverage.xml",
+            "tests/dummy.source2/coverage.xml",
+            "--only-show-columns",
+            ["Filename"],
+        ],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
 Filename
 ---------------
 dummy/dummy.py
@@ -388,15 +523,24 @@ dummy/dummy2.py
 dummy/dummy3.py
 TOTAL
 """
+    )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
+
 def test_diff__format_default_hide_columns_combinations_2():
-    result = runner.invoke(diff, [
-        'tests/dummy.source1/coverage.xml',
-        'tests/dummy.source2/coverage.xml',
-        '--only-show-columns', ["Filename","Stmts"]
-    ], catch_exceptions=False)
-    assert result.output == """\
+    result = runner.invoke(
+        diff,
+        [
+            "tests/dummy.source1/coverage.xml",
+            "tests/dummy.source2/coverage.xml",
+            "--only-show-columns",
+            ["Filename", "Stmts"],
+        ],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
 Filename           Stmts
 ---------------  -------
 dummy/dummy.py         0
@@ -404,15 +548,24 @@ dummy/dummy2.py       +2
 dummy/dummy3.py       +2
 TOTAL                 +4
 """
+    )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
+
 def test_diff__format_default_hide_columns_combinations_3():
-    result = runner.invoke(diff, [
-        'tests/dummy.source1/coverage.xml',
-        'tests/dummy.source2/coverage.xml',
-        '--only-show-columns', ["Filename","Stmts","Miss"]
-    ], catch_exceptions=False)
-    assert result.output == """\
+    result = runner.invoke(
+        diff,
+        [
+            "tests/dummy.source1/coverage.xml",
+            "tests/dummy.source2/coverage.xml",
+            "--only-show-columns",
+            ["Filename", "Stmts", "Miss"],
+        ],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
 Filename           Stmts    Miss
 ---------------  -------  ------
 dummy/dummy.py         0      \x1b[32m-2\x1b[39m
@@ -420,15 +573,24 @@ dummy/dummy2.py       +2      \x1b[31m+1\x1b[39m
 dummy/dummy3.py       +2      \x1b[31m+2\x1b[39m
 TOTAL                 +4      \x1b[31m+1\x1b[39m
 """
+    )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
+
 def test_diff__format_default_show_columns_combinations_4():
-    result = runner.invoke(diff, [
-        'tests/dummy.source1/coverage.xml',
-        'tests/dummy.source2/coverage.xml',
-        '--only-show-columns', ["Filename","Stmts","Miss","Cover"]
-    ], catch_exceptions=False)
-    assert result.output == """\
+    result = runner.invoke(
+        diff,
+        [
+            "tests/dummy.source1/coverage.xml",
+            "tests/dummy.source2/coverage.xml",
+            "--only-show-columns",
+            ["Filename", "Stmts", "Miss", "Cover"],
+        ],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
 Filename           Stmts    Miss  Cover
 ---------------  -------  ------  --------
 dummy/dummy.py         0      \x1b[32m-2\x1b[39m  +40.00%
@@ -436,18 +598,25 @@ dummy/dummy2.py       +2      \x1b[31m+1\x1b[39m  -25.00%
 dummy/dummy3.py       +2      \x1b[31m+2\x1b[39m  +100.00%
 TOTAL                 +4      \x1b[31m+1\x1b[39m  +31.06%
 """
+    )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__format_text():
-    
-    for opt in ('-f', '--format'):
-        result = runner.invoke(diff, [
-            opt, 'text',
-            'tests/dummy.source1/coverage.xml',
-            'tests/dummy.source2/coverage.xml',
-        ], catch_exceptions=False)
-        assert result.output == """\
+    for opt in ("-f", "--format"):
+        result = runner.invoke(
+            diff,
+            [
+                opt,
+                "text",
+                "tests/dummy.source1/coverage.xml",
+                "tests/dummy.source2/coverage.xml",
+            ],
+            catch_exceptions=False,
+        )
+        assert (
+            result.output
+            == """\
 Filename           Stmts    Miss  Cover     Missing
 ---------------  -------  ------  --------  ---------
 dummy/dummy.py         0      \x1b[32m-2\x1b[39m  +40.00%
@@ -455,72 +624,106 @@ dummy/dummy2.py       +2      \x1b[31m+1\x1b[39m  -25.00%   \x1b[31m5\x1b[39m
 dummy/dummy3.py       +2      \x1b[31m+2\x1b[39m  +100.00%  \x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m
 TOTAL                 +4      \x1b[31m+1\x1b[39m  +31.06%
 """
+        )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
+
 
 def test_diff__format_csv():
-    
-    for opt in ('-f', '--format'):
-        result = runner.invoke(diff, [
-            opt, 'csv',
-            'tests/dummy.source1/coverage.xml',
-            'tests/dummy.source2/coverage.xml',
-        ], catch_exceptions=False)
-        assert result.output == """\
+    for opt in ("-f", "--format"):
+        result = runner.invoke(
+            diff,
+            [
+                opt,
+                "csv",
+                "tests/dummy.source1/coverage.xml",
+                "tests/dummy.source2/coverage.xml",
+            ],
+            catch_exceptions=False,
+        )
+        assert (
+            result.output
+            == """\
 Filename;Stmts;Miss;Cover;Missing
 dummy/dummy.py;0;\x1b[32m-2\x1b[39m;+40.00%;[]
 dummy/dummy2.py;+2;\x1b[31m+1\x1b[39m;-25.00%;['\x1b[31m5\x1b[39m']
 dummy/dummy3.py;+2;\x1b[31m+2\x1b[39m;+100.00%;['\x1b[31m1\x1b[39m', '\x1b[31m2\x1b[39m']
 TOTAL;+4;\x1b[31m+1\x1b[39m;+31.06%;[]
 """
+        )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
+
 
 def test_diff__format_csv_delimiter_semicolon():
-    
-    for delim_opt in ('-delim', '--delimiter'):
-        for opt in ('-f', '--format'):
-            result = runner.invoke(diff, [
-                opt, 'csv',
-                'tests/dummy.source1/coverage.xml',
-                'tests/dummy.source2/coverage.xml',
-                delim_opt, ';',
-        ], catch_exceptions=False)
-        assert result.output == """\
+    for delim_opt in ("-delim", "--delimiter"):
+        for opt in ("-f", "--format"):
+            result = runner.invoke(
+                diff,
+                [
+                    opt,
+                    "csv",
+                    "tests/dummy.source1/coverage.xml",
+                    "tests/dummy.source2/coverage.xml",
+                    delim_opt,
+                    ";",
+                ],
+                catch_exceptions=False,
+            )
+        assert (
+            result.output
+            == """\
 Filename;Stmts;Miss;Cover;Missing
 dummy/dummy.py;0;\x1b[32m-2\x1b[39m;+40.00%;[]
 dummy/dummy2.py;+2;\x1b[31m+1\x1b[39m;-25.00%;['\x1b[31m5\x1b[39m']
 dummy/dummy3.py;+2;\x1b[31m+2\x1b[39m;+100.00%;['\x1b[31m1\x1b[39m', '\x1b[31m2\x1b[39m']
 TOTAL;+4;\x1b[31m+1\x1b[39m;+31.06%;[]
 """
+        )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
+
 def test_diff__format_csv_delimiter_tab():
-    
-    for delim_opt in ('-delim', '--delimiter'):
-        for opt in ('-f', '--format'):
-            result = runner.invoke(diff, [
-                opt, 'csv',
-                'tests/dummy.source1/coverage.xml',
-                'tests/dummy.source2/coverage.xml',
-                delim_opt, '\t'
-            ], catch_exceptions=False)
-        assert result.output == """\
+    for delim_opt in ("-delim", "--delimiter"):
+        for opt in ("-f", "--format"):
+            result = runner.invoke(
+                diff,
+                [
+                    opt,
+                    "csv",
+                    "tests/dummy.source1/coverage.xml",
+                    "tests/dummy.source2/coverage.xml",
+                    delim_opt,
+                    "\t",
+                ],
+                catch_exceptions=False,
+            )
+        assert (
+            result.output
+            == """\
 Filename\tStmts\tMiss\tCover\tMissing
 dummy/dummy.py\t0\t\x1b[32m-2\x1b[39m\t+40.00%\t[]
 dummy/dummy2.py\t+2\t\x1b[31m+1\x1b[39m\t-25.00%\t['\x1b[31m5\x1b[39m']
 dummy/dummy3.py\t+2\t\x1b[31m+2\x1b[39m\t+100.00%\t['\x1b[31m1\x1b[39m', '\x1b[31m2\x1b[39m']
 TOTAL\t+4\t\x1b[31m+1\x1b[39m\t+31.06%\t[]
 """
+        )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
+
 def test_diff__format_markdown():
-    
-    for opt in ('-f', '--format'):
-        result = runner.invoke(diff, [
-            opt, 'markdown',
-            'tests/dummy.source1/coverage.xml',
-            'tests/dummy.source2/coverage.xml',
-        ], catch_exceptions=False)
-    assert result.output == """\
+    for opt in ("-f", "--format"):
+        result = runner.invoke(
+            diff,
+            [
+                opt,
+                "markdown",
+                "tests/dummy.source1/coverage.xml",
+                "tests/dummy.source2/coverage.xml",
+            ],
+            catch_exceptions=False,
+        )
+    assert (
+        result.output
+        == """\
 | Filename        |   Stmts |   Miss | Cover    | Missing   |
 |-----------------|---------|--------|----------|-----------|
 | dummy/dummy.py  |       0 |     \x1b[32m-2\x1b[39m | +40.00%  |           |
@@ -528,18 +731,25 @@ def test_diff__format_markdown():
 | dummy/dummy3.py |      +2 |     \x1b[31m+2\x1b[39m | +100.00% | \x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m      |
 | TOTAL           |      +4 |     \x1b[31m+1\x1b[39m | +31.06%  |           |
 """
+    )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__format_json():
-    
-    for opt in ('-f', '--format'):
-        result = runner.invoke(diff, [
-            opt, 'json',
-            'tests/dummy.source1/coverage.xml',
-            'tests/dummy.source2/coverage.xml',
-        ], catch_exceptions=False)
-        assert result.output == """\
+    for opt in ("-f", "--format"):
+        result = runner.invoke(
+            diff,
+            [
+                opt,
+                "json",
+                "tests/dummy.source1/coverage.xml",
+                "tests/dummy.source2/coverage.xml",
+            ],
+            catch_exceptions=False,
+        )
+        assert (
+            result.output
+            == """\
 {
     "files": [
         {
@@ -572,17 +782,25 @@ def test_diff__format_json():
     }
 }
 """
+        )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
+
 def test_diff__format_yaml():
-    
-    for opt in ('-f', '--format'):
-        result = runner.invoke(diff, [
-            opt, 'yaml',
-            'tests/dummy.source1/coverage.xml',
-            'tests/dummy.source2/coverage.xml',
-        ], catch_exceptions=False)
-        assert result.output == """\
+    for opt in ("-f", "--format"):
+        result = runner.invoke(
+            diff,
+            [
+                opt,
+                "yaml",
+                "tests/dummy.source1/coverage.xml",
+                "tests/dummy.source2/coverage.xml",
+            ],
+            catch_exceptions=False,
+        )
+        assert (
+            result.output
+            == """\
 files:
 - Filename: dummy/dummy.py
   Stmts: '0'
@@ -606,62 +824,81 @@ total:
   Cover: +31.06%
 
 """
+        )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__output_to_file():
-    
-
-    for opt in ('-o', '--output'):
-        result = runner.invoke(diff, [
-            'tests/dummy.source1/coverage.xml',
-            'tests/dummy.source2/coverage.xml',
-            opt, 'report.out'
-        ], catch_exceptions=False)
-        with open('report.out') as f:
+    for opt in ("-o", "--output"):
+        result = runner.invoke(
+            diff,
+            [
+                "tests/dummy.source1/coverage.xml",
+                "tests/dummy.source2/coverage.xml",
+                opt,
+                "report.out",
+            ],
+            catch_exceptions=False,
+        )
+        with open("report.out") as f:
             report = f.read()
-        os.remove('report.out')
+        os.remove("report.out")
         assert result.output == ""
-        assert report == """\
+        assert (
+            report
+            == """\
 Filename           Stmts    Miss  Cover     Missing
 ---------------  -------  ------  --------  ---------
 dummy/dummy.py         0      -2  +40.00%
 dummy/dummy2.py       +2      +1  -25.00%   5
 dummy/dummy3.py       +2      +2  +100.00%  1, 2
 TOTAL                 +4      +1  +31.06%"""
+        )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__output_to_file__force_color():
-    
-
-    result = runner.invoke(diff, [
-        'tests/dummy.source1/coverage.xml',
-        'tests/dummy.source2/coverage.xml',
-        '--color', '--output', 'report.out'
-    ], catch_exceptions=False)
-    with open('report.out') as f:
+    result = runner.invoke(
+        diff,
+        [
+            "tests/dummy.source1/coverage.xml",
+            "tests/dummy.source2/coverage.xml",
+            "--color",
+            "--output",
+            "report.out",
+        ],
+        catch_exceptions=False,
+    )
+    with open("report.out") as f:
         report = f.read()
-    os.remove('report.out')
+    os.remove("report.out")
     assert result.output == ""
-    assert report == """\
+    assert (
+        report
+        == """\
 Filename           Stmts    Miss  Cover     Missing
 ---------------  -------  ------  --------  ---------
 dummy/dummy.py         0      \x1b[32m-2\x1b[39m  +40.00%
 dummy/dummy2.py       +2      \x1b[31m+1\x1b[39m  -25.00%   \x1b[31m5\x1b[39m
 dummy/dummy3.py       +2      \x1b[31m+2\x1b[39m  +100.00%  \x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m
 TOTAL                 +4      \x1b[31m+1\x1b[39m  +31.06%"""
+    )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__format_text__with_color():
-    
-    result = runner.invoke(diff, [
-        '--color',
-        'tests/dummy.source1/coverage.xml',
-        'tests/dummy.source2/coverage.xml',
-    ], catch_exceptions=False)
-    assert result.output == """\
+    result = runner.invoke(
+        diff,
+        [
+            "--color",
+            "tests/dummy.source1/coverage.xml",
+            "tests/dummy.source2/coverage.xml",
+        ],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
 Filename           Stmts    Miss  Cover     Missing
 ---------------  -------  ------  --------  ---------
 dummy/dummy.py         0      \x1b[32m-2\x1b[39m  +40.00%
@@ -669,17 +906,23 @@ dummy/dummy2.py       +2      \x1b[31m+1\x1b[39m  -25.00%   \x1b[31m5\x1b[39m
 dummy/dummy3.py       +2      \x1b[31m+2\x1b[39m  +100.00%  \x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m
 TOTAL                 +4      \x1b[31m+1\x1b[39m  +31.06%
 """
+    )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__format_text__with_no_color():
-    
-    result = runner.invoke(diff, [
-        '--no-color',
-        'tests/dummy.source1/coverage.xml',
-        'tests/dummy.source2/coverage.xml',
-    ], catch_exceptions=False)
-    assert result.output == """\
+    result = runner.invoke(
+        diff,
+        [
+            "--no-color",
+            "tests/dummy.source1/coverage.xml",
+            "tests/dummy.source2/coverage.xml",
+        ],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
 Filename           Stmts    Miss  Cover     Missing
 ---------------  -------  ------  --------  ---------
 dummy/dummy.py         0      -2  +40.00%
@@ -687,18 +930,25 @@ dummy/dummy2.py       +2      +1  -25.00%   5
 dummy/dummy3.py       +2      +2  +100.00%  1, 2
 TOTAL                 +4      +1  +31.06%
 """
+    )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
+
 def test_diff__format_markdown__with_color():
-    
-    result = runner.invoke(diff, [
-        '--color',
-        'tests/dummy.source1/coverage.xml',
-        'tests/dummy.source2/coverage.xml',
-        '--format',
-        'markdown',
-    ], catch_exceptions=False)
-    assert result.output == """\
+    result = runner.invoke(
+        diff,
+        [
+            "--color",
+            "tests/dummy.source1/coverage.xml",
+            "tests/dummy.source2/coverage.xml",
+            "--format",
+            "markdown",
+        ],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
 | Filename        |   Stmts |   Miss | Cover    | Missing   |
 |-----------------|---------|--------|----------|-----------|
 | dummy/dummy.py  |       0 |     \x1b[32m-2\x1b[39m | +40.00%  |           |
@@ -706,18 +956,25 @@ def test_diff__format_markdown__with_color():
 | dummy/dummy3.py |      +2 |     \x1b[31m+2\x1b[39m | +100.00% | \x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m      |
 | TOTAL           |      +4 |     \x1b[31m+1\x1b[39m | +31.06%  |           |
 """
+    )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
+
 def test_diff__format_markdown__with_no_color():
-    
-    result = runner.invoke(diff, [
-        '--no-color',
-        'tests/dummy.source1/coverage.xml',
-        'tests/dummy.source2/coverage.xml',
-        '--format',
-        'markdown',
-    ], catch_exceptions=False)
-    assert result.output == """\
+    result = runner.invoke(
+        diff,
+        [
+            "--no-color",
+            "tests/dummy.source1/coverage.xml",
+            "tests/dummy.source2/coverage.xml",
+            "--format",
+            "markdown",
+        ],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
 | Filename        |   Stmts |   Miss | Cover    | Missing   |
 |-----------------|---------|--------|----------|-----------|
 | dummy/dummy.py  |       0 |     -2 | +40.00%  |           |
@@ -725,19 +982,25 @@ def test_diff__format_markdown__with_no_color():
 | dummy/dummy3.py |      +2 |     +2 | +100.00% | 1, 2      |
 | TOTAL           |      +4 |     +1 | +31.06%  |           |
 """
+    )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__format_json__with_color():
-    
-    result = runner.invoke(diff, [
-        '--color',
-        'tests/dummy.source1/coverage.xml',
-        'tests/dummy.source2/coverage.xml',
-        '--format',
-        'json'
-    ], catch_exceptions=False)
-    assert result.output == """\
+    result = runner.invoke(
+        diff,
+        [
+            "--color",
+            "tests/dummy.source1/coverage.xml",
+            "tests/dummy.source2/coverage.xml",
+            "--format",
+            "json",
+        ],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
 {
     "files": [
         {
@@ -770,19 +1033,25 @@ def test_diff__format_json__with_color():
     }
 }
 """
+    )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__format_json__with_no_color():
-    
-    result = runner.invoke(diff, [
-        '--no-color',
-        'tests/dummy.source1/coverage.xml',
-        'tests/dummy.source2/coverage.xml',
-        '--format',
-        'json'
-    ], catch_exceptions=False)
-    assert result.output == """\
+    result = runner.invoke(
+        diff,
+        [
+            "--no-color",
+            "tests/dummy.source1/coverage.xml",
+            "tests/dummy.source2/coverage.xml",
+            "--format",
+            "json",
+        ],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
 {
     "files": [
         {
@@ -815,18 +1084,26 @@ def test_diff__format_json__with_no_color():
     }
 }
 """
+    )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
+
 def test_diff__format_yaml_with_color():
-    
-    for opt in ('-f', '--format'):
-        result = runner.invoke(diff, [
-            '--color',
-            opt, 'yaml',
-            'tests/dummy.source1/coverage.xml',
-            'tests/dummy.source2/coverage.xml',
-        ], catch_exceptions=False)
-        assert result.output == """\
+    for opt in ("-f", "--format"):
+        result = runner.invoke(
+            diff,
+            [
+                "--color",
+                opt,
+                "yaml",
+                "tests/dummy.source1/coverage.xml",
+                "tests/dummy.source2/coverage.xml",
+            ],
+            catch_exceptions=False,
+        )
+        assert (
+            result.output
+            == """\
 files:
 - Filename: dummy/dummy.py
   Stmts: '0'
@@ -850,18 +1127,26 @@ total:
   Cover: +31.06%
 
 """
+        )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
+
 def test_diff__format_yaml_with_no_color():
-    
-    for opt in ('-f', '--format'):
-        result = runner.invoke(diff, [
-            '--no-color',
-            opt, 'yaml',
-            'tests/dummy.source1/coverage.xml',
-            'tests/dummy.source2/coverage.xml',
-        ], catch_exceptions=False)
-        assert result.output == """\
+    for opt in ("-f", "--format"):
+        result = runner.invoke(
+            diff,
+            [
+                "--no-color",
+                opt,
+                "yaml",
+                "tests/dummy.source1/coverage.xml",
+                "tests/dummy.source2/coverage.xml",
+            ],
+            catch_exceptions=False,
+        )
+        assert (
+            result.output
+            == """\
 files:
 - Filename: dummy/dummy.py
   Stmts: '0'
@@ -885,144 +1170,203 @@ total:
   Cover: +31.06%
 
 """
+        )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__format_html__no_source_on_disk():
     from pycobertura.filesystem import FileSystem
 
-    
-    pytest.raises(FileSystem.FileNotFound, runner.invoke, diff, [
-        '--format', 'html',
-        'tests/dummy.with-dummy2-better-cov.xml',
-        'tests/dummy.with-dummy2-better-and-worse.xml',
-    ], catch_exceptions=False)
+    pytest.raises(
+        FileSystem.FileNotFound,
+        runner.invoke,
+        diff,
+        [
+            "--format",
+            "html",
+            "tests/dummy.with-dummy2-better-cov.xml",
+            "tests/dummy.with-dummy2-better-and-worse.xml",
+        ],
+        catch_exceptions=False,
+    )
 
 
-@pytest.mark.parametrize("source1, source2, prefix1, prefix2", [
-    ("tests/", "tests/dummy", "dummy/", ""),
-    ("tests/dummy", "tests/", "", "dummy/"),
-    ("tests/dummy/dummy.zip", "tests/dummy/dummy.zip", "", ""),
-    ("tests/dummy/dummy-with-prefix.zip", "tests/dummy", "dummy-with-prefix", ""),
-    ("tests/dummy/dummy-with-prefix.zip", "tests/dummy/dummy.zip", "dummy-with-prefix", ""),
-])
+@pytest.mark.parametrize(
+    "source1, source2, prefix1, prefix2",
+    [
+        ("tests/", "tests/dummy", "dummy/", ""),
+        ("tests/dummy", "tests/", "", "dummy/"),
+        ("tests/dummy/dummy.zip", "tests/dummy/dummy.zip", "", ""),
+        ("tests/dummy/dummy-with-prefix.zip", "tests/dummy", "dummy-with-prefix", ""),
+        (
+            "tests/dummy/dummy-with-prefix.zip",
+            "tests/dummy/dummy.zip",
+            "dummy-with-prefix",
+            "",
+        ),
+    ],
+)
 def test_diff__format_html__with_source_prefix(source1, source2, prefix1, prefix2):
-    
-    result = runner.invoke(diff, [
-        '--format', 'html',
-        '--source1', source1,
-        '--source2', source2,
-        '--source-prefix1', prefix1,
-        '--source-prefix2', prefix2,
-        'tests/dummy.with-dummy2-better-cov.xml',
-        'tests/dummy.with-dummy2-better-and-worse.xml',
-    ], catch_exceptions=False)
-    assert result.output.startswith('<html>')
-    assert result.output.endswith('</html>\n')
+    result = runner.invoke(
+        diff,
+        [
+            "--format",
+            "html",
+            "--source1",
+            source1,
+            "--source2",
+            source2,
+            "--source-prefix1",
+            prefix1,
+            "--source-prefix2",
+            prefix2,
+            "tests/dummy.with-dummy2-better-cov.xml",
+            "tests/dummy.with-dummy2-better-and-worse.xml",
+        ],
+        catch_exceptions=False,
+    )
+    assert result.output.startswith("<html>")
+    assert result.output.endswith("</html>\n")
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
-@pytest.mark.parametrize("source1, source2", [
-    ("tests/dummy", "tests/dummy"),
-    ("tests/dummy/dummy.zip", "tests/dummy/dummy.zip"),
-])
+@pytest.mark.parametrize(
+    "source1, source2",
+    [
+        ("tests/dummy", "tests/dummy"),
+        ("tests/dummy/dummy.zip", "tests/dummy/dummy.zip"),
+    ],
+)
 def test_diff__format_html__with_source(source1, source2):
-    
-    result = runner.invoke(diff, [
-        '--format', 'html',
-        '--source1', source1,
-        '--source2', source2,
-        'tests/dummy.with-dummy2-better-cov.xml',
-        'tests/dummy.with-dummy2-better-and-worse.xml',
-    ], catch_exceptions=False)
-    assert result.output.startswith('<html>')
-    assert result.output.endswith('</html>\n')
+    result = runner.invoke(
+        diff,
+        [
+            "--format",
+            "html",
+            "--source1",
+            source1,
+            "--source2",
+            source2,
+            "tests/dummy.with-dummy2-better-cov.xml",
+            "tests/dummy.with-dummy2-better-and-worse.xml",
+        ],
+        catch_exceptions=False,
+    )
+    assert result.output.startswith("<html>")
+    assert result.output.endswith("</html>\n")
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__format_html__source():
-    
-    result = runner.invoke(diff, [
-        '--format', 'html',
-        '--source',
-        'tests/dummy.source1/coverage.xml',
-        'tests/dummy.source2/coverage.xml',
-    ], catch_exceptions=False)
-    assert 'Missing' in result.output
-    assert result.output.startswith('<html>')
-    assert result.output.endswith('</html>\n')
+    result = runner.invoke(
+        diff,
+        [
+            "--format",
+            "html",
+            "--source",
+            "tests/dummy.source1/coverage.xml",
+            "tests/dummy.source2/coverage.xml",
+        ],
+        catch_exceptions=False,
+    )
+    assert "Missing" in result.output
+    assert result.output.startswith("<html>")
+    assert result.output.endswith("</html>\n")
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__format_html__source_is_default():
-    
-    result = runner.invoke(diff, [
-        '--format', 'html',
-        'tests/dummy.source1/coverage.xml',
-        'tests/dummy.source2/coverage.xml',
-    ], catch_exceptions=False)
-    assert 'Missing' in result.output
-    assert result.output.startswith('<html>')
-    assert result.output.endswith('</html>\n')
+    result = runner.invoke(
+        diff,
+        [
+            "--format",
+            "html",
+            "tests/dummy.source1/coverage.xml",
+            "tests/dummy.source2/coverage.xml",
+        ],
+        catch_exceptions=False,
+    )
+    assert "Missing" in result.output
+    assert result.output.startswith("<html>")
+    assert result.output.endswith("</html>\n")
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__format_html__no_source():
-    
-    result = runner.invoke(diff, [
-        '--format', 'html',
-        '--no-source',
-        'tests/dummy.source1/coverage.xml',
-        'tests/dummy.source2/coverage.xml',
-    ], catch_exceptions=False)
-    assert 'Missing' not in result.output
-    assert result.output.startswith('<html>')
-    assert result.output.endswith('</html>\n')
+    result = runner.invoke(
+        diff,
+        [
+            "--format",
+            "html",
+            "--no-source",
+            "tests/dummy.source1/coverage.xml",
+            "tests/dummy.source2/coverage.xml",
+        ],
+        catch_exceptions=False,
+    )
+    assert "Missing" not in result.output
+    assert result.output.startswith("<html>")
+    assert result.output.endswith("</html>\n")
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__same_coverage_has_exit_status_of_zero():
-    
-    result = runner.invoke(diff, [
-        'tests/dummy.source1/coverage.xml',
-        'tests/dummy.source1/coverage.xml',
-    ], catch_exceptions=False)
+    result = runner.invoke(
+        diff,
+        [
+            "tests/dummy.source1/coverage.xml",
+            "tests/dummy.source1/coverage.xml",
+        ],
+        catch_exceptions=False,
+    )
     assert result.exit_code == ExitCodes.OK
 
 
 def test_diff__better_coverage_has_exit_status_of_zero():
-    
-    result = runner.invoke(diff, [
-        'tests/dummy.original.xml',
-        'tests/dummy.original-full-cov.xml',  # has no uncovered lines
-        '--no-source',
-    ], catch_exceptions=False)
+    result = runner.invoke(
+        diff,
+        [
+            "tests/dummy.original.xml",
+            "tests/dummy.original-full-cov.xml",  # has no uncovered lines
+            "--no-source",
+        ],
+        catch_exceptions=False,
+    )
     assert result.exit_code == ExitCodes.OK
 
 
 def test_diff__worse_coverage_exit_status():
-    
-    result = runner.invoke(diff, [
-        'tests/dummy.with-dummy2-no-cov.xml',
-        'tests/dummy.with-dummy2-better-and-worse.xml',  # has covered AND uncovered lines
-        '--no-source',
-    ], catch_exceptions=False)
+    result = runner.invoke(
+        diff,
+        [
+            "tests/dummy.with-dummy2-no-cov.xml",
+            "tests/dummy.with-dummy2-better-and-worse.xml",  # has covered AND uncovered lines
+            "--no-source",
+        ],
+        catch_exceptions=False,
+    )
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
 def test_diff__changes_uncovered_but_with_better_coverage_exit_status():
-    
-    result = runner.invoke(diff, [
-        'tests/dummy.zeroexit1/coverage.xml',
-        'tests/dummy.zeroexit2/coverage.xml',  # has uncovered changes
-    ], catch_exceptions=False)
+    result = runner.invoke(
+        diff,
+        [
+            "tests/dummy.zeroexit1/coverage.xml",
+            "tests/dummy.zeroexit2/coverage.xml",  # has uncovered changes
+        ],
+        catch_exceptions=False,
+    )
     assert result.exit_code == ExitCodes.NOT_ALL_CHANGES_COVERED
 
 
 def test_diff__line_status():
-    
-    runner.invoke(diff, [
-        'tests/dummy.linestatus/test1.xml',
-        'tests/dummy.linestatus/test2.xml',
-    ], catch_exceptions=False)
+    runner.invoke(
+        diff,
+        [
+            "tests/dummy.linestatus/test1.xml",
+            "tests/dummy.linestatus/test2.xml",
+        ],
+        catch_exceptions=False,
+    )
     assert True

@@ -1,4 +1,5 @@
 import click
+import ast
 
 from pycobertura.cobertura import Cobertura
 from pycobertura.reporters import (
@@ -56,6 +57,16 @@ def get_exit_code(differ, source):
         return ExitCodes.OK
 
 
+class ListParamType(click.ParamType):
+    name = "list"
+
+    def convert(self, value, param, ctx):
+        try:
+            return ast.literal_eval(value)
+        except:
+            self.fail(f"{value} is not a valid list", param, ctx)
+
+
 @pycobertura.command()
 @click.argument("cobertura_file")
 @click.option(
@@ -98,8 +109,8 @@ def get_exit_code(differ, source):
 @click.option(
     "-onlycols",
     "--only-show-columns",
-    default=[None],
-    type=list,
+    default="[None]",
+    type=ListParamType(),
     help="Comma-separated list of column names you want to show",
 )
 def show(
