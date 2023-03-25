@@ -63,8 +63,8 @@ class ListParamType(click.ParamType):
     def convert(self, value, param, ctx):
         try:
             return ast.literal_eval(value)
-        except:
-            self.fail(f"{value} is not a valid list", param, ctx)
+        except (NameError, SyntaxError, ValueError):
+            click.BadParameter(f"{value} is not a valid list", param, ctx)
 
 
 @pycobertura.command()
