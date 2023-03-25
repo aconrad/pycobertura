@@ -1,4 +1,5 @@
 import click
+import ast
 
 from pycobertura.cobertura import Cobertura
 from pycobertura.reporters import (
@@ -56,6 +57,16 @@ def get_exit_code(differ, source):
         return ExitCodes.OK
 
 
+class ListParamType(click.ParamType):
+    name = "list"
+
+    def convert(self, value, param, ctx):
+        try:
+            return ast.literal_eval(value)
+        except (NameError, SyntaxError, ValueError):
+            click.BadParameter(f"{value} is not a valid list", param, ctx)
+
+
 @pycobertura.command()
 @click.argument("cobertura_file")
 @click.option(
@@ -95,8 +106,22 @@ def get_exit_code(differ, source):
     "the --source is a zip archive and the files were zipped under "
     "a directory prefix that is not part of the source.",
 )
+@click.option(
+    "-onlycols",
+    "--only-show-columns",
+    default="[None]",
+    type=ListParamType(),
+    help="Comma-separated list of column names you want to show",
+)
 def show(
-    cobertura_file, ignore_regex, format, delimiter, output, source, source_prefix
+    cobertura_file,
+    ignore_regex,
+    format,
+    delimiter,
+    output,
+    source,
+    source_prefix,
+    only_show_columns,
 ):
     """show coverage summary of a Cobertura report"""
 
@@ -108,7 +133,7 @@ def show(
         filesystem=filesystem_factory(source, source_prefix=source_prefix),
     )
     Reporter = reporters[format]
-    reporter = Reporter(cobertura, ignore_regex)
+    reporter = Reporter(cobertura, ignore_regex, only_show_columns)
 
     if format == "csv":
         report = reporter.generate(delimiter)
@@ -216,6 +241,17 @@ directories (or zip archives). If the source is not available at all, pass
     "`--no-source` is passed, missing lines and the source code will "
     "not be displayed.",
 )
+@click.option(
+    "-onlycols",
+    "--only-show-columns",
+    default=[None],
+    type=list,
+    help="Comma-separated list of column names you want to show",
+)
+@click.option(
+    "--show-missing",
+    default=True,
+)
 def diff(
     cobertura_file1,
     cobertura_file2,
@@ -229,6 +265,8 @@ def diff(
     source_prefix1,
     source_prefix2,
     source,
+    only_show_columns,
+    show_missing,
 ):
     """compare coverage of two Cobertura reports"""
     # Assume that the source is located in the same directory as the provided
@@ -246,8 +284,8 @@ def diff(
     cobertura2 = Cobertura(cobertura_file2, filesystem=filesystem2)
 
     Reporter = delta_reporters[format]
-    reporter_args = [cobertura1, cobertura2, ignore_regex]
-    reporter_kwargs = {"show_source": source}
+    reporter_args = [cobertura1, cobertura2, ignore_regex, only_show_columns]
+    reporter_kwargs = {"show_source": source, "show_missing": show_missing}
 
     isatty = True if output is None else output.isatty()
 
