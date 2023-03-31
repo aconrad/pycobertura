@@ -661,3 +661,26 @@ def test_html_report_delta__show_missing_False():
     </div>
   </body>
 </html>"""
+
+def test_github_annotation_report():
+    from pycobertura.reporters import GitHubAnnotationReporter
+
+    cobertura = make_cobertura()
+    default_report = GitHubAnnotationReporter(cobertura)
+
+    assert (
+        default_report.generate()
+        == """\
+::error file=search/BinarySearch.java,line=24,endLine=24,title=pycobertura::not covered
+::error file=search/LinearSearch.java,line=19,endLine=24,title=pycobertura::not covered"""
+    )
+    custom_report = GitHubAnnotationReporter(
+        cobertura, annotation_level="notice", title="JCov", message="missing coverage"
+    )
+
+    assert (
+        custom_report.generate()
+        == """\
+::notice file=search/BinarySearch.java,line=24,endLine=24,title=JCov::missing coverage
+::notice file=search/LinearSearch.java,line=19,endLine=24,title=JCov::missing coverage"""
+    )

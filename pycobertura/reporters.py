@@ -1,6 +1,6 @@
 from jinja2 import Environment, PackageLoader
 from pycobertura.cobertura import CoberturaDiff
-from pycobertura.utils import green, red, stringify
+from pycobertura.utils import green, red, stringify, rangify
 from pycobertura.templates import filters
 from tabulate import tabulate
 from ruamel import yaml
@@ -443,3 +443,49 @@ class HtmlReporterDelta(DeltaReporter):
                     )
 
         return template.render(**render_kwargs)
+
+
+class GitHubAnnotationReporter(Reporter):
+    def __init__(
+        self,
+        cobertura,
+        ignore_regex=None,
+        annotation_level: str = "error",
+        title: str = "pycobertura",
+        message: str = "not covered",
+    ):
+        super().__init__(cobertura, ignore_regex)
+        self.annotation_level = annotation_level
+        self.title = title
+        self.message = message
+
+    def generate(self):
+        file_names = self.cobertura.files(ignore_regex=self.ignore_regex)
+        result_strs = []
+        for file_name in file_names:
+            for range_start, range_end in rangify(
+                self.cobertura.missed_lines(file_name)
+            ):
+                result_strs.append(
+                    self.to_github_annotation_message(
+                        file_name=file_name,
+                        start_line_num=range_start,
+                        end_line_num=range_end,
+                        annotation_level=self.annotation_level,
+                        title=self.title,
+                        message=self.message,
+                    )
+                )
+        result = "\n".join(result_strs)
+        return result
+
+    @staticmethod
+    def to_github_annotation_message(
+        file_name: str,
+        start_line_num: int,
+        end_line_num: int,
+        annotation_level: str,
+        title: str,
+        message: str,
+    ):
+        return f"::{annotation_level} file={file_name},line={start_line_num},endLine={end_line_num},title={title}::{message}"  # noqa

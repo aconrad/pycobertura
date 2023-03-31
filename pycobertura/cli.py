@@ -2,6 +2,7 @@ import click
 
 from pycobertura.cobertura import Cobertura
 from pycobertura.reporters import (
+    GitHubAnnotationReporter,
     HtmlReporter,
     TextReporter,
     CsvReporter,
@@ -28,6 +29,7 @@ reporters = {
     "markdown": MarkdownReporter,
     "json": JsonReporter,
     "yaml": YamlReporter,
+    "github-annotation": GitHubAnnotationReporter,
 }
 
 
