@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* pycobertura show now support output format: github-annotation
+
 ## 3.0.0 (2022-10-08)
 
 * BACKWARD INCOMPATIBLE:
