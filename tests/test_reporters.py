@@ -1,3 +1,5 @@
+import pytest
+
 from .utils import make_cobertura
 
 
@@ -662,25 +664,34 @@ def test_html_report_delta__show_missing_False():
   </body>
 </html>"""
 
-def test_github_annotation_report():
+@pytest.mark.parametrize(
+    "report, expected_default_output, expected_custom_output",
+    [
+        (
+            "tests/cobertura.xml",
+            """\
+::error file=search/BinarySearch.java,line=24,endLine=24,title=pycobertura::not covered
+::error file=search/LinearSearch.java,line=19,endLine=24,title=pycobertura::not covered""",
+            """\
+::notice file=search/BinarySearch.java,line=24,endLine=24,title=JCov::missing coverage
+::notice file=search/LinearSearch.java,line=19,endLine=24,title=JCov::missing coverage""",
+        ),
+        (
+            "tests/cobertura-generated-by-istanbul-from-coffeescript.xml",
+            "::error file=app.coffee,line=10,endLine=10,title=pycobertura::not covered",
+            "::notice file=app.coffee,line=10,endLine=10,title=JCov::missing coverage",
+        ),
+    ],
+)
+def test_github_annotation_report(report, expected_default_output, expected_custom_output):
     from pycobertura.reporters import GitHubAnnotationReporter
 
-    cobertura = make_cobertura()
+    cobertura = make_cobertura(report)
     default_report = GitHubAnnotationReporter(cobertura)
 
-    assert (
-        default_report.generate()
-        == """\
-::error file=search/BinarySearch.java,line=24,endLine=24,title=pycobertura::not covered
-::error file=search/LinearSearch.java,line=19,endLine=24,title=pycobertura::not covered"""
-    )
+    assert default_report.generate() == expected_default_output
     custom_report = GitHubAnnotationReporter(
         cobertura, annotation_level="notice", title="JCov", message="missing coverage"
     )
 
-    assert (
-        custom_report.generate()
-        == """\
-::notice file=search/BinarySearch.java,line=24,endLine=24,title=JCov::missing coverage
-::notice file=search/LinearSearch.java,line=19,endLine=24,title=JCov::missing coverage"""
-    )
+    assert custom_report.generate() == expected_custom_output
