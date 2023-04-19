@@ -208,7 +208,7 @@ $ pycobertura show --format github-annotation tests/cobertura.xml
 ::error file=dummy/dummy4.py,line=1,endLine=6,title=pycobertura::not covered
 ```
 
-If you run it in GitHub action/App, the above log generate check annotations.
+If you run it in GitHub Actions/Apps, the above log generates check annotations.
 
 ![Example output of github-annotation formatted pycobertura show command](images/example_github_annotation_show.png)
 
