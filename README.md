@@ -200,7 +200,7 @@ total:
 
 ```
 
-The following shows how to generate GitHub annotation with coverage file.
+The following shows how to generate GitHub annotations given a coverage file.
 
 ```shell
 $ pycobertura show --format github-annotation tests/cobertura.xml
