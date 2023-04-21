@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-* pycobertura show now support output format: github-annotation
+* pycobertura show now support output format: github-annotation. Thanks @goatwu1993
 
 ## 3.0.0 (2022-10-08)
 
