@@ -450,7 +450,7 @@ class GitHubAnnotationReporter(Reporter):
         self,
         cobertura,
         ignore_regex=None,
-        annotation_level: str = "error",
+        annotation_level: str = "notice",
         title: str = "pycobertura",
         message: str = "not covered",
     ):

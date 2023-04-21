@@ -204,8 +204,8 @@ The following shows how to generate GitHub annotations given a coverage file.
 
 ```shell
 $ pycobertura show --format github-annotation tests/cobertura.xml
-::error file=dummy/dummy.py,line=5,endLine=6,title=pycobertura::not covered
-::error file=dummy/dummy4.py,line=1,endLine=6,title=pycobertura::not covered
+::notice file=dummy/dummy.py,line=5,endLine=6,title=pycobertura::not covered
+::notice file=dummy/dummy4.py,line=1,endLine=6,title=pycobertura::not covered
 ```
 
 If you run it in GitHub Actions/Apps, the above log generates check annotations.

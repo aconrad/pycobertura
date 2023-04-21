@@ -670,16 +670,16 @@ def test_html_report_delta__show_missing_False():
         (
             "tests/cobertura.xml",
             """\
-::error file=search/BinarySearch.java,line=24,endLine=24,title=pycobertura::not covered
-::error file=search/LinearSearch.java,line=19,endLine=24,title=pycobertura::not covered""",
+::notice file=search/BinarySearch.java,line=24,endLine=24,title=pycobertura::not covered
+::notice file=search/LinearSearch.java,line=19,endLine=24,title=pycobertura::not covered""",
             """\
-::notice file=search/BinarySearch.java,line=24,endLine=24,title=JCov::missing coverage
-::notice file=search/LinearSearch.java,line=19,endLine=24,title=JCov::missing coverage""",
+::error file=search/BinarySearch.java,line=24,endLine=24,title=JCov::missing coverage
+::error file=search/LinearSearch.java,line=19,endLine=24,title=JCov::missing coverage""",
         ),
         (
             "tests/cobertura-generated-by-istanbul-from-coffeescript.xml",
-            "::error file=app.coffee,line=10,endLine=10,title=pycobertura::not covered",
-            "::notice file=app.coffee,line=10,endLine=10,title=JCov::missing coverage",
+            "::notice file=app.coffee,line=10,endLine=10,title=pycobertura::not covered",
+            "::error file=app.coffee,line=10,endLine=10,title=JCov::missing coverage",
         ),
     ],
 )
@@ -691,7 +691,7 @@ def test_github_annotation_report(report, expected_default_output, expected_cust
 
     assert default_report.generate() == expected_default_output
     custom_report = GitHubAnnotationReporter(
-        cobertura, annotation_level="notice", title="JCov", message="missing coverage"
+        cobertura, annotation_level="error", title="JCov", message="missing coverage"
     )
 
     assert custom_report.generate() == expected_custom_output
