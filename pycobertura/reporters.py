@@ -446,20 +446,12 @@ class HtmlReporterDelta(DeltaReporter):
 
 
 class GitHubAnnotationReporter(Reporter):
-    def __init__(
+    def generate(
         self,
-        cobertura,
-        ignore_regex=None,
-        annotation_level: str = "notice",
-        title: str = "pycobertura",
-        message: str = "not covered",
+        annotation_level: str,
+        annotation_title: str,
+        annotation_message: str,
     ):
-        super().__init__(cobertura, ignore_regex)
-        self.annotation_level = annotation_level
-        self.title = title
-        self.message = message
-
-    def generate(self):
         file_names = self.cobertura.files(ignore_regex=self.ignore_regex)
         result_strs = []
         for file_name in file_names:
@@ -471,9 +463,9 @@ class GitHubAnnotationReporter(Reporter):
                         file_name=file_name,
                         start_line_num=range_start,
                         end_line_num=range_end,
-                        annotation_level=self.annotation_level,
-                        title=self.title,
-                        message=self.message,
+                        annotation_level=annotation_level,
+                        annotation_title=annotation_title,
+                        annotation_message=annotation_message,
                     )
                 )
         result = "\n".join(result_strs)
@@ -485,7 +477,7 @@ class GitHubAnnotationReporter(Reporter):
         start_line_num: int,
         end_line_num: int,
         annotation_level: str,
-        title: str,
-        message: str,
+        annotation_title: str,
+        annotation_message: str,
     ):
-        return f"::{annotation_level} file={file_name},line={start_line_num},endLine={end_line_num},title={title}::{message}"  # noqa
+        return f"::{annotation_level} file={file_name},line={start_line_num},endLine={end_line_num},title={annotation_title}::{annotation_message}"  # noqa

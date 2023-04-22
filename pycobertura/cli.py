@@ -75,6 +75,24 @@ def get_exit_code(differ, source):
     help="Delimiter for csv format, e.g. ,;\n\t",
 )
 @click.option(
+    "--annotation-title",
+    default="pycobertura",
+    type=str,
+    help="annotation title for github annotation format",
+)
+@click.option(
+    "--annotation-level",
+    default="notice",
+    type=str,
+    help="annotation level for github annotation format",
+)
+@click.option(
+    "--annotation-message",
+    default="not covered",
+    type=str,
+    help="annotation message for github annotation format",
+)
+@click.option(
     "-o",
     "--output",
     metavar="<file>",
@@ -98,7 +116,16 @@ def get_exit_code(differ, source):
     "a directory prefix that is not part of the source.",
 )
 def show(
-    cobertura_file, ignore_regex, format, delimiter, output, source, source_prefix
+    cobertura_file,
+    ignore_regex,
+    format,
+    delimiter,
+    output,
+    source,
+    source_prefix,
+    annotation_level,
+    annotation_title,
+    annotation_message,
 ):
     """show coverage summary of a Cobertura report"""
 
@@ -114,6 +141,12 @@ def show(
 
     if format == "csv":
         report = reporter.generate(delimiter)
+    elif format == "github-annotation":
+        report = reporter.generate(
+            annotation_level=annotation_level,
+            annotation_title=annotation_title,
+            annotation_message=annotation_message,
+        )
     else:
         report = reporter.generate()
 

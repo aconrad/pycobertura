@@ -683,15 +683,25 @@ def test_html_report_delta__show_missing_False():
         ),
     ],
 )
-def test_github_annotation_report(report, expected_default_output, expected_custom_output):
+def test_github_annotation_report(
+    report, expected_default_output, expected_custom_output
+):
     from pycobertura.reporters import GitHubAnnotationReporter
 
     cobertura = make_cobertura(report)
-    default_report = GitHubAnnotationReporter(cobertura)
+    report = GitHubAnnotationReporter(cobertura)
+    default_config = {
+        "annotation_level": "notice",
+        "annotation_title": "pycobertura",
+        "annotation_message": "not covered",
+    }
 
-    assert default_report.generate() == expected_default_output
-    custom_report = GitHubAnnotationReporter(
-        cobertura, annotation_level="error", title="JCov", message="missing coverage"
+    assert report.generate(**default_config) == expected_default_output
+    assert (
+        report.generate(
+            annotation_level="error",
+            annotation_title="JCov",
+            annotation_message="missing coverage",
+        )
+        == expected_custom_output
     )
-
-    assert custom_report.generate() == expected_custom_output
