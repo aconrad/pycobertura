@@ -1,3 +1,5 @@
+import pytest
+
 from .utils import make_cobertura
 
 
@@ -661,3 +663,45 @@ def test_html_report_delta__show_missing_False():
     </div>
   </body>
 </html>"""
+
+@pytest.mark.parametrize(
+    "report, expected_default_output, expected_custom_output",
+    [
+        (
+            "tests/cobertura.xml",
+            """\
+::notice file=search/BinarySearch.java,line=24,endLine=24,title=pycobertura::not covered
+::notice file=search/LinearSearch.java,line=19,endLine=24,title=pycobertura::not covered""",
+            """\
+::error file=search/BinarySearch.java,line=24,endLine=24,title=JCov::missing coverage
+::error file=search/LinearSearch.java,line=19,endLine=24,title=JCov::missing coverage""",
+        ),
+        (
+            "tests/cobertura-generated-by-istanbul-from-coffeescript.xml",
+            "::notice file=app.coffee,line=10,endLine=10,title=pycobertura::not covered",
+            "::error file=app.coffee,line=10,endLine=10,title=JCov::missing coverage",
+        ),
+    ],
+)
+def test_github_annotation_report(
+    report, expected_default_output, expected_custom_output
+):
+    from pycobertura.reporters import GitHubAnnotationReporter
+
+    cobertura = make_cobertura(report)
+    report = GitHubAnnotationReporter(cobertura)
+    default_config = {
+        "annotation_level": "notice",
+        "annotation_title": "pycobertura",
+        "annotation_message": "not covered",
+    }
+
+    assert report.generate(**default_config) == expected_default_output
+    assert (
+        report.generate(
+            annotation_level="error",
+            annotation_title="JCov",
+            annotation_message="missing coverage",
+        )
+        == expected_custom_output
+    )

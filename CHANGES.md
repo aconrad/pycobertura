@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* `pycobertura show` now supports output format: `github-annotation`. Thanks @goatwu1993
+
 ## 3.0.0 (2022-10-08)
 
 * BACKWARD INCOMPATIBLE:

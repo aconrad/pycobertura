@@ -204,6 +204,52 @@ total:
 """
     assert result.exit_code == ExitCodes.OK
 
+def test_show__format_github_annotation():
+    from pycobertura.cli import show, ExitCodes
+
+    runner = CliRunner()
+    for opt in ("-f", "--format"):
+        result = runner.invoke(
+            show,
+            ["tests/dummy.original.xml", opt, "github-annotation"],
+            catch_exceptions=False,
+        )
+        assert (
+            result.output
+            == """\
+::notice file=dummy/dummy.py,line=2,endLine=2,title=pycobertura::not covered
+::notice file=dummy/dummy.py,line=5,endLine=5,title=pycobertura::not covered
+"""
+        )
+    assert result.exit_code == ExitCodes.OK
+
+
+def test_show__format_github_annotation_custom_annotation_input():
+    from pycobertura.cli import show, ExitCodes
+
+    runner = CliRunner()
+    for opt in ("-f", "--format"):
+        result = runner.invoke(
+            show,
+            [
+                "tests/dummy.original.xml",
+                opt,
+                "github-annotation",
+                "--annotation-title=coverage.py",
+                "--annotation-level=error",
+                "--annotation-message=missing coverage",
+            ],
+            catch_exceptions=False,
+        )
+        assert (
+            result.output
+            == """\
+::error file=dummy/dummy.py,line=2,endLine=2,title=coverage.py::missing coverage
+::error file=dummy/dummy.py,line=5,endLine=5,title=coverage.py::missing coverage
+"""
+        )
+    assert result.exit_code == ExitCodes.OK
+
 
 def test_show__output_to_file():
     from pycobertura.cli import show, ExitCodes
