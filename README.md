@@ -282,6 +282,19 @@ pycobertura diff --format yaml tests/dummy.source1/coverage.xml tests/dummy.sour
 
 ![Example output of yaml formatted pycobertura diff command](images/example_yaml_output.png)
 
+The following shows how to generate GitHub annotations given a coverage file.
+
+```shell
+$ pycobertura diff --format github-annotation tests/dummy.source1/coverage.xml tests/dummy.source2/coverage.xml
+::notice file=dummy/dummy2.py,line=5,endLine=5,title=pycobertura::not covered
+::notice file=dummy/dummy3.py,line=1,endLine=2,title=pycobertura::not covered
+```
+
+If you run it in GitHub Actions/Apps, the above log generates check annotations.
+
+![Example output of github-annotation formatted pycobertura diff command](images/example_github_annotation_diff.png)
+
+
 ### Option to exclude files via --ignore-regex-option
 You can specify the `--ignore-regex` option to exclude files that have a certain pattern either by specifying the path to a `.gitignore` file or by entering a Python regex.
 Examples:

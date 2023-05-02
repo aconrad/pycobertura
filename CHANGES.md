@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* `pycobertura diff` now supports output format: `github-annotation`. Thanks @goatwu1993
+
 ## 3.1.0 (2023-04-29)
 
 * `pycobertura show` now supports output format: `github-annotation`. Thanks @goatwu1993
