@@ -1,3 +1,5 @@
+import sys
+import os
 import xml.etree.ElementTree as ET
 from typing import List
 
@@ -37,7 +39,29 @@ def update_element_stats(
     return update_data
 
 
+def check_file_exists(file_):
+    if not os.path.isfile(file_):
+        print(f"Error: file {file_} does not exist.")
+        sys.exit(1)
+
+
+def check_is_valid_xml_file(file_):
+    try:
+        ET.parse(file_)
+    except ET.ParseError:
+        print(f"Error: Input file {file_} is not a valid XML file.")
+        sys.exit(1)
+
+
 def merge_coverage(files: List[str], output_file: str) -> str:
+    # Check that the output file does not already exist
+    check_file_exists(output_file)
+
+    # Check that all input files exist and are valid XML files
+    for file_ in files:
+        check_file_exists(file_)
+        check_is_valid_xml_file(file_)
+
     merged_data = {"packages": {}}
     for file in files:
         tree = ET.parse(file)
