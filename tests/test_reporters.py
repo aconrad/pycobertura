@@ -708,11 +708,16 @@ def test_github_annotation_report(
 
 
 @pytest.mark.parametrize(
-    "report1, report2, expected_default_output, expected_custom_output",
+    "report1, report2, config, expected_default_output, expected_custom_output",
     [
         (
             "tests/dummy.source1/coverage.xml",
             "tests/dummy.source2/coverage.xml",
+            {
+                "annotation_level":"error",
+                "annotation_title":"JCov",
+                "annotation_message":"missing coverage"
+            },
             """\
 ::notice file=dummy/dummy2.py,line=5,endLine=5,title=pycobertura::not covered
 ::notice file=dummy/dummy3.py,line=1,endLine=2,title=pycobertura::not covered""",
@@ -723,7 +728,7 @@ def test_github_annotation_report(
     ],
 )
 def test_github_annotation_report_delta(
-    report1, report2, expected_default_output, expected_custom_output
+    report1, report2, config, expected_default_output, expected_custom_output
 ):
     from pycobertura.reporters import GitHubAnnotationReporterDelta
 
@@ -739,9 +744,5 @@ def test_github_annotation_report_delta(
         cobertura1, cobertura2, show_missing=False
     )
     assert report_delta.generate(**default_config) == expected_default_output
-    assert report_delta.generate(
-        annotation_level="error",
-        annotation_title="JCov",
-        annotation_message="missing coverage",
-    ) == expected_custom_output
+    assert report_delta.generate(**config) == expected_custom_output
 
