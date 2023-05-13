@@ -15,6 +15,7 @@ from pycobertura.reporters import (
     MarkdownReporterDelta,
     JsonReporterDelta,
     YamlReporterDelta,
+    GitHubAnnotationReporterDelta,
 )
 from pycobertura.filesystem import filesystem_factory
 from pycobertura.utils import get_dir_from_file_path
@@ -164,6 +165,7 @@ delta_reporters = {
     "html": HtmlReporterDelta,
     "json": JsonReporterDelta,
     "yaml": YamlReporterDelta,
+    "github-annotation": GitHubAnnotationReporterDelta,
 }
 
 
@@ -251,6 +253,24 @@ directories (or zip archives). If the source is not available at all, pass
     "`--no-source` is passed, missing lines and the source code will "
     "not be displayed.",
 )
+@click.option(
+    "--annotation-title",
+    default="pycobertura",
+    type=str,
+    help="annotation title for github annotation format",
+)
+@click.option(
+    "--annotation-level",
+    default="notice",
+    type=str,
+    help="annotation level for github annotation format",
+)
+@click.option(
+    "--annotation-message",
+    default="not covered",
+    type=str,
+    help="annotation message for github annotation format",
+)
 def diff(
     cobertura_file1,
     cobertura_file2,
@@ -264,6 +284,9 @@ def diff(
     source_prefix1,
     source_prefix2,
     source,
+    annotation_level,
+    annotation_title,
+    annotation_message,
 ):
     """compare coverage of two Cobertura reports"""
     # Assume that the source is located in the same directory as the provided
@@ -293,6 +316,12 @@ def diff(
     reporter = Reporter(*reporter_args, **reporter_kwargs)
     if format == "csv":
         report = reporter.generate(delimiter)
+    elif format == "github-annotation":
+        report = reporter.generate(
+            annotation_level=annotation_level,
+            annotation_message=annotation_message,
+            annotation_title=annotation_title,
+        )
     else:
         report = reporter.generate()
 

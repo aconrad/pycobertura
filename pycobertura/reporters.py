@@ -481,3 +481,32 @@ class GitHubAnnotationReporter(Reporter):
         annotation_message: str,
     ):
         return f"::{annotation_level} file={file_name},line={start_line_num},endLine={end_line_num},title={annotation_title}::{annotation_message}"  # noqa
+
+
+class GitHubAnnotationReporterDelta(DeltaReporter):
+    def generate(
+        self,
+        annotation_level: str,
+        annotation_title: str,
+        annotation_message: str,
+    ):
+        lines = self.get_report_lines()
+        stats_dict = self.per_file_stats(lines)
+        result_strs = []
+
+        for file_stat in stats_dict["files"]:
+            for range_start, range_end in rangify(
+                [int(line) for line in file_stat["Missing"]]
+            ):
+                result_strs.append(
+                    GitHubAnnotationReporter.to_github_annotation_message(
+                        file_name=file_stat["Filename"],
+                        start_line_num=range_start,
+                        end_line_num=range_end,
+                        annotation_level=annotation_level,
+                        annotation_title=annotation_title,
+                        annotation_message=annotation_message,
+                    )
+                )
+        result = "\n".join(result_strs)
+        return result

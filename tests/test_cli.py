@@ -776,6 +776,43 @@ total:
     assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
 
+def test_diff__format_github_annotation():
+    from pycobertura.cli import diff, ExitCodes
+
+    runner = CliRunner()
+    for opt in ('-f', '--format'):
+        result = runner.invoke(diff, [
+            opt, 'github-annotation',
+            'tests/dummy.source1/coverage.xml',
+            'tests/dummy.source2/coverage.xml',
+        ], catch_exceptions=False)
+        assert result.output == """\
+::notice file=dummy/dummy2.py,line=5,endLine=5,title=pycobertura::not covered
+::notice file=dummy/dummy3.py,line=1,endLine=2,title=pycobertura::not covered
+"""
+        assert result.exit_code == ExitCodes.COVERAGE_WORSENED
+
+
+def test_diff__format_github_annotation_custom_annotation_input():
+    from pycobertura.cli import diff, ExitCodes
+
+    runner = CliRunner()
+    for opt in ('-f', '--format'):
+        result = runner.invoke(diff, [
+            opt, 'github-annotation',
+            'tests/dummy.source1/coverage.xml',
+            'tests/dummy.source2/coverage.xml',
+            "--annotation-title=coverage.py",
+            "--annotation-level=error",
+            "--annotation-message=missing coverage",
+        ], catch_exceptions=False)
+        assert result.output == """\
+::error file=dummy/dummy2.py,line=5,endLine=5,title=coverage.py::missing coverage
+::error file=dummy/dummy3.py,line=1,endLine=2,title=coverage.py::missing coverage
+"""
+        assert result.exit_code == ExitCodes.COVERAGE_WORSENED
+
+
 def test_diff__format_html__no_source_on_disk():
     from pycobertura.cli import diff
     from pycobertura.filesystem import FileSystem
