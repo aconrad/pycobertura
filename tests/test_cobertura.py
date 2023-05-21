@@ -283,6 +283,13 @@ def test_class_file_source__sources_not_found():
                 "search/LinearSearch.java": [(9, 'hit'), (13, 'partial'), (15, 'hit'), (16, 'hit'), (17, 'partial'), (19, 'miss'), (24, 'miss')],
             },
         ),
+        (
+            "tests/dummy.with-branch-condition/coverage.xml",
+            {
+                "__init__.py": [],
+                "dummy.py": [(1, 'hit'), (2, 'partial'), (3, 'hit'), (5, 'miss')],
+            },
+        ),
     ],
 )
 def test_line_statuses(report, expected_line_statuses):
