@@ -28,7 +28,8 @@ class Line(namedtuple("Line", ["number", "source", "status", "reason"])):
     The namedtuple has the following attributes:
     `number`: line number in the source code
     `source`: actual source code of line
-    `status`: "hit" (covered), "miss" (uncovered), "partial", or None (coverage unchanged)
+    `status`: "hit" (covered), "miss" (uncovered), "partial", or None (coverage
+    unchanged)
     `reason`: If `Line.status` is not `None` the possible values may be
         `"line-edit"`, `"cov-up"` or `"cov-down"`. Otherwise `None`.
     """
