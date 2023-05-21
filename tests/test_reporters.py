@@ -108,17 +108,7 @@ dummy/dummy3.py       +2      +2  +100.00%  1, 2
 TOTAL                 +4      +1  +31.06%"""
 
 
-def test_html_report():
-    from pycobertura.reporters import HtmlReporter
-
-    cobertura = make_cobertura()
-    report = HtmlReporter(cobertura)
-    html_output = report.generate()
-
-    assert "normalize.css" in html_output
-    assert "Skeleton V2.0" in html_output
-
-    assert remove_style_tag(html_output) == """\
+@pytest.mark.parametrize("report, source, expected_output", [('tests/cobertura.xml', None, """\
 <html>
   <head>
     <title>pycobertura report</title>
@@ -236,7 +226,107 @@ def test_html_report():
 
     </div>
   </body>
-</html>"""
+</html>"""), ('tests/dummy.with-branch-condition/coverage.xml', 'tests/dummy.with-branch-condition/dummy', """\
+<html>
+  <head>
+    <title>pycobertura report</title>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <div class="container">
+      <h1>pycobertura report</h1>
+      <table class="u-full-width">
+        <thead>
+          <tr>
+            <th>Filename</th>
+            <th>Stmts</th>
+            <th>Miss</th>
+            <th>Cover</th>
+            <th>Missing</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="#__init__.py">__init__.py</a></td>
+            <td>0</td>
+            <td>0</td>
+            <td>100.00%</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><a href="#dummy.py">dummy.py</a></td>
+            <td>4</td>
+            <td>2</td>
+            <td>75.00%</td>
+            <td>2, 5</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>TOTAL</td>
+            <td>4</td>
+            <td>2</td>
+            <td>75.00%</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+<h4 id="__init__.py">__init__.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre></pre>
+      </td>
+      <td class="source">
+        <pre></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h4 id="dummy.py">dummy.py</h4>
+<table class="code u-max-full-width">
+  <tbody>
+    <tr>
+      <td class="lineno">
+        <pre>1 &nbsp;
+2 &nbsp;
+3 &nbsp;
+4 &nbsp;
+5 &nbsp;
+</pre>
+      </td>
+      <td class="source">
+        <pre><span class="hit">def qualifies_for_discount(quantity, price):
+</span><span class="partial">    if quantity &gt;= 10 or price &lt;= 100:
+</span><span class="hit">        print(&#34;You qualify for a discount!&#34;)
+</span><span class="noop">    else:
+</span><span class="miss">        print(&#34;No discount available.&#34;)
+</span></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+  </body>
+</html>""")])
+def test_html_report(report, source, expected_output):
+    from pycobertura.reporters import HtmlReporter
+
+    cobertura = make_cobertura(report, source=source)
+    report = HtmlReporter(cobertura)
+    html_output = report.generate()
+
+    assert "normalize.css" in html_output
+    assert "Skeleton V2.0" in html_output
+    assert """\
+.hit {background-color: #E6FFEC}
+.miss {background-color: #FFEBE9}
+.partial {background-color: #FFFECD}
+""" in html_output
+
+    assert remove_style_tag(html_output) == expected_output
 
 
 def test_html_report__no_source_files_message():
