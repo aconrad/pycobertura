@@ -5,6 +5,7 @@ import fnmatch
 from functools import partial
 
 from typing import List, Tuple, Union
+
 try:
     from typing import Literal
 except ImportError:
@@ -101,8 +102,9 @@ def stringify(number_list):
     return ", ".join(stringified_list)
 
 
-LineStatus = Literal['hit', 'miss', 'partial']
+LineStatus = Literal["hit", "miss", "partial"]
 LineTupleWithStatusNone = Tuple[int, Union[LineStatus, None]]
+
 
 def extrapolate_coverage(lines_w_status):
     """

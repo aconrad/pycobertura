@@ -10,6 +10,7 @@ from pycobertura.utils import (
 )
 
 from typing import Dict, List, Tuple
+
 try:
     from typing import Literal
 except ImportError:
@@ -440,13 +441,17 @@ class CoberturaDiff:
                 if line_status1 is line_status2:
                     status = None  # unchanged
                     reason = None
-                elif line_status1 == "hit" and (line_status2 == "miss" or line_status2 == "partial"):
+                elif line_status1 == "hit" and (
+                    line_status2 == "miss" or line_status2 == "partial"
+                ):
                     status = line_status2  # decreased
                     reason = "cov-down"
                 elif line_status1 == "partial" and line_status2 == "miss":
                     status = line_status2  # decreased
                     reason = "cov-down"
-                elif (line_status1 == "miss" or line_status1 == "partial") and line_status2 == "hit":
+                elif (
+                    line_status1 == "miss" or line_status1 == "partial"
+                ) and line_status2 == "hit":
                     status = line_status2  # increased
                     reason = "cov-up"
                 elif line_status1 == "miss" and line_status2 == "partial":
