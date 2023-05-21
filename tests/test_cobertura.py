@@ -88,9 +88,9 @@ def test_missed_statements_by_class_file():
     cobertura = make_cobertura()
     expected_missed_statements = {
         'Main.java': [],
-        'search/BinarySearch.java': [24],
+        'search/BinarySearch.java': [23, 24],
         'search/ISortedArraySearch.java': [],
-        'search/LinearSearch.java': [19, 24],
+        'search/LinearSearch.java': [13, 17, 19, 24],
     }
 
     for filename in cobertura.files():
@@ -128,9 +128,9 @@ def test_hit_lines__by_iterating_over_classes():
 
     expected_lines = {
         'Main.java': [10, 16, 17, 18, 19, 23, 25, 26, 28, 29, 30, 31, 32, 33, 34],
-        'search/BinarySearch.java': [12, 16, 18, 20, 21, 23, 25, 26, 28, 29, 31],
+        'search/BinarySearch.java': [12, 16, 18, 20, 21, 25, 26, 28, 29, 31],
         'search/ISortedArraySearch.java': [],
-        'search/LinearSearch.java': [9, 13, 15, 16, 17],
+        'search/LinearSearch.java': [9, 15, 16],
     }
 
     for filename in cobertura.files():
@@ -142,9 +142,9 @@ def test_missed_lines():
 
     expected_lines = {
         'Main.java': [],
-        'search/BinarySearch.java': [24],
+        'search/BinarySearch.java': [23, 24],
         'search/ISortedArraySearch.java': [],
-        'search/LinearSearch.java': [19, 20, 21, 22, 23, 24],
+        'search/LinearSearch.java': [13, 17, 19, 20, 21, 22, 23, 24],
     }
 
     for filename in cobertura.files():
@@ -171,16 +171,16 @@ def test_total_statements_by_class_file():
 
 def test_total_misses():
     cobertura = make_cobertura()
-    assert cobertura.total_misses() == 3
+    assert cobertura.total_misses() == 6
 
 
 def test_total_misses_by_class_file():
     cobertura = make_cobertura()
     expected_total_misses = {
         'Main.java': 0,
-        'search/BinarySearch.java': 1,
+        'search/BinarySearch.java': 2,
         'search/ISortedArraySearch.java': 0,
-        'search/LinearSearch.java': 2,
+        'search/LinearSearch.java': 4,
     }
     for filename in cobertura.files():
         assert cobertura.total_misses(filename) == \
@@ -189,16 +189,16 @@ def test_total_misses_by_class_file():
 
 def test_total_hits():
     cobertura = make_cobertura()
-    assert cobertura.total_hits() == 31
+    assert cobertura.total_hits() == 28
 
 
 def test_total_hits_by_class_file():
     cobertura = make_cobertura()
     expected_total_misses = {
         'Main.java': 15,
-        'search/BinarySearch.java': 11,
+        'search/BinarySearch.java': 10,
         'search/ISortedArraySearch.java': 0,
-        'search/LinearSearch.java': 5,
+        'search/LinearSearch.java': 3,
     }
     for filename in cobertura.files():
         assert cobertura.total_hits(filename) == \
@@ -218,29 +218,75 @@ def test_class_file_source__sources_not_found():
         assert cobertura.file_source(filename) == expected_sources[filename]
 
 
-def test_line_statuses():
-    cobertura = make_cobertura('tests/dummy.source1/coverage.xml')
-    expected_line_statuses = {
-        'dummy/__init__.py': [],
-        'dummy/dummy.py': [
-            (1, True),
-            (2, True),
-            (4, True),
-            (5, False),
-            (6, False),
-        ],
-        'dummy/dummy2.py': [
-            (1, True),
-            (2, True),
-        ],
-        'dummy/dummy4.py': [
-            (1, False),
-            (2, False),
-            (4, False),
-            (5, False),
-            (6, False)
-        ],
-    }
+@pytest.mark.parametrize(
+    "report, expected_line_statuses",
+    [
+        (
+            "tests/dummy.source1/coverage.xml",
+            {
+                "dummy/__init__.py": [],
+                "dummy/dummy.py": [
+                    (1, "hit"),
+                    (2, "hit"),
+                    (4, "hit"),
+                    (5, "miss"),
+                    (6, "miss"),
+                ],
+                "dummy/dummy2.py": [
+                    (1, "hit"),
+                    (2, "hit"),
+                ],
+                "dummy/dummy4.py": [
+                    (1, "miss"),
+                    (2, "miss"),
+                    (4, "miss"),
+                    (5, "miss"),
+                    (6, "miss"),
+                ],
+            },
+        ),
+        (
+            "tests/cobertura.xml",
+            {
+                "Main.java": [
+                    (10, "hit"),
+                    (16, "hit"),
+                    (17, "hit"),
+                    (18, "hit"),
+                    (19, "hit"),
+                    (23, "hit"),
+                    (25, "hit"),
+                    (26, "hit"),
+                    (28, "hit"),
+                    (29, "hit"),
+                    (30, "hit"),
+                    (31, "hit"),
+                    (32, "hit"),
+                    (33, "hit"),
+                    (34, "hit"),
+                ],
+                "search/BinarySearch.java": [
+                    (12, "hit"),
+                    (16, "hit"),
+                    (18, "hit"),
+                    (20, "hit"),
+                    (21, "hit"),
+                    (23, "partial"),
+                    (24, "miss"),
+                    (25, "hit"),
+                    (26, "hit"),
+                    (28, "hit"),
+                    (29, "hit"),
+                    (31, "hit"),
+                ],
+                "search/ISortedArraySearch.java": [],
+                "search/LinearSearch.java": [(9, 'hit'), (13, 'partial'), (15, 'hit'), (16, 'hit'), (17, 'partial'), (19, 'miss'), (24, 'miss')],
+            },
+        ),
+    ],
+)
+def test_line_statuses(report, expected_line_statuses):
+    cobertura = make_cobertura(report)
     for filename in cobertura.files():
         assert cobertura.line_statuses(filename) == \
             expected_line_statuses[filename]
@@ -254,26 +300,26 @@ def test_class_file_source__sources_found(report, source, source_prefix):
     from pycobertura.cobertura import Line
     cobertura = make_cobertura(report, source=source, source_prefix=source_prefix)
     expected_sources = {
-    'dummy/__init__.py': [],
-        'dummy/dummy.py': [
-            Line(1, 'def foo():\n', True, None),
-            Line(2, '    pass\n', True, None),
-            Line(3, '\n', None, None),
-            Line(4, 'def bar():\n', True, None),
-            Line(5, "    a = 'a'\n", False, None),
-            Line(6, "    b = 'b'\n", False, None),
+        "dummy/__init__.py": [],
+        "dummy/dummy.py": [
+            Line(1, "def foo():\n", "hit", None),
+            Line(2, "    pass\n", "hit", None),
+            Line(3, "\n", None, None),
+            Line(4, "def bar():\n", "hit", None),
+            Line(5, "    a = 'a'\n", "miss", None),
+            Line(6, "    b = 'b'\n", "miss", None),
         ],
-        'dummy/dummy2.py': [
-            Line(1, 'def baz():\n', True, None),
-            Line(2, '    pass\n', True, None)
+        "dummy/dummy2.py": [
+            Line(1, "def baz():\n", "hit", None),
+            Line(2, "    pass\n", "hit", None),
         ],
-        'dummy/dummy4.py': [
-            Line(1, 'def barbaz():\n', False, None),
-            Line(2, '    pass\n', False, None),
-            Line(3, '\n', None, None),
-            Line(4, 'def foobarbaz():\n', False, None),
-            Line(5, '    a = 1 + 3\n', False, None),
-            Line(6, '    pass\n', False, None)
+        "dummy/dummy4.py": [
+            Line(1, "def barbaz():\n", "miss", None),
+            Line(2, "    pass\n", "miss", None),
+            Line(3, "\n", None, None),
+            Line(4, "def foobarbaz():\n", "miss", None),
+            Line(5, "    a = 1 + 3\n", "miss", None),
+            Line(6, "    pass\n", "miss", None),
         ],
     }
     for filename in cobertura.files():

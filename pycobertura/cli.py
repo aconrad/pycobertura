@@ -1,6 +1,6 @@
 import click
 
-from pycobertura.cobertura import Cobertura
+from pycobertura.cobertura import Cobertura, CoberturaDiff
 from pycobertura.reporters import (
     GitHubAnnotationReporter,
     HtmlReporter,
@@ -41,7 +41,7 @@ class ExitCodes:
     NOT_ALL_CHANGES_COVERED = 3
 
 
-def get_exit_code(differ, source):
+def get_exit_code(differ: CoberturaDiff, source):
     # Compute the non-zero exit code. This is a 2-step process which involves
     # checking whether code coverage is any better first and then check if all
     # changes are covered (stricter) which can only be done if the source code

@@ -265,12 +265,12 @@ def test_show__output_to_file():
         assert result.output == ""
         assert report == """\
 Filename                          Stmts    Miss  Cover    Missing
-------------------------------  -------  ------  -------  ---------
+------------------------------  -------  ------  -------  -------------
 Main.java                            15       0  100.00%
-search/BinarySearch.java             12       1  91.67%   24
+search/BinarySearch.java             12       2  91.67%   23-24
 search/ISortedArraySearch.java        0       0  100.00%
-search/LinearSearch.java              7       2  71.43%   19-24
-TOTAL                                34       3  90.00%"""
+search/LinearSearch.java              7       4  71.43%   13, 17, 19-24
+TOTAL                                34       6  90.00%"""
     assert result.exit_code == ExitCodes.OK
 
 

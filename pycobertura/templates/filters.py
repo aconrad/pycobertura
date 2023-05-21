@@ -3,8 +3,9 @@ Jinja2 filters meant to be used by templates.
 """
 
 line_status_style = {
-    True: "hit",
-    False: "miss",
+    "hit": "hit",
+    "miss": "miss",
+    "partial": "partial",
     None: "noop",
 }
 

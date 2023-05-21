@@ -4,6 +4,7 @@ import re
 import fnmatch
 
 from functools import partial
+from typing import List, Literal, Tuple, Union
 
 ANSI_ESCAPE_CODES = {
     "green": "\x1b[32m",
@@ -95,40 +96,43 @@ def stringify(number_list):
     return ", ".join(stringified_list)
 
 
+LineStatus = Literal['hit', 'miss', 'partial']
+LineTupleWithStatusNone = Tuple[int, Union[LineStatus, None]]
+
 def extrapolate_coverage(lines_w_status):
     """
     Given the following input:
 
     >>> lines_w_status = [
-        (1, True),
-        (4, True),
-        (7, False),
-        (9, False),
+        (1, "hit"),
+        (4, "hit"),
+        (7, "miss"),
+        (9, "miss"),
     ]
 
     Return expanded lines with their extrapolated line status.
 
     >>> extrapolate_coverage(lines_w_status) == [
-        (1, True),
-        (2, True),
-        (3, True),
-        (4, True),
+        (1, "hit"),
+        (2, "hit"),
+        (3, "hit"),
+        (4, "hit"),
         (5, None),
         (6, None),
-        (7, False),
-        (8, False),
-        (9, False),
+        (7, "miss"),
+        (8, "miss"),
+        (9, "miss"),
     ]
 
     """
-    lines = []
+    lines: List[LineTupleWithStatusNone] = []
 
     prev_lineno = 0
-    prev_status = True
+    prev_status = "hit"
     for lineno, status in lines_w_status:
         while (lineno - prev_lineno) > 1:
             prev_lineno += 1
-            if prev_status is status:
+            if prev_status == status:
                 lines.append((prev_lineno, status))
             else:
                 lines.append((prev_lineno, None))
@@ -258,3 +262,23 @@ def get_filenames_that_do_not_match_regex(
     else:
         remove_filenames = list(filter(re.compile(regex_param).match, filenames))
     return [fname for fname in filenames if fname not in remove_filenames]
+
+
+def get_line_status(line):
+    """
+    Returns the line status as "hit", "miss", or "partial". Line is an XML
+    Element from a Cobertura report of type `line`.
+    """
+    condition = line.get("condition-coverage")
+    status: LineStatus
+    if condition:
+        if condition.startswith("100%"):
+            status = "hit"
+        elif condition.startswith("0%"):
+            status = "miss"
+        else:
+            status = "partial"
+    else:
+        status: LineStatus = "miss" if line.get("hits") == "0" else "hit"
+
+    return status

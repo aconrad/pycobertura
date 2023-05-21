@@ -20,12 +20,12 @@ def test_text_report():
 
     assert report.generate() == """\
 Filename                          Stmts    Miss  Cover    Missing
-------------------------------  -------  ------  -------  ---------
+------------------------------  -------  ------  -------  -------------
 Main.java                            15       0  100.00%
-search/BinarySearch.java             12       1  91.67%   24
+search/BinarySearch.java             12       2  91.67%   23-24
 search/ISortedArraySearch.java        0       0  100.00%
-search/LinearSearch.java              7       2  71.43%   19-24
-TOTAL                                34       3  90.00%"""
+search/LinearSearch.java              7       4  71.43%   13, 17, 19-24
+TOTAL                                34       6  90.00%"""
 
 
 def test_text_report__with_missing_range():
@@ -148,9 +148,9 @@ def test_html_report():
           <tr>
             <td><a href="#search/BinarySearch.java">search/BinarySearch.java</a></td>
             <td>12</td>
-            <td>1</td>
+            <td>2</td>
             <td>91.67%</td>
-            <td>24</td>
+            <td>23-24</td>
           </tr>
           <tr>
             <td><a href="#search/ISortedArraySearch.java">search/ISortedArraySearch.java</a></td>
@@ -162,16 +162,16 @@ def test_html_report():
           <tr>
             <td><a href="#search/LinearSearch.java">search/LinearSearch.java</a></td>
             <td>7</td>
-            <td>2</td>
+            <td>4</td>
             <td>71.43%</td>
-            <td>19-24</td>
+            <td>13, 17, 19-24</td>
           </tr>
         </tbody>
         <tfoot>
           <tr>
             <td>TOTAL</td>
             <td>34</td>
-            <td>3</td>
+            <td>6</td>
             <td>90.00%</td>
             <td></td>
           </tr>
@@ -279,9 +279,9 @@ def test_html_report__no_source_files_message():
           <tr>
             <td>search/BinarySearch.java</td>
             <td>12</td>
-            <td>1</td>
+            <td>2</td>
             <td>91.67%</td>
-            <td>24</td>
+            <td>23-24</td>
           </tr>
           <tr>
             <td>search/ISortedArraySearch.java</td>
@@ -293,16 +293,16 @@ def test_html_report__no_source_files_message():
           <tr>
             <td>search/LinearSearch.java</td>
             <td>7</td>
-            <td>2</td>
+            <td>4</td>
             <td>71.43%</td>
-            <td>19-24</td>
+            <td>13, 17, 19-24</td>
           </tr>
         </tbody>
         <tfoot>
           <tr>
             <td>TOTAL</td>
             <td>34</td>
-            <td>3</td>
+            <td>6</td>
             <td>90.00%</td>
             <td></td>
           </tr>
@@ -670,16 +670,24 @@ def test_html_report_delta__show_missing_False():
         (
             "tests/cobertura.xml",
             """\
-::notice file=search/BinarySearch.java,line=24,endLine=24,title=pycobertura::not covered
+::notice file=search/BinarySearch.java,line=23,endLine=24,title=pycobertura::not covered
+::notice file=search/LinearSearch.java,line=13,endLine=13,title=pycobertura::not covered
+::notice file=search/LinearSearch.java,line=17,endLine=17,title=pycobertura::not covered
 ::notice file=search/LinearSearch.java,line=19,endLine=24,title=pycobertura::not covered""",
             """\
-::error file=search/BinarySearch.java,line=24,endLine=24,title=JCov::missing coverage
+::error file=search/BinarySearch.java,line=23,endLine=24,title=JCov::missing coverage
+::error file=search/LinearSearch.java,line=13,endLine=13,title=JCov::missing coverage
+::error file=search/LinearSearch.java,line=17,endLine=17,title=JCov::missing coverage
 ::error file=search/LinearSearch.java,line=19,endLine=24,title=JCov::missing coverage""",
         ),
         (
             "tests/cobertura-generated-by-istanbul-from-coffeescript.xml",
-            "::notice file=app.coffee,line=10,endLine=10,title=pycobertura::not covered",
-            "::error file=app.coffee,line=10,endLine=10,title=JCov::missing coverage",
+            """\
+::notice file=app.coffee,line=7,endLine=7,title=pycobertura::not covered
+::notice file=app.coffee,line=10,endLine=10,title=pycobertura::not covered""",
+            """\
+::error file=app.coffee,line=7,endLine=7,title=JCov::missing coverage
+::error file=app.coffee,line=10,endLine=10,title=JCov::missing coverage""",
         ),
     ],
 )
@@ -745,4 +753,3 @@ def test_github_annotation_report_delta(
     )
     assert report_delta.generate(**default_config) == expected_default_output
     assert report_delta.generate(**config) == expected_custom_output
-

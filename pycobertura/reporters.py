@@ -1,5 +1,5 @@
 from jinja2 import Environment, PackageLoader
-from pycobertura.cobertura import CoberturaDiff
+from pycobertura.cobertura import Cobertura, CoberturaDiff
 from pycobertura.utils import green, red, stringify, rangify
 from pycobertura.templates import filters
 from tabulate import tabulate
@@ -20,7 +20,7 @@ headers_without_missing = ["Filename", "Stmts", "Miss", "Cover"]
 
 class Reporter:
     def __init__(self, cobertura, ignore_regex=None):
-        self.cobertura = cobertura
+        self.cobertura: Cobertura = cobertura
         self.ignore_regex = ignore_regex
 
     @staticmethod
