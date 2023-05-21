@@ -439,7 +439,7 @@ class CoberturaDiff:
                 other_lineno = lineno_map[lineno]
                 line_status1 = line_statuses1.get(other_lineno)
                 line_status2 = line_statuses2.get(lineno)
-                if line_status1 is line_status2:
+                if line_status1 == line_status2:
                     status = None  # unchanged
                     reason = None
                 elif line_status1 == "hit" and (
