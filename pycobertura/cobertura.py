@@ -1,9 +1,5 @@
-from typing import Dict, List, Tuple
-from typing_extensions import Literal
 import lxml.etree as ET
-
 from collections import namedtuple
-
 from pycobertura.utils import (
     extrapolate_coverage,
     get_line_status,
@@ -12,6 +8,13 @@ from pycobertura.utils import (
     get_filenames_that_do_not_match_regex,
     memoize,
 )
+
+from typing import Dict, List, Tuple
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+
 
 LineStatus = Literal["hit", "miss", "partial"]
 LineStatusTuple = Tuple[int, LineStatus]

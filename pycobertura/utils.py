@@ -2,10 +2,14 @@ import difflib
 import os
 import re
 import fnmatch
-
 from functools import partial
+
 from typing import List, Tuple, Union
-from typing_extensions import Literal
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+
 
 ANSI_ESCAPE_CODES = {
     "green": "\x1b[32m",
