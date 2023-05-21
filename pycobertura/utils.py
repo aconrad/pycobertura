@@ -4,7 +4,8 @@ import re
 import fnmatch
 
 from functools import partial
-from typing import List, Literal, Tuple, Union
+from typing import List, Tuple, Union
+from typing_extensions import Literal
 
 ANSI_ESCAPE_CODES = {
     "green": "\x1b[32m",

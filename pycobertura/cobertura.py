@@ -1,4 +1,5 @@
-from typing import Dict, List, Literal, Tuple, Union
+from typing import Dict, List, Tuple
+from typing_extensions import Literal
 import lxml.etree as ET
 
 from collections import namedtuple
