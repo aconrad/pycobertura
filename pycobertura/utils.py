@@ -292,4 +292,6 @@ def get_line_status(line):
 
 
 def calculate_line_rate(total_statements: int, total_misses: int):
-    return (total_statements - total_misses) / total_statements if total_statements else 1
+    return (
+        (total_statements - total_misses) / total_statements if total_statements else 1
+    )
