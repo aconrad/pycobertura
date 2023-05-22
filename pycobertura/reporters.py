@@ -1,6 +1,6 @@
 from jinja2 import Environment, PackageLoader
 from pycobertura.cobertura import Cobertura, CoberturaDiff
-from pycobertura.utils import green, red, stringify, rangify
+from pycobertura.utils import green, red, stringify, rangify, calculate_line_rate
 from pycobertura.templates import filters
 from tabulate import tabulate
 from ruamel import yaml
@@ -31,23 +31,28 @@ class Reporter:
         filenames = self.cobertura.files(ignore_regex=self.ignore_regex)
         lines = {
             "Filename": filenames.copy(),
-            "Stmts": [
-                self.cobertura.total_statements(filename) for filename in filenames
-            ],
-            "Miss": [self.cobertura.total_misses(filename) for filename in filenames],
-            "Cover": [
-                self.format_line_rate(self.cobertura.line_rate(filename))
-                for filename in filenames
-            ],
-            "Missing": [
-                stringify(self.cobertura.missed_lines(filename))
-                for filename in filenames
-            ],
+            "Stmts": [],
+            "Miss": [],
+            "Cover": [],
+            "Missing": [],
         }
+        for filename in filenames:
+            file_statements = self.cobertura.total_statements(filename)
+            file_misses = self.cobertura.total_misses(filename)
+            file_rate = calculate_line_rate(file_statements, file_misses)
+            missing = stringify(self.cobertura.missed_lines(filename))
+            lines["Stmts"].append(file_statements)
+            lines["Miss"].append(file_misses)
+            lines["Cover"].append(self.format_line_rate(file_rate))
+            lines["Missing"].append(missing)
+
+        total_statements = self.cobertura.total_statements()
+        total_misses = self.cobertura.total_misses()
+        total_rate = calculate_line_rate(total_statements, total_misses)
         lines["Filename"].append("TOTAL")
-        lines["Stmts"] += [self.cobertura.total_statements()]
-        lines["Miss"] += [self.cobertura.total_misses()]
-        lines["Cover"] += [self.format_line_rate(self.cobertura.line_rate())]
+        lines["Stmts"].append(total_statements)
+        lines["Miss"].append(total_misses)
+        lines["Cover"].append(self.format_line_rate(total_rate))
         lines["Missing"].append("")
 
         return lines

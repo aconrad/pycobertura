@@ -23,7 +23,7 @@ def test_show__format_default():
     assert result.output == """\
 Filename             Stmts    Miss  Cover    Missing
 -----------------  -------  ------  -------  ---------
-dummy/__init__.py        0       0  0.00%
+dummy/__init__.py        0       0  100.00%
 dummy/dummy.py           4       2  50.00%   2, 5
 TOTAL                    4       2  50.00%
 """
@@ -43,7 +43,7 @@ def test_show__format_text():
         assert result.output == """\
 Filename             Stmts    Miss  Cover    Missing
 -----------------  -------  ------  -------  ---------
-dummy/__init__.py        0       0  0.00%
+dummy/__init__.py        0       0  100.00%
 dummy/dummy.py           4       2  50.00%   2, 5
 TOTAL                    4       2  50.00%
 """
@@ -61,7 +61,7 @@ def test_show__format_csv():
         )
         assert result.output == """\
 Filename;Stmts;Miss;Cover;Missing
-dummy/__init__.py;0;0;0.00%;
+dummy/__init__.py;0;0;100.00%;
 dummy/dummy.py;4;2;50.00%;2, 5
 TOTAL;4;2;50.00%;
 """
@@ -79,7 +79,7 @@ def test_show__format_csv_delimiter_semicolon():
         )
         assert result.output == """\
 Filename;Stmts;Miss;Cover;Missing
-dummy/__init__.py;0;0;0.00%;
+dummy/__init__.py;0;0;100.00%;
 dummy/dummy.py;4;2;50.00%;2, 5
 TOTAL;4;2;50.00%;
 """
@@ -97,7 +97,7 @@ def test_show__format_csv_delimiter_tab():
         )
         assert result.output == """\
 Filename\tStmts\tMiss\tCover\tMissing
-dummy/__init__.py\t0\t0\t0.00%\t
+dummy/__init__.py\t0\t0\t100.00%\t
 dummy/dummy.py\t4\t2\t50.00%\t2, 5
 TOTAL\t4\t2\t50.00%\t
 """
@@ -116,7 +116,7 @@ def test_show__format_markdown():
         assert result.output == """\
 | Filename          |   Stmts |   Miss | Cover   | Missing   |
 |-------------------|---------|--------|---------|-----------|
-| dummy/__init__.py |       0 |      0 | 0.00%   |           |
+| dummy/__init__.py |       0 |      0 | 100.00% |           |
 | dummy/dummy.py    |       4 |      2 | 50.00%  | 2, 5      |
 | TOTAL             |       4 |      2 | 50.00%  |           |
 """
@@ -152,7 +152,7 @@ def test_show__format_json():
             "Filename": "dummy/__init__.py",
             "Stmts": 0,
             "Miss": 0,
-            "Cover": "0.00%",
+            "Cover": "100.00%",
             "Missing": ""
         },
         {
@@ -188,7 +188,7 @@ files:
 - Filename: dummy/__init__.py
   Stmts: 0
   Miss: 0
-  Cover: 0.00%
+  Cover: 100.00%
   Missing: ''
 - Filename: dummy/dummy.py
   Stmts: 4
@@ -267,10 +267,10 @@ def test_show__output_to_file():
 Filename                          Stmts    Miss  Cover    Missing
 ------------------------------  -------  ------  -------  -------------
 Main.java                            15       0  100.00%
-search/BinarySearch.java             12       2  91.67%   23-24
+search/BinarySearch.java             12       2  83.33%   23-24
 search/ISortedArraySearch.java        0       0  100.00%
-search/LinearSearch.java              7       4  71.43%   13, 17, 19-24
-TOTAL                                34       6  90.00%"""
+search/LinearSearch.java              7       4  42.86%   13, 17, 19-24
+TOTAL                                34       6  82.35%"""
     assert result.exit_code == ExitCodes.OK
 
 

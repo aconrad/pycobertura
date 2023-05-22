@@ -22,10 +22,10 @@ def test_text_report():
 Filename                          Stmts    Miss  Cover    Missing
 ------------------------------  -------  ------  -------  -------------
 Main.java                            15       0  100.00%
-search/BinarySearch.java             12       2  91.67%   23-24
+search/BinarySearch.java             12       2  83.33%   23-24
 search/ISortedArraySearch.java        0       0  100.00%
-search/LinearSearch.java              7       4  71.43%   13, 17, 19-24
-TOTAL                                34       6  90.00%"""
+search/LinearSearch.java              7       4  42.86%   13, 17, 19-24
+TOTAL                                34       6  82.35%"""
 
 
 def test_text_report__with_missing_range():
@@ -37,7 +37,7 @@ def test_text_report__with_missing_range():
     assert report.generate() == """\
 Filename             Stmts    Miss  Cover    Missing
 -----------------  -------  ------  -------  ---------
-dummy/__init__.py        0       0  0.00%
+dummy/__init__.py        0       0  100.00%
 dummy/dummy.py           4       0  100.00%
 dummy/dummy2.py          2       2  0.00%    1-2
 TOTAL                    6       2  66.67%"""
@@ -139,7 +139,7 @@ TOTAL                 +4      +1  +31.06%"""
             <td><a href="#search/BinarySearch.java">search/BinarySearch.java</a></td>
             <td>12</td>
             <td>2</td>
-            <td>91.67%</td>
+            <td>83.33%</td>
             <td>23-24</td>
           </tr>
           <tr>
@@ -153,7 +153,7 @@ TOTAL                 +4      +1  +31.06%"""
             <td><a href="#search/LinearSearch.java">search/LinearSearch.java</a></td>
             <td>7</td>
             <td>4</td>
-            <td>71.43%</td>
+            <td>42.86%</td>
             <td>13, 17, 19-24</td>
           </tr>
         </tbody>
@@ -162,7 +162,7 @@ TOTAL                 +4      +1  +31.06%"""
             <td>TOTAL</td>
             <td>34</td>
             <td>6</td>
-            <td>90.00%</td>
+            <td>82.35%</td>
             <td></td>
           </tr>
         </tfoot>
@@ -257,7 +257,7 @@ TOTAL                 +4      +1  +31.06%"""
             <td><a href="#dummy.py">dummy.py</a></td>
             <td>4</td>
             <td>2</td>
-            <td>75.00%</td>
+            <td>50.00%</td>
             <td>2, 5</td>
           </tr>
         </tbody>
@@ -266,7 +266,7 @@ TOTAL                 +4      +1  +31.06%"""
             <td>TOTAL</td>
             <td>4</td>
             <td>2</td>
-            <td>75.00%</td>
+            <td>50.00%</td>
             <td></td>
           </tr>
         </tfoot>
@@ -370,7 +370,7 @@ def test_html_report__no_source_files_message():
             <td>search/BinarySearch.java</td>
             <td>12</td>
             <td>2</td>
-            <td>91.67%</td>
+            <td>83.33%</td>
             <td>23-24</td>
           </tr>
           <tr>
@@ -384,7 +384,7 @@ def test_html_report__no_source_files_message():
             <td>search/LinearSearch.java</td>
             <td>7</td>
             <td>4</td>
-            <td>71.43%</td>
+            <td>42.86%</td>
             <td>13, 17, 19-24</td>
           </tr>
         </tbody>
@@ -393,7 +393,7 @@ def test_html_report__no_source_files_message():
             <td>TOTAL</td>
             <td>34</td>
             <td>6</td>
-            <td>90.00%</td>
+            <td>82.35%</td>
             <td></td>
           </tr>
         </tfoot>
