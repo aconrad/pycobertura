@@ -64,7 +64,7 @@ class Cobertura:
             self._load_from_string,
         ]:
             try:
-                self.xml = load_func(report)
+                self.xml: ET._Element = load_func(report)
                 break
             except BaseException:
                 pass
