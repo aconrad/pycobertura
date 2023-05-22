@@ -75,7 +75,14 @@ def green(text):
 
 
 def rangify(number_list):
-    """Assumes the list is sorted."""
+    """
+    Returns a list of range tuples that represent continuous segments, such as
+    `(range_start, range_end)` given a list of sorted non-continuous integers
+    `number_list`.
+
+    For example: [1, 2, 3, 5, 7, 8, 10, 11, 12, 15]
+    Would return: [(1, 3), (5, 5), (7, 8), (10, 12), (15, 15)]
+    """
     if not number_list:
         return number_list
 
