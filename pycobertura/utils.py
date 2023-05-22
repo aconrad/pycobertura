@@ -19,8 +19,8 @@ ANSI_ESCAPE_CODES = {
 }
 
 
-# Recipe from https://github.com/ActiveState/
-# code/recipes/Python/577452_memoize_decorator_instance/recipe-577452.py
+# Recipe from
+# https://github.com/ActiveState/code/blob/master/recipes/Python/577452_memoize_decorator_instance/recipe-577452.py
 class memoize:
     """cache the return value of a method
 
