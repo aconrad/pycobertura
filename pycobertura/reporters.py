@@ -371,12 +371,12 @@ class CsvReporterDelta(DeltaReporter):
             for line_index, missing_line in enumerate(summary_lines["Missing"]):
                 # for colors, explanation see here:
                 # https://stackoverflow.com/a/61273717/9698518
+                colored = [
+                    self.color_number(str(lineno_status[0]))
+                    for lineno_status in missing_line
+                ]
                 list_of_lines[line_index + 1] += [
-                    f"{[self.color_number(str(lineno_status[0])) for lineno_status in missing_line]}".encode(
-                        "utf-8"
-                    ).decode(
-                        "unicode_escape"
-                    )
+                    f"{colored}".encode("utf-8").decode("unicode_escape")
                 ]
 
         # Explanation here:
