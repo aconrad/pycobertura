@@ -7,10 +7,9 @@ from functools import partial
 from typing import List, Tuple, Union
 
 try:
-    from typing import Literal
+    from typing import Literal, TypeAlias
 except ImportError:  # pragma: no cover
-    from typing_extensions import Literal
-
+    from typing_extensions import Literal, TypeAlias
 
 ANSI_ESCAPE_CODES = {
     "green": "\x1b[32m",
@@ -98,19 +97,50 @@ def rangify(number_list):
     ranges.append((range_start, prev_num))
     return ranges
 
-
-def stringify(number_list):
-    """Assumes the list is sorted."""
-    rangified_list = rangify(number_list)
-    stringified_list = [
-        f"{line_start}" if line_start == line_stop else f"{line_start}-{line_stop}"
-        for line_start, line_stop in rangified_list
-    ]
-    return ", ".join(stringified_list)
-
-
 LineStatus = Literal["hit", "miss", "partial"]
+LineStatusTuple = Tuple[int, LineStatus]
 LineTupleWithStatusNone = Tuple[int, Union[LineStatus, None]]
+LineRangeWithStatusNone = Tuple[int, int, Union[LineStatus, None]]
+
+def rangify_by_status(line_statuses: List[LineTupleWithStatusNone]):
+    """
+    Returns a list of range tuples that represent continuous segments by status,
+    such as `(range_start, range_end, status)` given a list of sorted
+    non-continuous integers `line_statuses` with their status.
+
+    For example: [(1, "hit"), (2, "hit"), (3, "miss"), (4, "hit")]
+    Would return: [(1, 2, "hit"), (3, 3, "miss"), (4, 4, "hit")]
+    """
+    ranges: List[LineRangeWithStatusNone] = []
+    if not line_statuses:
+        return ranges
+
+    range_start, *_ = prev_num, prev_status = line_statuses[0]
+    for num, status in line_statuses[1:]:
+        if num != (prev_num + 1) or status != prev_status:
+            ranges.append((range_start, prev_num, prev_status))
+            range_start = num
+        prev_num = num
+        prev_status = status
+
+    ranges.append((range_start, prev_num, prev_status))
+    return ranges
+
+
+def stringify(line_statuses):
+    """Assumes the list is sorted."""
+    rangified_list = rangify_by_status(line_statuses)
+
+    stringified_list = []
+    for line_start, line_stop, status in rangified_list:
+        prefix = "~" if status == "partial" else ""
+        if line_start == line_stop:
+            stringified = f"{prefix}{line_start}"
+        else:
+            stringified = f"{prefix}{line_start}-{line_stop}"
+        stringified_list.append(stringified)
+
+    return ", ".join(stringified_list)
 
 
 def extrapolate_coverage(lines_w_status):

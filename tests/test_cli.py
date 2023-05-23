@@ -217,8 +217,8 @@ def test_show__format_github_annotation():
         assert (
             result.output
             == """\
-::notice file=dummy/dummy.py,line=2,endLine=2,title=pycobertura::not covered
-::notice file=dummy/dummy.py,line=5,endLine=5,title=pycobertura::not covered
+::notice file=dummy/dummy.py,line=2,endLine=2,title=pycobertura::not covered (miss)
+::notice file=dummy/dummy.py,line=5,endLine=5,title=pycobertura::not covered (miss)
 """
         )
     assert result.exit_code == ExitCodes.OK
@@ -244,8 +244,8 @@ def test_show__format_github_annotation_custom_annotation_input():
         assert (
             result.output
             == """\
-::error file=dummy/dummy.py,line=2,endLine=2,title=coverage.py::missing coverage
-::error file=dummy/dummy.py,line=5,endLine=5,title=coverage.py::missing coverage
+::error file=dummy/dummy.py,line=2,endLine=2,title=coverage.py::missing coverage (miss)
+::error file=dummy/dummy.py,line=5,endLine=5,title=coverage.py::missing coverage (miss)
 """
         )
     assert result.exit_code == ExitCodes.OK
@@ -265,11 +265,11 @@ def test_show__output_to_file():
         assert result.output == ""
         assert report == """\
 Filename                          Stmts    Miss  Cover    Missing
-------------------------------  -------  ------  -------  -------------
+------------------------------  -------  ------  -------  ---------------
 Main.java                            15       0  100.00%
-search/BinarySearch.java             12       2  83.33%   23-24
+search/BinarySearch.java             12       2  83.33%   ~23, 24
 search/ISortedArraySearch.java        0       0  100.00%
-search/LinearSearch.java              7       4  42.86%   13, 17, 19-24
+search/LinearSearch.java              7       4  42.86%   ~13, ~17, 19-24
 TOTAL                                34       6  82.35%"""
     assert result.exit_code == ExitCodes.OK
 
@@ -787,8 +787,8 @@ def test_diff__format_github_annotation():
             'tests/dummy.source2/coverage.xml',
         ], catch_exceptions=False)
         assert result.output == """\
-::notice file=dummy/dummy2.py,line=5,endLine=5,title=pycobertura::not covered
-::notice file=dummy/dummy3.py,line=1,endLine=2,title=pycobertura::not covered
+::notice file=dummy/dummy2.py,line=5,endLine=5,title=pycobertura::not covered (miss)
+::notice file=dummy/dummy3.py,line=1,endLine=2,title=pycobertura::not covered (miss)
 """
         assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 
@@ -807,8 +807,8 @@ def test_diff__format_github_annotation_custom_annotation_input():
             "--annotation-message=missing coverage",
         ], catch_exceptions=False)
         assert result.output == """\
-::error file=dummy/dummy2.py,line=5,endLine=5,title=coverage.py::missing coverage
-::error file=dummy/dummy3.py,line=1,endLine=2,title=coverage.py::missing coverage
+::error file=dummy/dummy2.py,line=5,endLine=5,title=coverage.py::missing coverage (miss)
+::error file=dummy/dummy3.py,line=1,endLine=2,title=coverage.py::missing coverage (miss)
 """
         assert result.exit_code == ExitCodes.COVERAGE_WORSENED
 

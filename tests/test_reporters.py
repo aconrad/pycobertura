@@ -20,11 +20,11 @@ def test_text_report():
 
     assert report.generate() == """\
 Filename                          Stmts    Miss  Cover    Missing
-------------------------------  -------  ------  -------  -------------
+------------------------------  -------  ------  -------  ---------------
 Main.java                            15       0  100.00%
-search/BinarySearch.java             12       2  83.33%   23-24
+search/BinarySearch.java             12       2  83.33%   ~23, 24
 search/ISortedArraySearch.java        0       0  100.00%
-search/LinearSearch.java              7       4  42.86%   13, 17, 19-24
+search/LinearSearch.java              7       4  42.86%   ~13, ~17, 19-24
 TOTAL                                34       6  82.35%"""
 
 
@@ -140,7 +140,7 @@ TOTAL                 +4      +1  +31.06%"""
             <td>12</td>
             <td>2</td>
             <td>83.33%</td>
-            <td>23-24</td>
+            <td>~23, 24</td>
           </tr>
           <tr>
             <td><a href="#search/ISortedArraySearch.java">search/ISortedArraySearch.java</a></td>
@@ -154,7 +154,7 @@ TOTAL                 +4      +1  +31.06%"""
             <td>7</td>
             <td>4</td>
             <td>42.86%</td>
-            <td>13, 17, 19-24</td>
+            <td>~13, ~17, 19-24</td>
           </tr>
         </tbody>
         <tfoot>
@@ -258,7 +258,7 @@ TOTAL                 +4      +1  +31.06%"""
             <td>4</td>
             <td>2</td>
             <td>50.00%</td>
-            <td>2, 5</td>
+            <td>~2, 5</td>
           </tr>
         </tbody>
         <tfoot>
@@ -371,7 +371,7 @@ def test_html_report__no_source_files_message():
             <td>12</td>
             <td>2</td>
             <td>83.33%</td>
-            <td>23-24</td>
+            <td>~23, 24</td>
           </tr>
           <tr>
             <td>search/ISortedArraySearch.java</td>
@@ -385,7 +385,7 @@ def test_html_report__no_source_files_message():
             <td>7</td>
             <td>4</td>
             <td>42.86%</td>
-            <td>13, 17, 19-24</td>
+            <td>~13, ~17, 19-24</td>
           </tr>
         </tbody>
         <tfoot>
@@ -493,6 +493,7 @@ def test_html_report_delta():
     html_output = report_delta.generate()
     assert '.red {color: red}' in html_output
     assert '.green {color: green}' in html_output
+    assert '.yellow {color: yellow}' in html_output
     assert "normalize.css" in html_output
     assert "Skeleton V2.0" in html_output
 
@@ -760,24 +761,26 @@ def test_html_report_delta__show_missing_False():
         (
             "tests/cobertura.xml",
             """\
-::notice file=search/BinarySearch.java,line=23,endLine=24,title=pycobertura::not covered
-::notice file=search/LinearSearch.java,line=13,endLine=13,title=pycobertura::not covered
-::notice file=search/LinearSearch.java,line=17,endLine=17,title=pycobertura::not covered
-::notice file=search/LinearSearch.java,line=19,endLine=24,title=pycobertura::not covered""",
+::notice file=search/BinarySearch.java,line=23,endLine=23,title=pycobertura::not covered (partial)
+::notice file=search/BinarySearch.java,line=24,endLine=24,title=pycobertura::not covered (miss)
+::notice file=search/LinearSearch.java,line=13,endLine=13,title=pycobertura::not covered (partial)
+::notice file=search/LinearSearch.java,line=17,endLine=17,title=pycobertura::not covered (partial)
+::notice file=search/LinearSearch.java,line=19,endLine=24,title=pycobertura::not covered (miss)""",
             """\
-::error file=search/BinarySearch.java,line=23,endLine=24,title=JCov::missing coverage
-::error file=search/LinearSearch.java,line=13,endLine=13,title=JCov::missing coverage
-::error file=search/LinearSearch.java,line=17,endLine=17,title=JCov::missing coverage
-::error file=search/LinearSearch.java,line=19,endLine=24,title=JCov::missing coverage""",
+::error file=search/BinarySearch.java,line=23,endLine=23,title=JCov::missing coverage (partial)
+::error file=search/BinarySearch.java,line=24,endLine=24,title=JCov::missing coverage (miss)
+::error file=search/LinearSearch.java,line=13,endLine=13,title=JCov::missing coverage (partial)
+::error file=search/LinearSearch.java,line=17,endLine=17,title=JCov::missing coverage (partial)
+::error file=search/LinearSearch.java,line=19,endLine=24,title=JCov::missing coverage (miss)""",
         ),
         (
             "tests/cobertura-generated-by-istanbul-from-coffeescript.xml",
             """\
-::notice file=app.coffee,line=7,endLine=7,title=pycobertura::not covered
-::notice file=app.coffee,line=10,endLine=10,title=pycobertura::not covered""",
+::notice file=app.coffee,line=7,endLine=7,title=pycobertura::not covered (partial)
+::notice file=app.coffee,line=10,endLine=10,title=pycobertura::not covered (miss)""",
             """\
-::error file=app.coffee,line=7,endLine=7,title=JCov::missing coverage
-::error file=app.coffee,line=10,endLine=10,title=JCov::missing coverage""",
+::error file=app.coffee,line=7,endLine=7,title=JCov::missing coverage (partial)
+::error file=app.coffee,line=10,endLine=10,title=JCov::missing coverage (miss)""",
         ),
     ],
 )
@@ -817,11 +820,11 @@ def test_github_annotation_report(
                 "annotation_message":"missing coverage"
             },
             """\
-::notice file=dummy/dummy2.py,line=5,endLine=5,title=pycobertura::not covered
-::notice file=dummy/dummy3.py,line=1,endLine=2,title=pycobertura::not covered""",
+::notice file=dummy/dummy2.py,line=5,endLine=5,title=pycobertura::not covered (miss)
+::notice file=dummy/dummy3.py,line=1,endLine=2,title=pycobertura::not covered (miss)""",
             """\
-::error file=dummy/dummy2.py,line=5,endLine=5,title=JCov::missing coverage
-::error file=dummy/dummy3.py,line=1,endLine=2,title=JCov::missing coverage""",
+::error file=dummy/dummy2.py,line=5,endLine=5,title=JCov::missing coverage (miss)
+::error file=dummy/dummy3.py,line=1,endLine=2,title=JCov::missing coverage (miss)""",
         ),
     ],
 )

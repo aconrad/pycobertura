@@ -1,6 +1,8 @@
 import lxml.etree as ET
 from collections import namedtuple
 from pycobertura.utils import (
+    LineStatus,
+    LineStatusTuple,
     extrapolate_coverage,
     get_line_status,
     reconcile_lines,
@@ -15,10 +17,6 @@ try:
     from typing import Literal
 except ImportError:  # pragma: no cover
     from typing_extensions import Literal
-
-
-LineStatus = Literal["hit", "miss", "partial"]
-LineStatusTuple = Tuple[int, LineStatus]
 
 
 class Line(namedtuple("Line", ["number", "source", "status", "reason"])):
@@ -187,8 +185,8 @@ class Cobertura:
         statuses = self.line_statuses(filename)
         extrapolated_statuses = extrapolate_coverage(statuses)
         return [
-            lno
-            for lno, status in extrapolated_statuses
+            (lineno, status)
+            for lineno, status in extrapolated_statuses
             if (status == "miss" or status == "partial")
         ]
 
@@ -381,13 +379,13 @@ class CoberturaDiff:
             return self._diff_attr("line_rate", filename)
         return self.cobertura2.line_rate() - self.cobertura1.line_rate()
 
-    def diff_missed_lines(self, filename: str):
+    def diff_missed_lines(self, filename: str) -> List[Tuple[int, Literal["miss", "partial"]]]:
         """
-        Return a list of 2-element tuples `(lineno, True)` for uncovered lines.
+        Return a list of 2-element tuples `(lineno, status)` for uncovered lines.
         The given file `filename` where `lineno` is a missed line number.
         """
         return [
-            line.number
+            (line.number, line.status)
             for line in self.file_source(filename)
             if (line.status == "miss" or line.status == "partial")
         ]
@@ -442,20 +440,14 @@ class CoberturaDiff:
                 if line_status1 == line_status2:
                     status = None  # unchanged
                     reason = None
-                elif line_status1 == "hit" and (
-                    line_status2 == "miss" or line_status2 == "partial"
+                elif (line_status1 == "hit" and line_status2 != "hit") or (
+                    line_status1 == "partial" and line_status2 == "miss"
                 ):
                     status = line_status2  # decreased
                     reason = "cov-down"
-                elif line_status1 == "partial" and line_status2 == "miss":
-                    status = line_status2  # decreased
-                    reason = "cov-down"
-                elif (
-                    line_status1 == "miss" or line_status1 == "partial"
-                ) and line_status2 == "hit":
-                    status = line_status2  # increased
-                    reason = "cov-up"
-                elif line_status1 == "miss" and line_status2 == "partial":
+                elif (line_status1 != "hit" and line_status2 == "hit") or (
+                    line_status1 == "miss" and line_status2 == "partial"
+                ):
                     status = line_status2  # increased
                     reason = "cov-up"
 

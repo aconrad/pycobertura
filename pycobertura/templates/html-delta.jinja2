@@ -7,8 +7,10 @@
 {% include 'skeleton.css' %}
 .red {color: red}
 .green {color: green}
-.hit {background-color: #EAFFEA}
-.miss {background-color: #FFECEC}
+.yellow {color: yellow}
+.hit {background-color: #E6FFEC}
+.miss {background-color: #FFEBE9}
+.partial {background-color: #FFFECD}
 pre {line-height: 1.2}
 table.code pre {margin: 0;}
 table.code td {padding: 0; border: 0;}
@@ -43,7 +45,7 @@ table.code td.lineno pre {margin-right: 1rem;}
 {%- if show_source and show_missing %}
             <td>
 {%- for missed_line in lines["Missing"][file_index] %}
-            {%- if not loop.first %}, {% endif %}<span class="{{ missed_line | misses_color }}">{{ missed_line }}</span>
+            {%- if not loop.first %}, {% endif %}<span class="{{ missed_line | misses_color }}">{{ missed_line[0] }}</span>
 {%- endfor %}
             </td>
 {%- endif %}

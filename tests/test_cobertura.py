@@ -142,9 +142,9 @@ def test_missed_lines():
 
     expected_lines = {
         'Main.java': [],
-        'search/BinarySearch.java': [23, 24],
+        'search/BinarySearch.java': [(23, 'partial'), (24, 'miss')],
         'search/ISortedArraySearch.java': [],
-        'search/LinearSearch.java': [13, 17, 19, 20, 21, 22, 23, 24],
+        'search/LinearSearch.java': [(13, "partial"), (17, "partial"), (19, "miss"), (20, "miss"), (21, "miss"), (22, "miss"), (23, "miss"), (24, "miss")],
     }
 
     for filename in cobertura.files():
