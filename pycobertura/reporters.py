@@ -30,8 +30,14 @@ class Reporter:
         self.ignore_regex = ignore_regex
 
     @staticmethod
-    def format_line_rate(line_rate):
-        return f"{line_rate:.2%}"
+    def format_line_rates(summary_lines):
+        for i, line_rate in enumerate(summary_lines["Cover"]):
+            summary_lines["Cover"][i] = f"{line_rate:.2%}"
+
+    @staticmethod
+    def format_missing_lines(summary_lines):
+        for i, missing_lines in enumerate(summary_lines["Missing"]):
+            summary_lines["Missing"][i] = stringify(missing_lines)
 
     def get_summary_lines(self):
         filenames = self.cobertura.files(ignore_regex=self.ignore_regex)
@@ -46,24 +52,24 @@ class Reporter:
             file_statements = self.cobertura.total_statements(filename)
             file_misses = self.cobertura.total_misses(filename)
             file_rate = calculate_line_rate(file_statements, file_misses)
-            missing = stringify(self.cobertura.missed_lines(filename))
             summary_lines["Stmts"].append(file_statements)
             summary_lines["Miss"].append(file_misses)
-            summary_lines["Cover"].append(self.format_line_rate(file_rate))
-            summary_lines["Missing"].append(missing)
+            summary_lines["Cover"].append(file_rate)
+            summary_lines["Missing"].append(self.cobertura.missed_lines(filename))
 
+        # Generate TOTAL row
         total_statements = self.cobertura.total_statements()
         total_misses = self.cobertura.total_misses()
         total_rate = calculate_line_rate(total_statements, total_misses)
         summary_lines["Filename"].append("TOTAL")
         summary_lines["Stmts"].append(total_statements)
         summary_lines["Miss"].append(total_misses)
-        summary_lines["Cover"].append(self.format_line_rate(total_rate))
-        summary_lines["Missing"].append("")
+        summary_lines["Cover"].append(total_rate)
+        summary_lines["Missing"].append([])
 
         return summary_lines
 
-    def per_file_stats(self, file_stats_dict):
+    def per_file_stats(self, summary_lines):
         """
         Returns dict with keys `files` and `total` that contain coverage
         statistics per file and overall, respectively.
@@ -87,7 +93,7 @@ class Reporter:
             }
         }
         """
-        file_stats_dict_items = file_stats_dict.items()
+        file_stats_dict_items = summary_lines.items()
         number_of_files = len(self.cobertura.files()) + 1
         file_stats_list = [
             {
@@ -106,12 +112,17 @@ class Reporter:
 class TextReporter(Reporter):
     def generate(self):
         summary_lines = self.get_summary_lines()
+        self.format_line_rates(summary_lines)
+        self.format_missing_lines(summary_lines)
         return tabulate(summary_lines, headers=headers_with_missing)
 
 
 class CsvReporter(Reporter):
     def generate(self, delimiter):
         summary_lines = self.get_summary_lines()
+        self.format_line_rates(summary_lines)
+        self.format_missing_lines(summary_lines)
+
         list_of_lines = [headers_with_missing]
         list_of_lines.extend(
             [[f"{item}" for item in row] for row in zip(*summary_lines.values())]
@@ -127,12 +138,16 @@ class CsvReporter(Reporter):
 class MarkdownReporter(Reporter):
     def generate(self):
         summary_lines = self.get_summary_lines()
+        self.format_line_rates(summary_lines)
+        self.format_missing_lines(summary_lines)
         return tabulate(summary_lines, headers=headers_with_missing, tablefmt="github")
 
 
 class JsonReporter(Reporter):
     def generate(self):
         summary_lines = self.get_summary_lines()
+        self.format_line_rates(summary_lines)
+        self.format_missing_lines(summary_lines)
         stats_dict = self.per_file_stats(summary_lines)
         return json.dumps(stats_dict, indent=4)
 
@@ -140,6 +155,8 @@ class JsonReporter(Reporter):
 class YamlReporter(Reporter):
     def generate(self):
         summary_lines = self.get_summary_lines()
+        self.format_line_rates(summary_lines)
+        self.format_missing_lines(summary_lines)
         stats_dict = self.per_file_stats(summary_lines)
         # need to write to a buffer as yml packages are using a streaming interface
         buf = io.BytesIO()
@@ -158,6 +175,8 @@ class HtmlReporter(Reporter):
 
     def generate(self):
         summary_lines = self.get_summary_lines()
+        self.format_line_rates(summary_lines)
+        self.format_missing_lines(summary_lines)
 
         sources = []
         if self.render_file_sources:
@@ -297,8 +316,8 @@ class DeltaReporter:
 
         return summary_lines
 
-    def per_file_stats(self, file_stats_dict):
-        file_stats_dict_items = file_stats_dict.items()
+    def per_file_stats(self, summary_lines):
+        file_stats_dict_items = summary_lines.items()
         number_of_files = len(self.differ.files())
         file_stats_list = [
             {
