@@ -1,6 +1,12 @@
 from jinja2 import Environment, PackageLoader
 from pycobertura.cobertura import Cobertura, CoberturaDiff
-from pycobertura.utils import green, rangify_by_status, red, stringify, calculate_line_rate
+from pycobertura.utils import (
+    green,
+    rangify_by_status,
+    red,
+    stringify,
+    calculate_line_rate,
+)
 from pycobertura.templates import filters
 from tabulate import tabulate
 from ruamel import yaml
@@ -263,7 +269,9 @@ class DeltaReporter:
 
         for i in indexes_of_files_with_changes:
             summary_lines["Filename"].append(filenames[i])
-            summary_lines["Stmts"].append(self.format_total_statements(diff_total_stmts[i]))
+            summary_lines["Stmts"].append(
+                self.format_total_statements(diff_total_stmts[i])
+            )
             summary_lines["Miss"].append(self.format_total_misses(diff_total_miss[i]))
             summary_lines["Cover"].append(self.format_line_rate(diff_total_cover[i]))
 
@@ -271,17 +279,19 @@ class DeltaReporter:
         summary_lines["Stmts"].append(
             self.format_total_statements(self.differ.diff_total_statements())
         )
-        summary_lines["Miss"].append(self.format_total_misses(self.differ.diff_total_misses()))
-        summary_lines["Cover"].append(self.format_line_rate(self.differ.diff_line_rate()))
+        summary_lines["Miss"].append(
+            self.format_total_misses(self.differ.diff_total_misses())
+        )
+        summary_lines["Cover"].append(
+            self.format_line_rate(self.differ.diff_line_rate())
+        )
 
         if self.show_source:
             diff_total_missing = [
-                self.differ.diff_missed_lines(filename)
-                for filename in filenames
+                self.differ.diff_missed_lines(filename) for filename in filenames
             ]
             summary_lines["Missing"] = [
-                diff_total_missing[i]
-                for i in indexes_of_files_with_changes
+                diff_total_missing[i] for i in indexes_of_files_with_changes
             ]
             summary_lines["Missing"].append("")  # for total line
 
@@ -311,7 +321,8 @@ class TextReporterDelta(DeltaReporter):
 
         if self.show_source:
             missed_lines_colored = [
-                self.color_number([str(m[0]) for m in missing]) for missing in summary_lines["Missing"]
+                self.color_number([str(m[0]) for m in missing])
+                for missing in summary_lines["Missing"]
             ]
 
             summary_lines["Missing"] = missed_lines_colored
@@ -342,9 +353,11 @@ class CsvReporterDelta(DeltaReporter):
                 # for colors, explanation see here:
                 # https://stackoverflow.com/a/61273717/9698518
                 list_of_lines[line_index + 1] += [
-                    f"{[self.color_number(str(lineno[0])) for lineno in missing_line]}".encode(
+                    f"{[self.color_number(str(lineno_status[0])) for lineno_status in missing_line]}".encode(
                         "utf-8"
-                    ).decode("unicode_escape")
+                    ).decode(
+                        "unicode_escape"
+                    )
                 ]
 
         # Explanation here:
@@ -361,7 +374,8 @@ class MarkdownReporterDelta(DeltaReporter):
 
         if self.show_source:
             missed_lines_colored = [
-                self.color_number([str(m[0]) for m in missing]) for missing in summary_lines["Missing"]
+                self.color_number([str(m[0]) for m in missing])
+                for missing in summary_lines["Missing"]
             ]
             summary_lines["Missing"] = missed_lines_colored
             headers = headers_with_missing
@@ -374,7 +388,8 @@ class JsonReporterDelta(DeltaReporter):
 
         if self.show_source:
             missed_lines_colored = [
-                self.color_number([str(m[0]) for m in missing]) for missing in summary_lines["Missing"]
+                self.color_number([str(m[0]) for m in missing])
+                for missing in summary_lines["Missing"]
             ]
             summary_lines["Missing"] = missed_lines_colored
 
@@ -395,7 +410,8 @@ class YamlReporterDelta(DeltaReporter):
 
         if self.show_source:
             missed_lines_colored = [
-                self.color_number([str(m[0]) for m in missing]) for missing in summary_lines["Missing"]
+                self.color_number([str(m[0]) for m in missing])
+                for missing in summary_lines["Missing"]
             ]
             summary_lines["Missing"] = missed_lines_colored
 
@@ -499,7 +515,9 @@ class GitHubAnnotationReporterDelta(DeltaReporter):
         # import pdb; pdb.set_trace()
 
         for file_stat in stats_dict["files"]:
-            for range_start, range_end, status in rangify_by_status(file_stat["Missing"]):
+            for range_start, range_end, status in rangify_by_status(
+                file_stat["Missing"]
+            ):
                 result_strs.append(
                     GitHubAnnotationReporter.to_github_annotation_message(
                         file_name=file_stat["Filename"],

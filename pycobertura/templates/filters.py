@@ -39,7 +39,6 @@ def misses_color(arg):
         return "green"
 
 
-
 def line_status(line):
     return line_status_style[line.status]
 

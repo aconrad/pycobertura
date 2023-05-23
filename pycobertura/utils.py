@@ -7,9 +7,9 @@ from functools import partial
 from typing import List, Tuple, Union
 
 try:
-    from typing import Literal, TypeAlias
+    from typing import Literal
 except ImportError:  # pragma: no cover
-    from typing_extensions import Literal, TypeAlias
+    from typing_extensions import Literal
 
 ANSI_ESCAPE_CODES = {
     "green": "\x1b[32m",
@@ -77,6 +77,7 @@ LineStatus = Literal["hit", "miss", "partial"]
 LineStatusTuple = Tuple[int, LineStatus]
 LineTupleWithStatusNone = Tuple[int, Union[LineStatus, None]]
 LineRangeWithStatusNone = Tuple[int, int, Union[LineStatus, None]]
+
 
 def rangify_by_status(line_statuses: List[LineTupleWithStatusNone]):
     """

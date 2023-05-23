@@ -379,7 +379,9 @@ class CoberturaDiff:
             return self._diff_attr("line_rate", filename)
         return self.cobertura2.line_rate() - self.cobertura1.line_rate()
 
-    def diff_missed_lines(self, filename: str) -> List[Tuple[int, Literal["miss", "partial"]]]:
+    def diff_missed_lines(
+        self, filename: str
+    ) -> List[Tuple[int, Literal["miss", "partial"]]]:
         """
         Return a list of 2-element tuples `(lineno, status)` for uncovered lines.
         The given file `filename` where `lineno` is a missed line number.
