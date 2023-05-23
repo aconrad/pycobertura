@@ -73,30 +73,6 @@ def green(text):
     return colorize(text, "green")
 
 
-def rangify(number_list):
-    """
-    Returns a list of range tuples that represent continuous segments, such as
-    `(range_start, range_end)` given a list of sorted non-continuous integers
-    `number_list`.
-
-    For example: [1, 2, 3, 5, 7, 8, 10, 11, 12, 15]
-    Would return: [(1, 3), (5, 5), (7, 8), (10, 12), (15, 15)]
-    """
-    if not number_list:
-        return number_list
-
-    ranges = []
-
-    range_start = prev_num = number_list[0]
-    for num in number_list[1:]:
-        if num != (prev_num + 1):
-            ranges.append((range_start, prev_num))
-            range_start = num
-        prev_num = num
-
-    ranges.append((range_start, prev_num))
-    return ranges
-
 LineStatus = Literal["hit", "miss", "partial"]
 LineStatusTuple = Tuple[int, LineStatus]
 LineTupleWithStatusNone = Tuple[int, Union[LineStatus, None]]
