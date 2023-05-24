@@ -39,24 +39,24 @@ class memoize:
     """
 
     def __init__(self, func):
-        self.func = func
+        self.target_func = func
 
     def __get__(self, obj, objtype=None):
         if obj is None:
-            return self.func
+            return self.target_func
         return partial(self, obj)
 
     def __call__(self, *args, **kw):
-        obj = args[0]
+        target_self = args[0]
         try:
-            cache = obj.__cache
+            cache = target_self.__cache
         except AttributeError:
-            cache = obj.__cache = {}
-        key = (self.func, args[1:], frozenset(kw.items()))
+            cache = target_self.__cache = {}
+        key = (self.target_func, args[1:], frozenset(kw.items()))
         try:
             res = cache[key]
         except KeyError:
-            res = cache[key] = self.func(*args, **kw)
+            res = cache[key] = self.target_func(*args, **kw)
         return res
 
 
