@@ -178,12 +178,12 @@ class HtmlReporter(Reporter):
         self.format_line_rates(summary_lines)
         self.format_missing_lines(summary_lines)
 
+        filenames = summary_lines["Filename"]
         sources = []
         if self.render_file_sources:
-            sources = [
-                (filename, self.cobertura.file_source(filename))
-                for filename in self.cobertura.files()
-            ]
+            for i, filename in enumerate(filenames):
+                if i != len(filenames) - 1:  # exclude TOTAL, not a filename
+                    sources.append((filename, self.cobertura.file_source(filename)))
 
         template = env.get_template("html.jinja2")
         rows = {k: v[:-1] for k, v in summary_lines.items()}

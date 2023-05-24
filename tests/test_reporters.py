@@ -328,6 +328,17 @@ def test_html_report(report, source, expected_output):
 
     assert remove_style_tag(html_output) == expected_output
 
+def test_html_report__dont_render_ignore_regex():
+    from pycobertura.reporters import HtmlReporter
+
+    cobertura = make_cobertura()
+    report = HtmlReporter(cobertura, title="test report", ignore_regex='.*ISortedArraySearch')
+    html_output = report.generate()
+
+    assert "normalize.css" in html_output
+    assert "Skeleton V2.0" in html_output
+    assert 'search/ISortedArraySearch.java' not in html_output
+    assert 'search/LinearSearch.java' in html_output
 
 def test_html_report__no_source_files_message():
     from pycobertura.reporters import HtmlReporter
