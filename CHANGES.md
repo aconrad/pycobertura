@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Make `ZipFileSystem` read files in text mode to fix diffing mixed file systems
+
 ## 3.2.0 (2023-05-12)
 
 * `pycobertura diff` now supports output format: `github-annotation`. Thanks @goatwu1993

@@ -102,6 +102,21 @@ def test_filesystem_zip__with_source_prefix():
             assert hasattr(f, 'read')
 
 
+def test_filesystem_zip__read_str():
+    from pycobertura.filesystem import ZipFileSystem
+
+    fs = ZipFileSystem("tests/dummy/dummy.zip")
+
+    source_files_in_zip = [
+        'dummy/dummy.py',
+        'dummy/dummy2.py',
+    ]
+
+    for source_file in source_files_in_zip:
+        with fs.open(source_file) as f:
+            assert isinstance(f.read(), str)
+
+
 def test_filesystem_git():
     import pycobertura.filesystem as fsm
 
