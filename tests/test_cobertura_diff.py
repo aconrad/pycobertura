@@ -160,3 +160,13 @@ def test_diff__has_not_better_coverage():
     cobertura2 = Cobertura('tests/dummy.zeroexit1/coverage.xml')
     differ = CoberturaDiff(cobertura1, cobertura2)
     assert differ.has_better_coverage() is False
+
+
+def test_diff__mixed_filesystems():
+    from pycobertura.cobertura import Cobertura, CoberturaDiff
+
+    cobertura1 = make_cobertura('tests/dummy.original.xml', source='tests/dummy/dummy.zip')
+    cobertura2 = make_cobertura('tests/dummy.original.xml', source='tests/dummy')
+
+    differ = CoberturaDiff(cobertura1, cobertura2)
+    assert differ.has_all_changes_covered() is True
