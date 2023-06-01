@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.2.1 (2023-06-01)
+
 * Make `ZipFileSystem` read files in text mode to fix diffing mixed file systems. Thanks @ernestask
 * Add Python 3.11 as a supported version. Thanks @ernestask
 
