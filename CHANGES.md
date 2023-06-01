@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-* Make `ZipFileSystem` read files in text mode to fix diffing mixed file systems
+* Make `ZipFileSystem` read files in text mode to fix diffing mixed file systems. Thanks @ernestask
 
 ## 3.2.0 (2023-05-12)
 
