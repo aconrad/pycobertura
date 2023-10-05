@@ -376,9 +376,16 @@ class CoberturaDiff:
 
     def files(self, ignore_regex=None):
         """
-        Return `self.cobertura2.files()`.
+        Return the total of all files we're comparing.
         """
-        return list(set(self.cobertura2.files(ignore_regex) + self.cobertura1.files(ignore_regex)))
+        f = list(
+            set(
+                self.cobertura2.files(ignore_regex)
+                + self.cobertura1.files(ignore_regex)
+            )
+        )
+        f.sort()
+        return f
 
     def file_source(self, filename):
         """
@@ -386,11 +393,13 @@ class CoberturaDiff:
         given file `filename`.
 
         """
+        nonexistent = True
         if self.cobertura1.has_file(filename) and self.cobertura1.filesystem.has_file(
             filename
         ):
             lines1 = self.cobertura1.source_lines(filename)
             line_statuses1 = dict(self.cobertura1.line_statuses(filename))
+            nonexistent = False
         else:
             lines1 = []
             line_statuses1 = {}
@@ -400,9 +409,14 @@ class CoberturaDiff:
         ):
             lines2 = self.cobertura2.source_lines(filename)
             line_statuses2 = dict(self.cobertura2.line_statuses(filename))
+            nonexistent = False
         else:
             lines2 = []
             line_statuses2 = {}
+
+        if nonexistent:
+            # try to get source lines anyway, to get the exception traceback
+            self.cobertura2.source_lines(filename)
 
         # Build a dict of lineno2 -> lineno1
         lineno_map = reconcile_lines(lines2, lines1)

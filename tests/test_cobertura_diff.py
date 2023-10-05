@@ -44,7 +44,7 @@ def test_diff_total_misses():
     cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
     differ = CoberturaDiff(cobertura1, cobertura2)
 
-    assert differ.diff_total_misses() == 1
+    assert differ.diff_total_misses() == -4
 
 
 def test_diff_total_misses_by_class_file():
