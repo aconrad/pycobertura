@@ -340,14 +340,14 @@ class CoberturaDiff:
 
         total_count = 0.0
         for filename in files:
+            count = [0, 0]
             if self.cobertura1.has_file(filename):
                 method = getattr(self.cobertura1, attr_name)
-                count1 = method(filename)
-            else:
-                count1 = 0.0
-            method = getattr(self.cobertura2, attr_name)
-            count2 = method(filename)
-            total_count += count2 - count1
+                count[0] = method(filename)
+            if self.cobertura2.has_file(filename):
+                method = getattr(self.cobertura2, attr_name)
+                count[1] = method(filename)
+            total_count += count[1] - count[0]
 
         return total_count
 
@@ -378,7 +378,7 @@ class CoberturaDiff:
         """
         Return `self.cobertura2.files()`.
         """
-        return self.cobertura2.files(ignore_regex)
+        return list(set(self.cobertura2.files(ignore_regex) + self.cobertura1.files(ignore_regex)))
 
     def file_source(self, filename):
         """
@@ -395,8 +395,14 @@ class CoberturaDiff:
             lines1 = []
             line_statuses1 = {}
 
-        lines2 = self.cobertura2.source_lines(filename)
-        line_statuses2 = dict(self.cobertura2.line_statuses(filename))
+        if self.cobertura2.has_file(filename) and self.cobertura2.filesystem.has_file(
+            filename
+        ):
+            lines2 = self.cobertura2.source_lines(filename)
+            line_statuses2 = dict(self.cobertura2.line_statuses(filename))
+        else:
+            lines2 = []
+            line_statuses2 = {}
 
         # Build a dict of lineno2 -> lineno1
         lineno_map = reconcile_lines(lines2, lines1)
