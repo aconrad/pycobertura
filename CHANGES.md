@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix `pycobertura diff` bug related to number of changed files. Thanks @ulasozguler
+
 ## 3.2.1 (2023-06-01)
 
 * Make `ZipFileSystem` read files in text mode to fix diffing mixed file systems. Thanks @ernestask
