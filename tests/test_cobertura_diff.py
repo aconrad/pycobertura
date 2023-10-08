@@ -46,6 +46,14 @@ def test_diff_total_misses():
 
     assert differ.diff_total_misses() == -4
 
+def test_diff_total_misses_move():
+    from pycobertura.cobertura import CoberturaDiff
+
+    cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
+    cobertura2 = make_cobertura('tests/dummy.moved/coverage.xml')
+    differ = CoberturaDiff(cobertura1, cobertura2)
+
+    assert differ.diff_total_misses() == 0
 
 def test_diff_total_misses_by_class_file():
     from pycobertura.cobertura import CoberturaDiff
