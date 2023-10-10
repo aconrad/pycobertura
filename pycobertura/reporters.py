@@ -287,7 +287,7 @@ class DeltaReporter:
 
     def per_file_stats(self, file_stats_dict):
         file_stats_dict_items = file_stats_dict.items()
-        number_of_files = len(self.differ.files())
+        number_of_files = len(file_stats_dict["Filename"])
         file_stats_list = [
             {
                 header_name: header_value[file_index]

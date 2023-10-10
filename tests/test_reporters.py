@@ -746,3 +746,29 @@ def test_github_annotation_report_delta(
     assert report_delta.generate(**default_config) == expected_default_output
     assert report_delta.generate(**config) == expected_custom_output
 
+
+def test_delta_reporter__single_file_coverage_changed():
+    import json
+
+    from pycobertura.reporters import JsonReporterDelta
+
+    cobertura1 = make_cobertura('tests/dummy.diffcoverage/old-coverage.xml')
+    cobertura2 = make_cobertura('tests/dummy.diffcoverage/new-coverage.xml')
+
+    report_delta = JsonReporterDelta(cobertura1, cobertura2, show_source=False)
+    assert json.loads(report_delta.generate()) == {
+        "files": [
+            {
+                "Filename": "app/file3.py",
+                "Stmts": "0",
+                "Miss": "-1",
+                "Cover": "+50.00%"
+            }
+        ],
+        "total": {
+            "Filename": "TOTAL",
+            "Stmts": "0",
+            "Miss": "-1",
+            "Cover": "+16.67%"
+        }
+    }
