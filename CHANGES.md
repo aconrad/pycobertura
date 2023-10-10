@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Fix `pycobertura diff` bug related to number of changed files. Thanks @ulasozguler
+- Fix `IndexError: list index out of range` error raised by `pycobertura diff` when number of files with coverage change is less then total number of files in coverage report. Thanks @ulasozguler
 
 ## 3.2.1 (2023-06-01)
 
