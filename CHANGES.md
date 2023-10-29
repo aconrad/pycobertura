@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 3.2.3 (2023-10-29)
+
+* Fix: Account for moved/renamed/delted files in miss counts. Thanks @wdouglass
+
 ## 3.2.2 (2023-10-10)
 
 * Fix `IndexError: list index out of range` error raised by `pycobertura diff`
