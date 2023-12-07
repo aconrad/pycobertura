@@ -36,7 +36,7 @@ def test_parse_string():
 def test_no_branch_rate():
     from pycobertura import Cobertura
 
-    assert Cobertura('tests/cobertura-no-branch-rate.xml').branch_rate == None
+    assert Cobertura('tests/cobertura-no-branch-rate.xml').branch_rate() == None
 
 def test_invalid_coverage_report():
     from pycobertura import Cobertura
