@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Fix: Cobertura.branch_rate() returns None when branch rate is absent instead of raising TypeError
+
 ## 3.2.3 (2023-10-29)
 
 * Fix: Account for moved/renamed/delted files in miss counts. Thanks @wdouglass
