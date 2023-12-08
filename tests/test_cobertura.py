@@ -70,6 +70,12 @@ def test_branch_rate():
     assert cobertura.branch_rate() == 0.75
 
 
+def test_no_branch_rate():
+    from pycobertura import Cobertura
+
+    assert Cobertura('tests/cobertura-no-branch-rate.xml').branch_rate() == None
+
+
 def test_branch_rate_by_class_file():
     cobertura = make_cobertura()
     expected_branch_rates = {

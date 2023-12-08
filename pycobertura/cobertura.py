@@ -123,11 +123,13 @@ class Cobertura:
         Return the global branch rate of the coverage report. If the
         `filename` file is given, return the branch rate of the file.
         """
+        branch_rate = None
         if filename is None:
-            return float(self.xml.get("branch-rate"))
+            branch_rate = self.xml.get("branch-rate")
         else:
             classElement = self._class_elements_by_file_name[filename][0]
-            return float(classElement.get("branch-rate"))
+            branch_rate = classElement.get("branch-rate")
+        return None if branch_rate is None else float(branch_rate)
 
     @memoize
     def missed_statements(self, filename):
