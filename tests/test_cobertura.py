@@ -33,10 +33,6 @@ def test_parse_string():
         xml_string = f.read()
     assert ET.tostring(Cobertura(xml_path).xml) == ET.tostring(Cobertura(xml_string).xml)
 
-def test_no_branch_rate():
-    from pycobertura import Cobertura
-
-    assert Cobertura('tests/cobertura-no-branch-rate.xml').branch_rate() == None
 
 def test_invalid_coverage_report():
     from pycobertura import Cobertura
@@ -72,6 +68,12 @@ def test_line_rate_by_class_file():
 def test_branch_rate():
     cobertura = make_cobertura()
     assert cobertura.branch_rate() == 0.75
+
+
+def test_no_branch_rate():
+    from pycobertura import Cobertura
+
+    assert Cobertura('tests/cobertura-no-branch-rate.xml').branch_rate() == None
 
 
 def test_branch_rate_by_class_file():
