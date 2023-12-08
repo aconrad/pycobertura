@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.2.4 (2023-12-08)
+
 * Fix: `Cobertura.branch_rate()` returns `None` when `branch-rate` is absent
   from the Cobertura coverage report instead of raising `TypeError`. Thanks
   @starcruiseromega
