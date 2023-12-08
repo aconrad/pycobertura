@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-* Fix: `Cobertura.branch_rate()` returns `None` when `branch-rate` is absent from the Cobertura coverage report instead of raising `TypeError`. Thanks @starcruiseromega
+* Fix: `Cobertura.branch_rate()` returns `None` when `branch-rate` is absent
+  from the Cobertura coverage report instead of raising `TypeError`. Thanks
+  @starcruiseromega
 
 ## 3.2.3 (2023-10-29)
 
@@ -16,16 +18,19 @@
 
 ## 3.2.1 (2023-06-01)
 
-* Make `ZipFileSystem` read files in text mode to fix diffing mixed file systems. Thanks @ernestask
+* Make `ZipFileSystem` read files in text mode to fix diffing mixed file
+  systems. Thanks @ernestask
 * Add Python 3.11 as a supported version. Thanks @ernestask
 
 ## 3.2.0 (2023-05-12)
 
-* `pycobertura diff` now supports output format: `github-annotation`. Thanks @goatwu1993
+* `pycobertura diff` now supports output format: `github-annotation`. Thanks
+  @goatwu1993
 
 ## 3.1.0 (2023-04-29)
 
-* `pycobertura show` now supports output format: `github-annotation`. Thanks @goatwu1993
+* `pycobertura show` now supports output format: `github-annotation`. Thanks
+  @goatwu1993
 
 ## 3.0.0 (2022-10-08)
 
