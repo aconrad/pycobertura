@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Enable executing as scripts
+
 ## 3.2.4 (2023-12-08)
 
 * Fix: `Cobertura.branch_rate()` returns `None` when `branch-rate` is absent
