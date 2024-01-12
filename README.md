@@ -42,7 +42,9 @@ pip install pycobertura
 
 ## CLI usage
 
-pycobertura provides a command line interface to report on coverage files and also allows you to execute pycobertura module as scripts (see [PEP 338](https://peps.python.org/pep-0338/))
+pycobertura provides a command line interface `pycobertura` to report on coverage files.
+
+Alternatively, pycobertura can also be invoked as a module with `python -m pycobertura`, see [PEP 338](https://peps.python.org/pep-0338/).
 
 ### Help commands
 
