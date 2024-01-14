@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-* Support executing pycobertura as a python module with: `python -m pycobertura`. Thanks @paveltsialnou
+## 3.3.0 (2024-01-14)
+
+* Feat: Support executing pycobertura as a python module with: `python -m
+  pycobertura`. Thanks @paveltsialnou
 
 ## 3.2.4 (2023-12-08)
 
