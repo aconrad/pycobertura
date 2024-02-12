@@ -1,6 +1,8 @@
 # Release Notes
 
 ## Unreleased
+* Fix total stmts, miss and cover values in the coverage report when an ignore
+  regex is passed. Thanks @danctorres
 
 ## 3.3.0 (2024-01-14)
 
