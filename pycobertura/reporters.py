@@ -45,9 +45,15 @@ class Reporter:
             ],
         }
         lines["Filename"].append("TOTAL")
-        lines["Stmts"] += [self.cobertura.total_statements()]
-        lines["Miss"] += [self.cobertura.total_misses()]
-        lines["Cover"] += [self.format_line_rate(self.cobertura.line_rate())]
+        lines["Stmts"] += [
+            self.cobertura.total_statements(ignore_regex=self.ignore_regex)
+        ]
+        lines["Miss"] += [self.cobertura.total_misses(ignore_regex=self.ignore_regex)]
+        lines["Cover"] += [
+            self.format_line_rate(
+                self.cobertura.line_rate(ignore_regex=self.ignore_regex)
+            )
+        ]
         lines["Missing"].append("")
 
         return lines

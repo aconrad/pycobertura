@@ -102,21 +102,23 @@ class Cobertura:
         """Return the version number of the coverage report."""
         return self.xml.get("version")
 
-    def line_rate(self, filename=None):
+    def line_rate(self, filename=None, ignore_regex=None):
         """
         Return the global line rate of the coverage report. If the
         `filename` file is given, return the line rate of the file.
         """
 
-        if filename is None:
+        if filename is None and ignore_regex is None:
             return float(self.xml.get("line-rate"))
 
-        elements = self._class_elements_by_file_name[filename]
-        if len(elements) == 1:
-            return float(elements[0].get("line-rate"))
-        else:
-            total = self.total_statements(filename)
-            return float(self.total_hits(filename) / total) if total != 0 else 0
+        if ignore_regex is None:
+            elements = self._class_elements_by_file_name[filename]
+            if len(elements) == 1:
+                return float(elements[0].get("line-rate"))
+        total = self.total_statements(filename, ignore_regex)
+        return (
+            float(self.total_hits(filename, ignore_regex) / total) if total != 0 else 0
+        )
 
     def branch_rate(self, filename=None):
         """
@@ -209,7 +211,7 @@ class Cobertura:
 
         return lines
 
-    def total_misses(self, filename=None):
+    def total_misses(self, filename=None, ignore_regex=None):
         """
         Return the total number of uncovered statements for the file
         `filename`. If `filename` is not given, return the total
@@ -218,9 +220,14 @@ class Cobertura:
         if filename is not None:
             return len(self.missed_statements(filename))
 
-        return sum([len(self.missed_statements(filename)) for filename in self.files()])
+        return sum(
+            [
+                len(self.missed_statements(filename))
+                for filename in self.files(ignore_regex)
+            ]
+        )
 
-    def total_hits(self, filename=None):
+    def total_hits(self, filename=None, ignore_regex=None):
         """
         Return the total number of covered statements for the file
         `filename`. If `filename` is not given, return the total
@@ -228,10 +235,14 @@ class Cobertura:
         """
         if filename is not None:
             return len(self.hit_statements(filename))
+        return sum(
+            [
+                len(self.hit_statements(filename))
+                for filename in self.files(ignore_regex)
+            ]
+        )
 
-        return sum([len(self.hit_statements(filename)) for filename in self.files()])
-
-    def total_statements(self, filename=None):
+    def total_statements(self, filename=None, ignore_regex=None):
         """
         Return the total number of statements for the file
         `filename`. If `filename` is not given, return the total
@@ -239,9 +250,11 @@ class Cobertura:
         """
         if filename is not None:
             return len(self._get_lines_by_filename(filename))
-
         return sum(
-            [len(self._get_lines_by_filename(filename)) for filename in self.files()]
+            [
+                len(self._get_lines_by_filename(filename))
+                for filename in self.files(ignore_regex)
+            ]
         )
 
     @memoize
