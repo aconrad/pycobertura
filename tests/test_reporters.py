@@ -43,6 +43,20 @@ dummy/dummy2.py          2       2  0.00%    1-2
 TOTAL                    6       2  66.67%"""
 
 
+def test_text_report__with_ignore_regex():
+    from pycobertura.reporters import TextReporter
+
+    cobertura = make_cobertura()
+    report = TextReporter(cobertura, ".*Main.java|.*ISortedArraySearch.java")
+
+    assert report.generate() == """\
+Filename                    Stmts    Miss  Cover    Missing
+------------------------  -------  ------  -------  ---------
+search/BinarySearch.java       12       1  91.67%   24
+search/LinearSearch.java        7       2  71.43%   19-24
+TOTAL                          19       3  84.21%"""
+
+
 def test_text_report_delta__no_diff():
     from pycobertura.reporters import TextReporterDelta
 
