@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Unreleased
+* Improve error message as to why parsing the Cobertura report failed.
 
 ## 3.3.1 (2024-02-17)
 * Fix total stmts, miss and cover values in the coverage report when an ignore
