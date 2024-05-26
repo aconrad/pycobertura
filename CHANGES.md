@@ -1,6 +1,8 @@
 # Release Notes
 
 ## Unreleased
+
+## 3.3.2 (2024-05-26)
 * Improve error message as to why parsing the Cobertura report failed.
 
 ## 3.3.1 (2024-02-17)
