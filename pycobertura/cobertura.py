@@ -54,6 +54,7 @@ class Cobertura:
         source files referenced in the report. Please check the
         `pycobertura.filesystem` module to learn more about filesystems.
         """
+        errors = []
         for load_func in [
             self._load_from_file,
             self._load_from_string,
@@ -61,10 +62,19 @@ class Cobertura:
             try:
                 self.xml = load_func(report)
                 break
-            except BaseException:
+            except BaseException as e:
+                errors.append(e)
                 pass
         else:
-            raise self.InvalidCoverageReport("Invalid coverage file: {}".format(report))
+            raise self.InvalidCoverageReport(
+                """\
+Invalid coverage report: {}.
+The following exceptions occurred while attempting to parse the report:
+* While treating the report as a filename: {}.
+* While treating the report as an XML Cobertura string: {}""".format(
+                    report, errors[0], errors[1]
+                )
+            )
 
         self.filesystem = filesystem
         self.report = report
