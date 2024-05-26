@@ -68,7 +68,8 @@ class Cobertura:
         else:
             raise self.InvalidCoverageReport(
                 """\
-Invalid coverage file: {}. The following exceptions occurred while attempting to parse the report:
+Invalid coverage report: {}.
+The following exceptions occurred while attempting to parse the report:
 * While treating the report as a filename: {}.
 * While treating the report as an XML Cobertura string: {}""".format(
                     report, errors[0], errors[1]
