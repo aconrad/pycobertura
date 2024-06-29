@@ -810,3 +810,41 @@ def test_delta_reporter__single_file_coverage_changed():
             "Cover": "+16.67%"
         }
     }
+
+
+def test_phorge_json_reporter():
+    from pycobertura.reporters import PhorgeJsonReporter
+
+    cobertura = make_cobertura('tests/dummy.source1/coverage.xml')
+    report = PhorgeJsonReporter(cobertura)
+
+    assert report.generate() == """\
+{
+    "dummy/__init__.py": "",
+    "dummy/dummy.py": "CCNCUU",
+    "dummy/dummy2.py": "CC",
+    "dummy/dummy4.py": "UUNUUU"
+}"""
+
+
+def test_phorge_json_reporter__no_source():
+    """
+    This checks that if a file is not found, the PhorgeJsonReporter
+    always raises an exception. This is because the phorge-json
+    format only wants coverage information for each line, and this
+    does not make sense if a source file is not found.
+    """
+    from pycobertura.reporters import PhorgeJsonReporter
+    import pycobertura.filesystem
+
+    cobertura = make_cobertura('tests/cobertura.xml')
+    report = PhorgeJsonReporter(cobertura)
+
+    exception = None
+
+    try:
+        report.generate()
+    except pycobertura.filesystem.FileSystem.FileNotFound as e:
+        exception = e
+
+    assert exception is not None

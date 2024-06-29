@@ -9,6 +9,7 @@ from pycobertura.reporters import (
     MarkdownReporter,
     JsonReporter,
     YamlReporter,
+    PhorgeJsonReporter,
     HtmlReporterDelta,
     TextReporterDelta,
     CsvReporterDelta,
@@ -31,6 +32,7 @@ reporters = {
     "json": JsonReporter,
     "yaml": YamlReporter,
     "github-annotation": GitHubAnnotationReporter,
+    "phorge-json": PhorgeJsonReporter,
 }
 
 

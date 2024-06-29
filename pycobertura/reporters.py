@@ -174,6 +174,28 @@ class HtmlReporter(Reporter):
         )
 
 
+class PhorgeJsonReporter(Reporter):
+    """
+    A reporter that outputs a JSON object in the Phorge/Phabricator
+    coverage format. It is required to have the source files available.
+    """
+
+    def generate_one(self, filename):
+        statuses = self.cobertura.line_statuses(filename)
+        with self.cobertura.filesystem.open(filename) as f:
+            lines = ["N" for _ in f]
+            for lineNum, covered in statuses:
+                lines[lineNum - 1] = "C" if covered else "U"
+            return "".join(lines)
+
+    def generate(self):
+        filenames = self.cobertura.files(ignore_regex=self.ignore_regex)
+        res = {}
+        for filename in filenames:
+            res[filename] = self.generate_one(filename)
+        return json.dumps(res, indent=4)
+
+
 class DeltaReporter:
     def __init__(
         self,
