@@ -103,7 +103,7 @@ TOTAL;794;264;66.75%;
 ```
 
 ```shell
-$ pycobertura show --format markdown coverage.xml 
+$ pycobertura show --format markdown coverage.xml
 | Filename                          |   Stmts |   Miss | Cover   | Missing            |
 |-----------------------------------|---------|--------|---------|--------------------|
 | pycobertura/__init__.py           |       2 |      0 | 100.00% |                    |
@@ -213,6 +213,19 @@ $ pycobertura show --format github-annotation tests/cobertura.xml
 If you run it in GitHub Actions/Apps, the above log generates check annotations.
 
 ![Example output of github-annotation formatted pycobertura show command](images/example_github_annotation_show.png)
+
+The following shows how to generate a JSON in the [Phorge/Phabricator coverage
+format](https://we.phorge.it/book/phorge/article/arcanist_coverage/#building-coverage-support).
+
+```shell
+$ pycobertura show --format phorge-json tests/dummy.source1/coverage.xml
+{
+    "dummy/__init__.py": "",
+    "dummy/dummy.py": "CCNCUU",
+    "dummy/dummy2.py": "CC",
+    "dummy/dummy4.py": "UUNUUU"
+}
+```
 
 ### Command `diff`
 

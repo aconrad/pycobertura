@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Add phorge-json format.
+
 ## 3.3.2 (2024-05-26)
 * Improve error message as to why parsing the Cobertura report failed.
 
