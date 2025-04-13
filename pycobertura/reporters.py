@@ -49,8 +49,12 @@ class Reporter:
             "Missing": [],
         }
         for filename in filenames:
-            file_statements = self.cobertura.total_statements(filename, ignore_regex=self.ignore_regex)
-            file_misses = self.cobertura.total_misses(filename, ignore_regex=self.ignore_regex)
+            file_statements = self.cobertura.total_statements(
+                filename, ignore_regex=self.ignore_regex
+            )
+            file_misses = self.cobertura.total_misses(
+                filename, ignore_regex=self.ignore_regex
+            )
             file_rate = calculate_line_rate(file_statements, file_misses)
             summary_lines["Stmts"].append(file_statements)
             summary_lines["Miss"].append(file_misses)
@@ -58,7 +62,9 @@ class Reporter:
             summary_lines["Missing"].append(self.cobertura.missed_lines(filename))
 
         # Generate TOTAL row
-        total_statements = self.cobertura.total_statements(ignore_regex=self.ignore_regex)
+        total_statements = self.cobertura.total_statements(
+            ignore_regex=self.ignore_regex
+        )
         total_misses = self.cobertura.total_misses(ignore_regex=self.ignore_regex)
         total_rate = calculate_line_rate(total_statements, total_misses)
         summary_lines["Filename"].append("TOTAL")
