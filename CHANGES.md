@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 4.0.0 (2025-04-13)
+
+* Add support for partially covered lines and will be highlighted in yellow.
+
 ## 3.3.2 (2024-05-26)
 * Improve error message as to why parsing the Cobertura report failed.
 
