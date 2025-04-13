@@ -32,7 +32,7 @@ jobs:
         run: tox
 
       - name: Upload coverage artifact
-        if: ${{ env.GITHUB_REF_NAME == 'master' }}
+        if: ${{ github.event_name == 'push' }}
         uses: actions/upload-artifact@v4
         with:
           name: cobertura-coverage-${{ github.sha }}-${{ matrix.python-version }}
