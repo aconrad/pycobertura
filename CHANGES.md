@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Add support for Python 3.12 and 3.13.
+
 ## 4.0.0 (2025-04-13)
 
 * Add support for partially covered lines and will be highlighted in yellow.
