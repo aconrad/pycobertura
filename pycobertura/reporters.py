@@ -49,8 +49,8 @@ class Reporter:
             "Missing": [],
         }
         for filename in filenames:
-            file_statements = self.cobertura.total_statements(filename)
-            file_misses = self.cobertura.total_misses(filename)
+            file_statements = self.cobertura.total_statements(filename, ignore_regex=self.ignore_regex)
+            file_misses = self.cobertura.total_misses(filename, ignore_regex=self.ignore_regex)
             file_rate = calculate_line_rate(file_statements, file_misses)
             summary_lines["Stmts"].append(file_statements)
             summary_lines["Miss"].append(file_misses)
@@ -58,8 +58,8 @@ class Reporter:
             summary_lines["Missing"].append(self.cobertura.missed_lines(filename))
 
         # Generate TOTAL row
-        total_statements = self.cobertura.total_statements()
-        total_misses = self.cobertura.total_misses()
+        total_statements = self.cobertura.total_statements(ignore_regex=self.ignore_regex)
+        total_misses = self.cobertura.total_misses(ignore_regex=self.ignore_regex)
         total_rate = calculate_line_rate(total_statements, total_misses)
         summary_lines["Filename"].append("TOTAL")
         summary_lines["Stmts"].append(total_statements)
@@ -318,7 +318,7 @@ class DeltaReporter:
 
     def per_file_stats(self, summary_lines):
         file_stats_dict_items = summary_lines.items()
-        number_of_files = len(self.differ.files())
+        number_of_files = len(summary_lines["Filename"])
         file_stats_list = [
             {
                 header_name: header_value[file_index]

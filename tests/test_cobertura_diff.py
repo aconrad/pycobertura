@@ -44,8 +44,16 @@ def test_diff_total_misses():
     cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
     differ = CoberturaDiff(cobertura1, cobertura2)
 
-    assert differ.diff_total_misses() == 1
+    assert differ.diff_total_misses() == -4
 
+def test_diff_total_misses_move():
+    from pycobertura.cobertura import CoberturaDiff
+
+    cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
+    cobertura2 = make_cobertura('tests/dummy.moved/coverage.xml')
+    differ = CoberturaDiff(cobertura1, cobertura2)
+
+    assert differ.diff_total_misses() == 0
 
 def test_diff_total_misses_by_class_file():
     from pycobertura.cobertura import CoberturaDiff
@@ -160,3 +168,13 @@ def test_diff__has_not_better_coverage():
     cobertura2 = Cobertura('tests/dummy.zeroexit1/coverage.xml')
     differ = CoberturaDiff(cobertura1, cobertura2)
     assert differ.has_better_coverage() is False
+
+
+def test_diff__mixed_filesystems():
+    from pycobertura.cobertura import Cobertura, CoberturaDiff
+
+    cobertura1 = make_cobertura('tests/dummy.original.xml', source='tests/dummy/dummy.zip')
+    cobertura2 = make_cobertura('tests/dummy.original.xml', source='tests/dummy')
+
+    differ = CoberturaDiff(cobertura1, cobertura2)
+    assert differ.has_all_changes_covered() is True

@@ -42,7 +42,9 @@ pip install pycobertura
 
 ## CLI usage
 
-pycobertura provides a command line interface to report on coverage files.
+pycobertura provides a command line interface `pycobertura` to report on coverage files.
+
+Alternatively, pycobertura can also be invoked as a module with `python -m pycobertura`, see [PEP 338](https://peps.python.org/pep-0338/).
 
 ### Help commands
 
@@ -607,7 +609,7 @@ the line rate the wrong metric to look at when validating coverage.
 The basic idea is that a code base may have technical debt of N uncovered lines
 and you want to prevent N from ever going up.
 
-### pycobertura sounds cool, but how to I generate a Cobertura file?
+### pycobertura sounds cool, but how do I generate a Cobertura file?
 
 Depending on your programing language, you need to find a tool that measures
 code coverage and generates a Cobertura report which is an XML representation

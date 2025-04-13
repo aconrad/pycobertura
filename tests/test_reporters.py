@@ -43,6 +43,20 @@ dummy/dummy2.py          2       2  0.00%    1-2
 TOTAL                    6       2  66.67%"""
 
 
+def test_text_report__with_ignore_regex():
+    from pycobertura.reporters import TextReporter
+
+    cobertura = make_cobertura()
+    report = TextReporter(cobertura, ".*Main.java|.*ISortedArraySearch.java")
+
+    assert report.generate() == """\
+Filename                    Stmts    Miss  Cover    Missing
+------------------------  -------  ------  -------  ---------------
+search/BinarySearch.java       12       2  83.33%   ~23, 24
+search/LinearSearch.java        7       4  42.86%   ~13, ~17, 19-24
+TOTAL                          19       6  68.42%"""
+
+
 def test_text_report_delta__no_diff():
     from pycobertura.reporters import TextReporterDelta
 
@@ -71,7 +85,8 @@ Filename           Stmts    Miss  Cover     Missing
 dummy/dummy.py         0      \x1b[32m-2\x1b[39m  +40.00%
 dummy/dummy2.py       +2      \x1b[31m+1\x1b[39m  -25.00%   \x1b[31m5\x1b[39m
 dummy/dummy3.py       +2      \x1b[31m+2\x1b[39m  +100.00%  \x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m
-TOTAL                 +4      \x1b[31m+1\x1b[39m  +31.06%"""
+dummy/dummy4.py       -5      \x1b[32m-5\x1b[39m  +100.00%
+TOTAL                 -1      \x1b[32m-4\x1b[39m  +31.06%"""
 
 
 def test_text_report_delta__colorize_True__with_missing_range():
@@ -88,7 +103,8 @@ Filename           Stmts    Miss  Cover     Missing
 dummy/dummy.py         0      \x1b[32m-2\x1b[39m  +40.00%
 dummy/dummy2.py       +2      \x1b[31m+1\x1b[39m  -25.00%   \x1b[31m5\x1b[39m
 dummy/dummy3.py       +2      \x1b[31m+2\x1b[39m  +100.00%  \x1b[31m1\x1b[39m, \x1b[31m2\x1b[39m
-TOTAL                 +4      \x1b[31m+1\x1b[39m  +31.06%"""
+dummy/dummy4.py       -5      \x1b[32m-5\x1b[39m  +100.00%
+TOTAL                 -1      \x1b[32m-4\x1b[39m  +31.06%"""
 
 
 def test_text_report_delta__colorize_False():
@@ -105,7 +121,8 @@ Filename           Stmts    Miss  Cover     Missing
 dummy/dummy.py         0      -2  +40.00%
 dummy/dummy2.py       +2      +1  -25.00%   5
 dummy/dummy3.py       +2      +2  +100.00%  1, 2
-TOTAL                 +4      +1  +31.06%"""
+dummy/dummy4.py       -5      -5  +100.00%
+TOTAL                 -1      -4  +31.06%"""
 
 
 @pytest.mark.parametrize("report, source, expected_output", [('tests/cobertura.xml', None, """\
@@ -429,7 +446,8 @@ Filename           Stmts    Miss  Cover
 dummy/dummy.py         0      -2  +40.00%
 dummy/dummy2.py       +2      +1  -25.00%
 dummy/dummy3.py       +2      +2  +100.00%
-TOTAL                 +4      +1  +31.06%"""
+dummy/dummy4.py       -5      -5  +100.00%
+TOTAL                 -1      -4  +31.06%"""
 
 
 def test_html_report_delta__no_source():
@@ -479,12 +497,18 @@ def test_html_report_delta__no_source():
             <td><span class="red">+2</span></td>
             <td>+100.00%</td>
           </tr>
+          <tr>
+            <td><a href="#dummy/dummy4.py">dummy/dummy4.py</a></td>
+            <td>-5</td>
+            <td><span class="green">-5</span></td>
+            <td>+100.00%</td>
+          </tr>
         </tbody>
         <tfoot>
           <tr>
             <td>TOTAL</td>
-            <td>+4</td>
-            <td><span class="red">+1</span></td>
+            <td>-1</td>
+            <td><span class="green">-4</span></td>
             <td>+31.06%</td>
           </tr>
         </tfoot>
@@ -551,12 +575,20 @@ def test_html_report_delta():
             <td><span class="red">1</span>, <span class="red">2</span>
             </td>
           </tr>
+          <tr>
+            <td><a href="#dummy/dummy4.py">dummy/dummy4.py</a></td>
+            <td>-5</td>
+            <td><span class="green">-5</span></td>
+            <td>+100.00%</td>
+            <td>
+            </td>
+          </tr>
         </tbody>
         <tfoot>
           <tr>
             <td>TOTAL</td>
-            <td>+4</td>
-            <td><span class="red">+1</span></td>
+            <td>-1</td>
+            <td><span class="green">-4</span></td>
             <td>+31.06%</td>
             <td></td>
           </tr>
@@ -682,12 +714,18 @@ def test_html_report_delta__show_missing_False():
             <td><span class="red">+2</span></td>
             <td>+100.00%</td>
           </tr>
+          <tr>
+            <td><a href="#dummy/dummy4.py">dummy/dummy4.py</a></td>
+            <td>-5</td>
+            <td><span class="green">-5</span></td>
+            <td>+100.00%</td>
+          </tr>
         </tbody>
         <tfoot>
           <tr>
             <td>TOTAL</td>
-            <td>+4</td>
-            <td><span class="red">+1</span></td>
+            <td>-1</td>
+            <td><span class="green">-4</span></td>
             <td>+31.06%</td>
           </tr>
         </tfoot>
@@ -857,3 +895,30 @@ def test_github_annotation_report_delta(
     )
     assert report_delta.generate(**default_config) == expected_default_output
     assert report_delta.generate(**config) == expected_custom_output
+
+
+def test_delta_reporter__single_file_coverage_changed():
+    import json
+
+    from pycobertura.reporters import JsonReporterDelta
+
+    cobertura1 = make_cobertura('tests/dummy.diffcoverage/old-coverage.xml')
+    cobertura2 = make_cobertura('tests/dummy.diffcoverage/new-coverage.xml')
+
+    report_delta = JsonReporterDelta(cobertura1, cobertura2, show_source=False)
+    assert json.loads(report_delta.generate()) == {
+        "files": [
+            {
+                "Filename": "app/file3.py",
+                "Stmts": "0",
+                "Miss": "-1",
+                "Cover": "+50.00%"
+            }
+        ],
+        "total": {
+            "Filename": "TOTAL",
+            "Stmts": "0",
+            "Miss": "-1",
+            "Cover": "+16.67%"
+        }
+    }

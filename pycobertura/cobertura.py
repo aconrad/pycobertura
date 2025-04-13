@@ -57,6 +57,7 @@ class Cobertura:
         source files referenced in the report. Please check the
         `pycobertura.filesystem` module to learn more about filesystems.
         """
+        errors = []
         for load_func in [
             self._load_from_file,
             self._load_from_string,
@@ -64,10 +65,19 @@ class Cobertura:
             try:
                 self.xml: ET._Element = load_func(report)
                 break
-            except BaseException:
+            except BaseException as e:
+                errors.append(e)
                 pass
         else:
-            raise self.InvalidCoverageReport("Invalid coverage file: {}".format(report))
+            raise self.InvalidCoverageReport(
+                """\
+Invalid coverage report: {}.
+The following exceptions occurred while attempting to parse the report:
+* While treating the report as a filename: {}.
+* While treating the report as an XML Cobertura string: {}""".format(
+                    report, errors[0], errors[1]
+                )
+            )
 
         self.filesystem = filesystem
         self.report = report
@@ -105,32 +115,36 @@ class Cobertura:
         """Return the version number of the coverage report."""
         return self.xml.get("version")
 
-    def line_rate(self, filename=None):
+    def line_rate(self, filename=None, ignore_regex=None):
         """
         Return the global line rate of the coverage report. If the
         `filename` file is given, return the line rate of the file.
         """
 
-        if filename is None:
+        if filename is None and ignore_regex is None:
             return float(self.xml.get("line-rate"))
 
-        elements = self._class_elements_by_file_name[filename]
-        if len(elements) == 1:
-            return float(elements[0].get("line-rate"))
-        else:
-            total = self.total_statements(filename)
-            return float(self.total_hits(filename) / total) if total != 0 else 0
+        if ignore_regex is None:
+            elements = self._class_elements_by_file_name[filename]
+            if len(elements) == 1:
+                return float(elements[0].get("line-rate"))
+        total = self.total_statements(filename, ignore_regex)
+        return (
+            float(self.total_hits(filename, ignore_regex) / total) if total != 0 else 0
+        )
 
     def branch_rate(self, filename=None):
         """
         Return the global branch rate of the coverage report. If the
         `filename` file is given, return the branch rate of the file.
         """
+        branch_rate = None
         if filename is None:
-            return float(self.xml.get("branch-rate"))
+            branch_rate = self.xml.get("branch-rate")
         else:
             classElement = self._class_elements_by_file_name[filename][0]
-            return float(classElement.get("branch-rate"))
+            branch_rate = classElement.get("branch-rate")
+        return None if branch_rate is None else float(branch_rate)
 
     @memoize
     def missed_statements(self, filename):
@@ -221,7 +235,7 @@ class Cobertura:
 
         return lines
 
-    def total_misses(self, filename=None):
+    def total_misses(self, filename=None, ignore_regex=None):
         """
         Return the total number of uncovered statements for the file
         `filename`. If `filename` is not given, return the total
@@ -230,9 +244,14 @@ class Cobertura:
         if filename is not None:
             return len(self.missed_statements(filename))
 
-        return sum([len(self.missed_statements(filename)) for filename in self.files()])
+        return sum(
+            [
+                len(self.missed_statements(filename))
+                for filename in self.files(ignore_regex)
+            ]
+        )
 
-    def total_hits(self, filename=None):
+    def total_hits(self, filename=None, ignore_regex=None):
         """
         Return the total number of covered statements for the file
         `filename`. If `filename` is not given, return the total
@@ -240,10 +259,14 @@ class Cobertura:
         """
         if filename is not None:
             return len(self.hit_statements(filename))
+        return sum(
+            [
+                len(self.hit_statements(filename))
+                for filename in self.files(ignore_regex)
+            ]
+        )
 
-        return sum([len(self.hit_statements(filename)) for filename in self.files()])
-
-    def total_statements(self, filename=None):
+    def total_statements(self, filename=None, ignore_regex=None):
         """
         Return the total number of statements for the file
         `filename`. If `filename` is not given, return the total
@@ -251,9 +274,11 @@ class Cobertura:
         """
         if filename is not None:
             return len(self._get_lines_by_filename(filename))
-
         return sum(
-            [len(self._get_lines_by_filename(filename)) for filename in self.files()]
+            [
+                len(self._get_lines_by_filename(filename))
+                for filename in self.files(ignore_regex)
+            ]
         )
 
     @memoize
@@ -354,14 +379,14 @@ class CoberturaDiff:
 
         total_count = 0.0
         for filename in files:
+            count = [0, 0]
             if self.cobertura1.has_file(filename):
                 method = getattr(self.cobertura1, attr_name)
-                count1 = method(filename)
-            else:
-                count1 = 0.0
-            method = getattr(self.cobertura2, attr_name)
-            count2 = method(filename)
-            total_count += count2 - count1
+                count[0] = method(filename)
+            if self.cobertura2.has_file(filename):
+                method = getattr(self.cobertura2, attr_name)
+                count[1] = method(filename)
+            total_count += count[1] - count[0]
 
         return total_count
 
@@ -394,9 +419,16 @@ class CoberturaDiff:
 
     def files(self, ignore_regex=None):
         """
-        Return `self.cobertura2.files()`.
+        Return the total of all files we're comparing.
         """
-        return self.cobertura2.files(ignore_regex)
+        f = list(
+            set(
+                self.cobertura2.files(ignore_regex)
+                + self.cobertura1.files(ignore_regex)
+            )
+        )
+        f.sort()
+        return f
 
     def file_source(self, filename: str):
         """
@@ -404,17 +436,30 @@ class CoberturaDiff:
         given file `filename`.
 
         """
+        nonexistent = True
         if self.cobertura1.has_file(filename) and self.cobertura1.filesystem.has_file(
             filename
         ):
             lines1 = self.cobertura1.source_lines(filename)
             line_statuses1 = dict(self.cobertura1.line_statuses(filename))
+            nonexistent = False
         else:
             lines1 = []
             line_statuses1: Dict[int, LineStatus] = {}
 
-        lines2 = self.cobertura2.source_lines(filename)
-        line_statuses2 = dict(self.cobertura2.line_statuses(filename))
+        if self.cobertura2.has_file(filename) and self.cobertura2.filesystem.has_file(
+            filename
+        ):
+            lines2 = self.cobertura2.source_lines(filename)
+            line_statuses2 = dict(self.cobertura2.line_statuses(filename))
+            nonexistent = False
+        else:
+            lines2 = []
+            line_statuses2 = {}
+
+        if nonexistent:
+            # try to get source lines anyway, to get the exception traceback
+            self.cobertura2.source_lines(filename)
 
         # Build a dict of lineno2 -> lineno1
         lineno_map = reconcile_lines(lines2, lines1)
