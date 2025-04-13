@@ -42,7 +42,9 @@ pip install pycobertura
 
 ## CLI usage
 
-pycobertura provides a command line interface to report on coverage files.
+pycobertura provides a command line interface `pycobertura` to report on coverage files.
+
+Alternatively, pycobertura can also be invoked as a module with `python -m pycobertura`, see [PEP 338](https://peps.python.org/pep-0338/).
 
 ### Help commands
 
@@ -200,6 +202,18 @@ total:
 
 ```
 
+The following shows how to generate GitHub annotations given a coverage file.
+
+```shell
+$ pycobertura show --format github-annotation tests/cobertura.xml
+::notice file=dummy/dummy.py,line=5,endLine=6,title=pycobertura::not covered
+::notice file=dummy/dummy4.py,line=1,endLine=6,title=pycobertura::not covered
+```
+
+If you run it in GitHub Actions/Apps, the above log generates check annotations.
+
+![Example output of github-annotation formatted pycobertura show command](images/example_github_annotation_show.png)
+
 ### Command `diff`
 
 You can also use the `diff` command to show the difference between two coverage
@@ -269,6 +283,19 @@ pycobertura diff --format yaml tests/dummy.source1/coverage.xml tests/dummy.sour
 ```
 
 ![Example output of yaml formatted pycobertura diff command](images/example_yaml_output.png)
+
+The following shows how to generate GitHub annotations given a coverage file.
+
+```shell
+$ pycobertura diff --format github-annotation tests/dummy.source1/coverage.xml tests/dummy.source2/coverage.xml
+::notice file=dummy/dummy2.py,line=5,endLine=5,title=pycobertura::not covered
+::notice file=dummy/dummy3.py,line=1,endLine=2,title=pycobertura::not covered
+```
+
+If you run it in GitHub Actions/Apps, the above log generates check annotations.
+
+![Example output of github-annotation formatted pycobertura diff command](images/example_github_annotation_diff.png)
+
 
 ### Option to exclude files via --ignore-regex-option
 You can specify the `--ignore-regex` option to exclude files that have a certain pattern either by specifying the path to a `.gitignore` file or by entering a Python regex.
@@ -582,7 +609,7 @@ the line rate the wrong metric to look at when validating coverage.
 The basic idea is that a code base may have technical debt of N uncovered lines
 and you want to prevent N from ever going up.
 
-### pycobertura sounds cool, but how to I generate a Cobertura file?
+### pycobertura sounds cool, but how do I generate a Cobertura file?
 
 Depending on your programing language, you need to find a tool that measures
 code coverage and generates a Cobertura report which is an XML representation

@@ -66,9 +66,9 @@ class ZipFileSystem(FileSystem):
         filename = self.real_filename(filename)
 
         try:
-            f = self.zipfile.open(filename)
-            yield f
-            f.close()
+            with self.zipfile.open(filename) as f:
+                with io.TextIOWrapper(f, encoding="utf-8") as t:
+                    yield t
         except KeyError:
             raise self.FileNotFound(filename)
 

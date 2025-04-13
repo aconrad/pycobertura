@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">                                       
+<coverage lines-valid="8" lines-covered="7" line-rate="0.875" timestamp="1514593481526" complexity="0" version="0.1">   
+  <sources>
+    <source>minimal-coverage</source>
+  </sources>
+  <packages>
+    <class name="app.coffee" filename="app.coffee" line-rate="0.875">
+    </class>
+  </packages>
+</coverage>

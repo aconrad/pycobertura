@@ -2,6 +2,56 @@
 
 ## Unreleased
 
+* Add support for Python 3.12 and 3.13.
+
+## 4.0.0 (2025-04-13)
+
+* Add support for partially covered lines and will be highlighted in yellow.
+
+## 3.3.2 (2024-05-26)
+* Improve error message as to why parsing the Cobertura report failed.
+
+## 3.3.1 (2024-02-17)
+* Fix total stmts, miss and cover values in the coverage report when an ignore
+  regex is passed. Thanks @danctorres
+
+## 3.3.0 (2024-01-14)
+
+* Feat: Support executing pycobertura as a python module with: `python -m
+  pycobertura`. Thanks @paveltsialnou
+
+## 3.2.4 (2023-12-08)
+
+* Fix: `Cobertura.branch_rate()` returns `None` when `branch-rate` is absent
+  from the Cobertura coverage report instead of raising `TypeError`. Thanks
+  @starcruiseromega
+
+## 3.2.3 (2023-10-29)
+
+* Fix: Account for moved/renamed/delted files in miss counts. Thanks @wdouglass
+
+## 3.2.2 (2023-10-10)
+
+* Fix `IndexError: list index out of range` error raised by `pycobertura diff`
+  when number of files with coverage change is less then total number of files
+  in coverage report. Thanks @ulasozguler
+
+## 3.2.1 (2023-06-01)
+
+* Make `ZipFileSystem` read files in text mode to fix diffing mixed file
+  systems. Thanks @ernestask
+* Add Python 3.11 as a supported version. Thanks @ernestask
+
+## 3.2.0 (2023-05-12)
+
+* `pycobertura diff` now supports output format: `github-annotation`. Thanks
+  @goatwu1993
+
+## 3.1.0 (2023-04-29)
+
+* `pycobertura show` now supports output format: `github-annotation`. Thanks
+  @goatwu1993
+
 ## 3.0.0 (2022-10-08)
 
 * BACKWARD INCOMPATIBLE:

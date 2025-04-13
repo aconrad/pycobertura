@@ -1,7 +1,8 @@
 import click
 
-from pycobertura.cobertura import Cobertura
+from pycobertura.cobertura import Cobertura, CoberturaDiff
 from pycobertura.reporters import (
+    GitHubAnnotationReporter,
     HtmlReporter,
     TextReporter,
     CsvReporter,
@@ -14,6 +15,7 @@ from pycobertura.reporters import (
     MarkdownReporterDelta,
     JsonReporterDelta,
     YamlReporterDelta,
+    GitHubAnnotationReporterDelta,
 )
 from pycobertura.filesystem import filesystem_factory
 from pycobertura.utils import get_dir_from_file_path
@@ -28,6 +30,7 @@ reporters = {
     "markdown": MarkdownReporter,
     "json": JsonReporter,
     "yaml": YamlReporter,
+    "github-annotation": GitHubAnnotationReporter,
 }
 
 
@@ -38,7 +41,7 @@ class ExitCodes:
     NOT_ALL_CHANGES_COVERED = 3
 
 
-def get_exit_code(differ, source):
+def get_exit_code(differ: CoberturaDiff, source):
     # Compute the non-zero exit code. This is a 2-step process which involves
     # checking whether code coverage is any better first and then check if all
     # changes are covered (stricter) which can only be done if the source code
@@ -73,6 +76,24 @@ def get_exit_code(differ, source):
     help="Delimiter for csv format, e.g. ,;\n\t",
 )
 @click.option(
+    "--annotation-title",
+    default="pycobertura",
+    type=str,
+    help="annotation title for github annotation format",
+)
+@click.option(
+    "--annotation-level",
+    default="notice",
+    type=str,
+    help="annotation level for github annotation format",
+)
+@click.option(
+    "--annotation-message",
+    default="not covered",
+    type=str,
+    help="annotation message for github annotation format",
+)
+@click.option(
     "-o",
     "--output",
     metavar="<file>",
@@ -96,7 +117,16 @@ def get_exit_code(differ, source):
     "a directory prefix that is not part of the source.",
 )
 def show(
-    cobertura_file, ignore_regex, format, delimiter, output, source, source_prefix
+    cobertura_file,
+    ignore_regex,
+    format,
+    delimiter,
+    output,
+    source,
+    source_prefix,
+    annotation_level,
+    annotation_title,
+    annotation_message,
 ):
     """show coverage summary of a Cobertura report"""
 
@@ -112,6 +142,12 @@ def show(
 
     if format == "csv":
         report = reporter.generate(delimiter)
+    elif format == "github-annotation":
+        report = reporter.generate(
+            annotation_level=annotation_level,
+            annotation_title=annotation_title,
+            annotation_message=annotation_message,
+        )
     else:
         report = reporter.generate()
 
@@ -129,6 +165,7 @@ delta_reporters = {
     "html": HtmlReporterDelta,
     "json": JsonReporterDelta,
     "yaml": YamlReporterDelta,
+    "github-annotation": GitHubAnnotationReporterDelta,
 }
 
 
@@ -216,6 +253,24 @@ directories (or zip archives). If the source is not available at all, pass
     "`--no-source` is passed, missing lines and the source code will "
     "not be displayed.",
 )
+@click.option(
+    "--annotation-title",
+    default="pycobertura",
+    type=str,
+    help="annotation title for github annotation format",
+)
+@click.option(
+    "--annotation-level",
+    default="notice",
+    type=str,
+    help="annotation level for github annotation format",
+)
+@click.option(
+    "--annotation-message",
+    default="not covered",
+    type=str,
+    help="annotation message for github annotation format",
+)
 def diff(
     cobertura_file1,
     cobertura_file2,
@@ -229,6 +284,9 @@ def diff(
     source_prefix1,
     source_prefix2,
     source,
+    annotation_level,
+    annotation_title,
+    annotation_message,
 ):
     """compare coverage of two Cobertura reports"""
     # Assume that the source is located in the same directory as the provided
@@ -258,6 +316,12 @@ def diff(
     reporter = Reporter(*reporter_args, **reporter_kwargs)
     if format == "csv":
         report = reporter.generate(delimiter)
+    elif format == "github-annotation":
+        report = reporter.generate(
+            annotation_level=annotation_level,
+            annotation_message=annotation_message,
+            annotation_title=annotation_title,
+        )
     else:
         report = reporter.generate()
 

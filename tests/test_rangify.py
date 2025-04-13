@@ -1,52 +1,18 @@
-def test_rangify_func__1():
-    from pycobertura.utils import rangify
-
-    assert rangify([1]) == [(1, 1)]
+import pytest
 
 
-def test_rangify_func__1_2():
-    from pycobertura.utils import rangify
+@pytest.mark.parametrize(
+    "line_statuses, expected_output",
+    [
+        ([(1, "hit")], [(1, 1, "hit")]),
+        ([(1, "hit"), (2, "hit")], [(1, 2, "hit")]),
+        ([(1, "hit"), (2, "hit"), (3, "hit")], [(1, 3, "hit")]),
+        ([(1, "hit"), (3, "hit")], [(1, 1, "hit"), (3, 3, "hit")]),
+        ([(1, "hit"), (2, "hit"), (3, "miss"), (4, "hit")], [(1, 2, "hit"), (3, 3, "miss"), (4, 4, "hit")]),
+        ([(1, "hit"), (2, "partial"), (3, "miss"), (4, "hit")], [(1, 1, "hit"), (2, 2, "partial"), (3, 3, "miss"), (4, 4, "hit")]),
+    ],
+)
+def test_rangify_by_status(line_statuses, expected_output):
+    from pycobertura.utils import rangify_by_status
 
-    assert rangify([1, 2]) == [(1, 2)]
-
-
-def test_rangify_func__1_2_3():
-    from pycobertura.utils import rangify
-
-    assert rangify([1, 2, 3]) == [(1, 3)]
-
-
-def test_rangify_func__1_2_3_and_7():
-    from pycobertura.utils import rangify
-
-    assert rangify([1, 2, 3, 7]) == [(1, 3), (7, 7)]
-
-
-def test_rangify_func__1_2_3_and_7_8():
-    from pycobertura.utils import rangify
-
-    assert rangify([1, 2, 3, 7, 8]) == [(1, 3), (7, 8)]
-
-
-def test_rangify_func__1_2_3_and_7_8_9():
-    from pycobertura.utils import rangify
-
-    assert rangify([1, 2, 3, 7, 8, 9]) == [(1, 3), (7, 9)]
-
-
-def test_rangify_func__1_and_7_8_9():
-    from pycobertura.utils import rangify
-
-    assert rangify([1, 7, 8, 9]) == [(1, 1), (7, 9)]
-
-
-def test_rangify_func__1_2_and_7_8_9():
-    from pycobertura.utils import rangify
-
-    assert rangify([1, 2, 7, 8, 9]) == [(1, 2), (7, 9)]
-
-
-def test_rangify_func__1_and_7():
-    from pycobertura.utils import rangify
-
-    assert rangify([1, 7]) == [(1, 1), (7, 7)]
+    assert rangify_by_status(line_statuses) == expected_output
