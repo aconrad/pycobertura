@@ -1,20 +1,22 @@
 import lxml.etree as ET
-
 from collections import namedtuple
-
 from pycobertura.utils import (
+    LineStatus,
+    LineStatusTuple,
     extrapolate_coverage,
+    get_line_status,
     reconcile_lines,
     hunkify_lines,
     get_filenames_that_do_not_match_regex,
     memoize,
 )
 
+from typing import Dict, List, Tuple
+
 try:
-    basestring
-except NameError:  # pragma: no cover
-    # PY3 basestring
-    basestring = (str, bytes)
+    from typing import Literal
+except ImportError:  # pragma: no cover
+    from typing_extensions import Literal
 
 
 class Line(namedtuple("Line", ["number", "source", "status", "reason"])):
@@ -24,7 +26,8 @@ class Line(namedtuple("Line", ["number", "source", "status", "reason"])):
     The namedtuple has the following attributes:
     `number`: line number in the source code
     `source`: actual source code of line
-    `status`: True (covered), False (uncovered) or None (coverage unchanged)
+    `status`: "hit" (covered), "miss" (uncovered), "partial", or None (coverage
+    unchanged)
     `reason`: If `Line.status` is not `None` the possible values may be
         `"line-edit"`, `"cov-up"` or `"cov-down"`. Otherwise `None`.
     """
@@ -60,7 +63,7 @@ class Cobertura:
             self._load_from_string,
         ]:
             try:
-                self.xml = load_func(report)
+                self.xml: ET._Element = load_func(report)
                 break
             except BaseException as e:
                 errors.append(e)
@@ -153,7 +156,8 @@ The following exceptions occurred while attempting to parse the report:
         return [
             int(line.get("number"))
             for classElement in classElements
-            for line in classElement.xpath("./lines/line[@hits=0]")
+            for line in classElement.xpath("./lines/line")
+            if get_line_status(line) != "hit"
         ]
 
     @memoize
@@ -167,9 +171,10 @@ The following exceptions occurred while attempting to parse the report:
             int(line.get("number"))
             for classElement in classElements
             for line in classElement.xpath("./lines/line[@hits>0]")
+            if get_line_status(line) == "hit"
         ]
 
-    def line_statuses(self, filename):
+    def line_statuses(self, filename: str):
         """
         Return a list of tuples `(lineno, status)` of all the lines found in
         the Cobertura report for the given file `filename` where `lineno` is
@@ -177,18 +182,27 @@ The following exceptions occurred while attempting to parse the report:
         be either `True` (line hit) or `False` (line miss).
         """
         line_elements = self._get_lines_by_filename(filename)
-        return [
-            (int(line.get("number")), line.get("hits") != "0") for line in line_elements
-        ]
+
+        output: List[LineStatusTuple] = []
+        for line in line_elements:
+            lineno = int(line.get("number"))
+            status = get_line_status(line)
+            output.append((lineno, status))
+
+        return output
 
     def missed_lines(self, filename):
         """
-        Return a list of extrapolated uncovered line numbers for the
-        file `filename` according to `Cobertura.line_statuses`.
+        Return a list of extrapolated uncovered or partially uncovered line
+        numbers for the file `filename` according to `Cobertura.line_statuses`.
         """
         statuses = self.line_statuses(filename)
-        statuses = extrapolate_coverage(statuses)
-        return [lno for lno, status in statuses if status is False]
+        extrapolated_statuses = extrapolate_coverage(statuses)
+        return [
+            (lineno, status)
+            for lineno, status in extrapolated_statuses
+            if (status == "miss" or status == "partial")
+        ]
 
     def _raise_MissingFileSystem(self, filename):
         raise self.MissingFileSystem(
@@ -298,7 +312,7 @@ The following exceptions occurred while attempting to parse the report:
         return filename in self.files()
 
     @memoize
-    def source_lines(self, filename):
+    def source_lines(self, filename: str):
         """
         Return a list for source lines of file `filename`.
         """
@@ -322,8 +336,8 @@ class CoberturaDiff:
     """
 
     def __init__(self, cobertura1, cobertura2):
-        self.cobertura1 = cobertura1
-        self.cobertura2 = cobertura2
+        self.cobertura1: Cobertura = cobertura1
+        self.cobertura2: Cobertura = cobertura2
 
     def has_better_coverage(self):
         """
@@ -345,7 +359,7 @@ class CoberturaDiff:
                 for line in hunk:
                     if line.reason is None:
                         continue  # line untouched
-                    if line.status is False:
+                    if line.status != "hit":
                         return False  # line not covered
         return True
 
@@ -390,13 +404,17 @@ class CoberturaDiff:
             return self._diff_attr("line_rate", filename)
         return self.cobertura2.line_rate() - self.cobertura1.line_rate()
 
-    def diff_missed_lines(self, filename):
+    def diff_missed_lines(
+        self, filename: str
+    ) -> List[Tuple[int, Literal["miss", "partial"]]]:
         """
-        Return a list of 2-element tuples `(lineno, True)` for uncovered lines.
+        Return a list of 2-element tuples `(lineno, status)` for uncovered lines.
         The given file `filename` where `lineno` is a missed line number.
         """
         return [
-            line.number for line in self.file_source(filename) if line.status is False
+            (line.number, line.status)
+            for line in self.file_source(filename)
+            if (line.status == "miss" or line.status == "partial")
         ]
 
     def files(self, ignore_regex=None):
@@ -412,7 +430,7 @@ class CoberturaDiff:
         f.sort()
         return f
 
-    def file_source(self, filename):
+    def file_source(self, filename: str):
         """
         Return a list of namedtuple `Line` for each line of code found in the
         given file `filename`.
@@ -427,7 +445,7 @@ class CoberturaDiff:
             nonexistent = False
         else:
             lines1 = []
-            line_statuses1 = {}
+            line_statuses1: Dict[int, LineStatus] = {}
 
         if self.cobertura2.has_file(filename) and self.cobertura2.filesystem.has_file(
             filename
@@ -466,14 +484,18 @@ class CoberturaDiff:
                 other_lineno = lineno_map[lineno]
                 line_status1 = line_statuses1.get(other_lineno)
                 line_status2 = line_statuses2.get(lineno)
-                if line_status1 is line_status2:
+                if line_status1 == line_status2:
                     status = None  # unchanged
                     reason = None
-                elif line_status1 is True and line_status2 is False:
-                    status = False  # decreased
+                elif (line_status1 == "hit" and line_status2 != "hit") or (
+                    line_status1 == "partial" and line_status2 == "miss"
+                ):
+                    status = line_status2  # decreased
                     reason = "cov-down"
-                elif line_status1 is False and line_status2 is True:
-                    status = True  # increased
+                elif (line_status1 != "hit" and line_status2 == "hit") or (
+                    line_status1 == "miss" and line_status2 == "partial"
+                ):
+                    status = line_status2  # increased
                     reason = "cov-up"
 
             line = Line(lineno, source, status, reason)

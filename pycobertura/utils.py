@@ -2,8 +2,14 @@ import difflib
 import os
 import re
 import fnmatch
-
 from functools import partial
+
+from typing import List, Tuple, Union
+
+try:
+    from typing import Literal
+except ImportError:  # pragma: no cover
+    from typing_extensions import Literal
 
 ANSI_ESCAPE_CODES = {
     "green": "\x1b[32m",
@@ -12,8 +18,8 @@ ANSI_ESCAPE_CODES = {
 }
 
 
-# Recipe from https://github.com/ActiveState/
-# code/recipes/Python/577452_memoize_decorator_instance/recipe-577452.py
+# Recipe from
+# https://github.com/ActiveState/code/blob/master/recipes/Python/577452_memoize_decorator_instance/recipe-577452.py
 class memoize:
     """cache the return value of a method
 
@@ -33,24 +39,24 @@ class memoize:
     """
 
     def __init__(self, func):
-        self.func = func
+        self.target_func = func
 
     def __get__(self, obj, objtype=None):
         if obj is None:
-            return self.func
+            return self.target_func
         return partial(self, obj)
 
     def __call__(self, *args, **kw):
-        obj = args[0]
+        target_self = args[0]
         try:
-            cache = obj.__cache
+            cache = target_self.__cache
         except AttributeError:
-            cache = obj.__cache = {}
-        key = (self.func, args[1:], frozenset(kw.items()))
+            cache = target_self.__cache = {}
+        key = (self.target_func, args[1:], frozenset(kw.items()))
         try:
             res = cache[key]
         except KeyError:
-            res = cache[key] = self.func(*args, **kw)
+            res = cache[key] = self.target_func(*args, **kw)
         return res
 
 
@@ -67,31 +73,50 @@ def green(text):
     return colorize(text, "green")
 
 
-def rangify(number_list):
-    """Assumes the list is sorted."""
-    if not number_list:
-        return number_list
+LineStatus = Literal["hit", "miss", "partial"]
+LineStatusTuple = Tuple[int, LineStatus]
+LineTupleWithStatusNone = Tuple[int, Union[LineStatus, None]]
+LineRangeWithStatusNone = Tuple[int, int, Union[LineStatus, None]]
 
-    ranges = []
 
-    range_start = prev_num = number_list[0]
-    for num in number_list[1:]:
-        if num != (prev_num + 1):
-            ranges.append((range_start, prev_num))
+def rangify_by_status(line_statuses: List[LineTupleWithStatusNone]):
+    """
+    Returns a list of range tuples that represent continuous segments by status,
+    such as `(range_start, range_end, status)` given a list of sorted
+    non-continuous integers `line_statuses` with their status.
+
+    For example: [(1, "hit"), (2, "hit"), (3, "miss"), (4, "hit")]
+    Would return: [(1, 2, "hit"), (3, 3, "miss"), (4, 4, "hit")]
+    """
+    ranges: List[LineRangeWithStatusNone] = []
+    if not line_statuses:
+        return ranges
+
+    range_start, *_ = prev_num, prev_status = line_statuses[0]
+    for num, status in line_statuses[1:]:
+        if num != (prev_num + 1) or status != prev_status:
+            ranges.append((range_start, prev_num, prev_status))
             range_start = num
         prev_num = num
+        prev_status = status
 
-    ranges.append((range_start, prev_num))
+    ranges.append((range_start, prev_num, prev_status))
     return ranges
 
 
-def stringify(number_list):
+def stringify(line_statuses):
     """Assumes the list is sorted."""
-    rangified_list = rangify(number_list)
-    stringified_list = [
-        f"{line_start}" if line_start == line_stop else f"{line_start}-{line_stop}"
-        for line_start, line_stop in rangified_list
-    ]
+    rangified_list = rangify_by_status(line_statuses)
+
+    stringified_list = []
+    for line_start, line_stop, status in rangified_list:
+        prefix = "~" if status == "partial" else ""
+        if line_start == line_stop:
+            stringified = f"{prefix}{line_start}"
+        else:
+            stringified = f"{prefix}{line_start}-{line_stop}"
+        stringified_list.append(stringified)
+
     return ", ".join(stringified_list)
 
 
@@ -100,35 +125,35 @@ def extrapolate_coverage(lines_w_status):
     Given the following input:
 
     >>> lines_w_status = [
-        (1, True),
-        (4, True),
-        (7, False),
-        (9, False),
+        (1, "hit"),
+        (4, "hit"),
+        (7, "miss"),
+        (9, "miss"),
     ]
 
     Return expanded lines with their extrapolated line status.
 
     >>> extrapolate_coverage(lines_w_status) == [
-        (1, True),
-        (2, True),
-        (3, True),
-        (4, True),
+        (1, "hit"),
+        (2, "hit"),
+        (3, "hit"),
+        (4, "hit"),
         (5, None),
         (6, None),
-        (7, False),
-        (8, False),
-        (9, False),
+        (7, "miss"),
+        (8, "miss"),
+        (9, "miss"),
     ]
 
     """
-    lines = []
+    lines: List[LineTupleWithStatusNone] = []
 
     prev_lineno = 0
-    prev_status = True
+    prev_status = "hit"
     for lineno, status in lines_w_status:
         while (lineno - prev_lineno) > 1:
             prev_lineno += 1
-            if prev_status is status:
+            if prev_status == status:
                 lines.append((prev_lineno, status))
             else:
                 lines.append((prev_lineno, None))
@@ -258,3 +283,29 @@ def get_filenames_that_do_not_match_regex(
     else:
         remove_filenames = list(filter(re.compile(regex_param).match, filenames))
     return [fname for fname in filenames if fname not in remove_filenames]
+
+
+def get_line_status(line):
+    """
+    Returns the line status as "hit", "miss", or "partial". Line is an XML
+    Element from a Cobertura report of type `line`.
+    """
+    condition = line.get("condition-coverage")
+    status: LineStatus
+    if condition:
+        if condition.startswith("100%"):
+            status = "hit"
+        elif condition.startswith("0%"):
+            status = "miss"
+        else:
+            status = "partial"
+    else:
+        status: LineStatus = "miss" if line.get("hits") == "0" else "hit"
+
+    return status
+
+
+def calculate_line_rate(total_statements: int, total_misses: int):
+    return (
+        (total_statements - total_misses) / total_statements if total_statements else 1
+    )

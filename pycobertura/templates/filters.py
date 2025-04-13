@@ -3,8 +3,9 @@ Jinja2 filters meant to be used by templates.
 """
 
 line_status_style = {
-    True: "hit",
-    False: "miss",
+    "hit": "hit",
+    "miss": "miss",
+    "partial": "partial",
     None: "noop",
 }
 
@@ -22,9 +23,20 @@ def is_not_equal_to_dash(arg):
 
 
 def misses_color(arg):
-    if arg.startswith("+") or arg[0].isdigit():
+    if isinstance(arg, str):
+        if arg.startswith("+") or arg[0].isdigit():
+            return "red"
+        return "green"
+
+    *_, status = arg
+    if status == "partial":
+        return "yellow"
+
+    if status == "miss":
         return "red"
-    return "green"
+
+    if status == "hit":
+        return "green"
 
 
 def line_status(line):
