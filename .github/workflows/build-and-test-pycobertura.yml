@@ -33,7 +33,7 @@ jobs:
 
       - name: Upload coverage artifact
         if: ${{ env.GITHUB_REF_NAME == 'master' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cobertura-coverage-${{ github.sha }}-${{ matrix.python-version }}
           path: coverage.xml
