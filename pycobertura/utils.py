@@ -44,7 +44,6 @@ class memoize:
         # Store signature for later use
         self._sig = inspect.signature(self.target_func)
 
-
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self.target_func
@@ -69,17 +68,19 @@ class memoize:
             # (it was bound by __get__ and is args[0])
             bound_args = self._sig.bind(target_self, *method_args, **kw)
         except TypeError:
-             # Handle cases where binding fails (e.g., incorrect arguments passed)
-             # In such cases, don't cache, just call the original function
-             # which will likely raise the TypeError again.
-             return self.target_func(*args, **kw)
+            # Handle cases where binding fails (e.g., incorrect arguments passed)
+            # In such cases, don't cache, just call the original function
+            # which will likely raise the TypeError again.
+            return self.target_func(*args, **kw)
 
-        bound_args.apply_defaults() # Apply defaults for consistent keys
+        bound_args.apply_defaults()  # Apply defaults for consistent keys
 
         # Create a hashable key from the bound arguments *excluding* 'self'
         # Use tuple(bound_args.arguments.items()) which includes param names and values in order
         # Skip the first item, which corresponds to 'self'
-        key_items = tuple(item for item in bound_args.arguments.items() if item[0] != 'self')
+        key_items = tuple(
+            item for item in bound_args.arguments.items() if item[0] != "self"
+        )
         key = (self.target_func, key_items)
 
         try:
