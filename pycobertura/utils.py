@@ -76,8 +76,8 @@ class memoize:
         bound_args.apply_defaults()  # Apply defaults for consistent keys
 
         # Create a hashable key from the bound arguments *excluding* 'self'
-        # Use tuple(bound_args.arguments.items()) which includes param names and values in order
-        # Skip the first item, which corresponds to 'self'
+        # Use tuple(bound_args.arguments.items()) which includes param names
+        # and values in order Skip the first item, which corresponds to 'self'
         key_items = tuple(
             item for item in bound_args.arguments.items() if item[0] != "self"
         )
