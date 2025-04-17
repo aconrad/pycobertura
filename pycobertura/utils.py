@@ -3,6 +3,7 @@ import os
 import re
 import fnmatch
 from functools import partial
+import inspect  # Add import
 
 from typing import List, Tuple, Union
 
@@ -40,22 +41,51 @@ class memoize:
 
     def __init__(self, func):
         self.target_func = func
+        # Store signature for later use
+        self._sig = inspect.signature(self.target_func)
+
 
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self.target_func
+        # Use partial to pre-bind the instance `obj`
         return partial(self, obj)
 
     def __call__(self, *args, **kw):
+        # `args[0]` is the instance pre-bound by `__get__` using `partial`
         target_self = args[0]
+        # The actual arguments passed to the method start from args[1:]
+        method_args = args[1:]
+
         try:
             cache = target_self.__cache
         except AttributeError:
             cache = target_self.__cache = {}
-        key = (self.target_func, args[1:], frozenset(kw.items()))
+
+        # Bind arguments to the function signature to normalize them
+        try:
+            # We pass target_self explicitly here because the signature includes 'self'
+            # but it's not part of the *args received by __call__ in this context
+            # (it was bound by __get__ and is args[0])
+            bound_args = self._sig.bind(target_self, *method_args, **kw)
+        except TypeError:
+             # Handle cases where binding fails (e.g., incorrect arguments passed)
+             # In such cases, don't cache, just call the original function
+             # which will likely raise the TypeError again.
+             return self.target_func(*args, **kw)
+
+        bound_args.apply_defaults() # Apply defaults for consistent keys
+
+        # Create a hashable key from the bound arguments *excluding* 'self'
+        # Use tuple(bound_args.arguments.items()) which includes param names and values in order
+        # Skip the first item, which corresponds to 'self'
+        key_items = tuple(item for item in bound_args.arguments.items() if item[0] != 'self')
+        key = (self.target_func, key_items)
+
         try:
             res = cache[key]
         except KeyError:
+            # Pass the original *args and **kw to the target function
             res = cache[key] = self.target_func(*args, **kw)
         return res
 
