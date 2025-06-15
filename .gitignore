@@ -32,6 +32,7 @@ htmlcov/
 .tox/
 .coverage
 .cache
+.history
 nosetests.xml
 coverage.xml
 junit.xml
