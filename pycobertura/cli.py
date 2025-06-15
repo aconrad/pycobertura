@@ -116,6 +116,12 @@ def get_exit_code(differ: CoberturaDiff, source):
     "the --source is a zip archive and the files were zipped under "
     "a directory prefix that is not part of the source.",
 )
+@click.option(
+    '-cols',
+    '--show-columns', 
+    required=True, 
+    help='List in format [item1,item2,item3]'
+)
 def show(
     cobertura_file,
     ignore_regex,
@@ -127,6 +133,7 @@ def show(
     annotation_level,
     annotation_title,
     annotation_message,
+    show_columns,
 ):
     """show coverage summary of a Cobertura report"""
 
@@ -138,7 +145,7 @@ def show(
         filesystem=filesystem_factory(source, source_prefix=source_prefix),
     )
     Reporter = reporters[format]
-    reporter = Reporter(cobertura, ignore_regex)
+    reporter = Reporter(cobertura, ignore_regex, show_columns)
 
     if format == "csv":
         report = reporter.generate(delimiter)

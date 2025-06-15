@@ -25,9 +25,10 @@ headers_without_missing = ["Filename", "Stmts", "Miss", "Cover"]
 
 
 class Reporter:
-    def __init__(self, cobertura, ignore_regex=None):
+    def __init__(self, cobertura, ignore_regex=None, show_columns=None):
         self.cobertura: Cobertura = cobertura
         self.ignore_regex = ignore_regex
+        self.show_columns = show_columns
 
     @staticmethod
     def format_line_rates(summary_lines):
@@ -39,41 +40,67 @@ class Reporter:
         for i, missing_lines in enumerate(summary_lines["Missing"]):
             summary_lines["Missing"][i] = stringify(missing_lines)
 
-    def get_summary_lines(self):
-        filenames = self.cobertura.files(ignore_regex=self.ignore_regex)
-        summary_lines = {
-            "Filename": filenames.copy(),
-            "Stmts": [],
-            "Miss": [],
-            "Cover": [],
-            "Missing": [],
-        }
-        for filename in filenames:
-            file_statements = self.cobertura.total_statements(
-                filename, ignore_regex=self.ignore_regex
-            )
-            file_misses = self.cobertura.total_misses(
-                filename, ignore_regex=self.ignore_regex
-            )
-            file_rate = calculate_line_rate(file_statements, file_misses)
-            summary_lines["Stmts"].append(file_statements)
-            summary_lines["Miss"].append(file_misses)
-            summary_lines["Cover"].append(file_rate)
-            summary_lines["Missing"].append(self.cobertura.missed_lines(filename))
+    def parse_show_columns(self):
+        # Strip the square brackets if present and split by comma
+        cols = self.show_columns.strip("[]").split(",")
+        # Optional: strip whitespace from each item
+        return [col.strip() for col in cols if col.strip()]
 
-        # Generate TOTAL row
-        total_statements = self.cobertura.total_statements(
-            ignore_regex=self.ignore_regex
-        )
+    def get_filename_row_entry(self, filenames):
+        return filenames + ["Total"]
+
+    def get_stmts_row_entry(self, filenames):
+        file_statements = [
+            self.cobertura.total_statements(filename, ignore_regex=self.ignore_regex)
+            for filename in filenames
+        ]
+        total_statements = [
+            self.cobertura.total_statements(ignore_regex=self.ignore_regex)
+        ]
+        return file_statements + total_statements
+
+    def get_miss_row_entry(self, filenames):
+        file_misses = [
+            self.cobertura.total_misses(filename, ignore_regex=self.ignore_regex)
+            for filename in filenames
+        ]
         total_misses = self.cobertura.total_misses(ignore_regex=self.ignore_regex)
-        total_rate = calculate_line_rate(total_statements, total_misses)
-        summary_lines["Filename"].append("TOTAL")
-        summary_lines["Stmts"].append(total_statements)
-        summary_lines["Miss"].append(total_misses)
-        summary_lines["Cover"].append(total_rate)
-        summary_lines["Missing"].append([])
+        return file_misses + total_misses
 
-        return summary_lines
+    def get_cover_row_entry(self, filenames):
+        file_and_total_statements = self.get_stmts_row_entry(filenames)
+        file_and_total_misses = self.get_miss_row_entry(filenames)
+        file_statements, file_misses = (
+            file_and_total_statements[:-1],
+            file_and_total_misses[:-1],
+        )
+        file_rate = calculate_line_rate(file_statements, file_misses)
+        total_statements, total_misses = (
+            file_and_total_statements[-1],
+            file_and_total_misses[-1],
+        )
+        total_rate = calculate_line_rate(total_statements, total_misses)
+        return file_rate + total_rate
+
+    def get_missing_row_entry(self, filenames):
+        file_missing = [self.cobertura.missed_lines(filename) for filename in filenames]
+        return file_missing + []
+
+    def get_row_entry_by_column_key(self, key):
+        filenames = self.cobertura.files(ignore_regex=self.ignore_regex)
+        if key == "Filename":
+            return self.get_filename_row_entry(filenames)
+        if key == "Stmts":
+            return self.get_stmts_row_entry(filenames)
+        if key == "Miss":
+            return self.get_miss_row_entry(filenames)
+        if key == "Cover":
+            return self.get_cover_row_entry(filenames)
+        if key == "Missing":
+            return self.get_missing_row_entry(filenames)
+
+    def get_summary_lines(self):
+        return {col: self.get_row_entry_by_column_key(col) for col in self.show_columns}
 
     def per_file_stats(self, summary_lines):
         """
@@ -117,19 +144,15 @@ class Reporter:
 
 class TextReporter(Reporter):
     def generate(self):
-        summary_lines = self.get_summary_lines()
-        self.format_line_rates(summary_lines)
-        self.format_missing_lines(summary_lines)
-        return tabulate(summary_lines, headers=headers_with_missing)
+        return tabulate(
+            tabular_data=self.get_summary_lines(), headers=headers_with_missing
+        )
 
 
 class CsvReporter(Reporter):
     def generate(self, delimiter):
         summary_lines = self.get_summary_lines()
-        self.format_line_rates(summary_lines)
-        self.format_missing_lines(summary_lines)
-
-        list_of_lines = [headers_with_missing]
+        list_of_lines = [self.show_columns]
         list_of_lines.extend(
             [[f"{item}" for item in row] for row in zip(*summary_lines.values())]
         )
@@ -143,27 +166,22 @@ class CsvReporter(Reporter):
 
 class MarkdownReporter(Reporter):
     def generate(self):
-        summary_lines = self.get_summary_lines()
-        self.format_line_rates(summary_lines)
-        self.format_missing_lines(summary_lines)
-        return tabulate(summary_lines, headers=headers_with_missing, tablefmt="github")
+        return tabulate(
+            tabular_data=self.get_summary_lines(),
+            headers=headers_with_missing,
+            tablefmt="github",
+        )
 
 
 class JsonReporter(Reporter):
     def generate(self):
-        summary_lines = self.get_summary_lines()
-        self.format_line_rates(summary_lines)
-        self.format_missing_lines(summary_lines)
-        stats_dict = self.per_file_stats(summary_lines)
+        stats_dict = self.per_file_stats(self.get_summary_lines())
         return json.dumps(stats_dict, indent=4)
 
 
 class YamlReporter(Reporter):
     def generate(self):
-        summary_lines = self.get_summary_lines()
-        self.format_line_rates(summary_lines)
-        self.format_missing_lines(summary_lines)
-        stats_dict = self.per_file_stats(summary_lines)
+        stats_dict = self.per_file_stats(self.get_summary_lines())
         # need to write to a buffer as yml packages are using a streaming interface
         buf = io.BytesIO()
         yaml.YAML().dump(stats_dict, buf)
@@ -181,8 +199,6 @@ class HtmlReporter(Reporter):
 
     def generate(self):
         summary_lines = self.get_summary_lines()
-        self.format_line_rates(summary_lines)
-        self.format_missing_lines(summary_lines)
 
         filenames = summary_lines["Filename"]
         sources = []
@@ -211,11 +227,15 @@ class DeltaReporter:
         cobertura2,
         ignore_regex=None,
         show_source=True,
+        show_columns=None,
         *args,
         **kwargs,
     ):
         self.differ = CoberturaDiff(cobertura1, cobertura2)
         self.show_source = show_source
+        self.show_columns = (
+            self.show_columns if self.show_columns else headers_with_missing
+        )
         self.color = kwargs.pop("color", False)
         self.ignore_regex = ignore_regex
 
