@@ -25,9 +25,10 @@ headers_without_missing = ["Filename", "Stmts", "Miss", "Cover"]
 
 
 class Reporter:
-    def __init__(self, cobertura, ignore_regex=None):
+    def __init__(self, cobertura, ignore_regex=None, show_columns=None):
         self.cobertura: Cobertura = cobertura
         self.ignore_regex = ignore_regex
+        self.show_columns = show_columns
 
     @staticmethod
     def format_line_rates(summary_lines):
@@ -72,6 +73,9 @@ class Reporter:
         summary_lines["Miss"].append(total_misses)
         summary_lines["Cover"].append(total_rate)
         summary_lines["Missing"].append([])
+
+        if self.show_columns:
+            summary_lines = {k:v for k, v in summary_lines.items() if k in self.show_columns}
 
         return summary_lines
 
@@ -211,6 +215,7 @@ class DeltaReporter:
         cobertura2,
         ignore_regex=None,
         show_source=True,
+        show_columns = None,
         *args,
         **kwargs,
     ):
@@ -218,6 +223,7 @@ class DeltaReporter:
         self.show_source = show_source
         self.color = kwargs.pop("color", False)
         self.ignore_regex = ignore_regex
+        self.show_columns = show_columns
 
     def format_line_rate(self, line_rate):
         return f"{line_rate:+.2%}" if line_rate else "+100.00%"
@@ -319,6 +325,10 @@ class DeltaReporter:
                 diff_total_missing[i] for i in indexes_of_files_with_changes
             ]
             summary_lines["Missing"].append("")  # for total line
+            
+            
+        if self.show_columns:
+            summary_lines = {k:v for k, v in summary_lines.items() if k in self.show_columns}
 
         return summary_lines
 

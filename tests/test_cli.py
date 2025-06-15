@@ -30,6 +30,264 @@ TOTAL                    4       2  50.00%
     assert result.exit_code == ExitCodes.OK
 
 
+def test_show__format_default_show_columns_combinations_1():
+    from pycobertura.cli import show, ExitCodes
+
+    runner = CliRunner()
+    result = runner.invoke(
+        show,
+        ["tests/dummy.original.xml", "--only-show-columns", '["Filename"]'],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
+Filename
+-----------------
+dummy/__init__.py
+dummy/dummy.py
+TOTAL
+"""
+    )
+    assert result.exit_code == ExitCodes.OK
+
+
+def test_show__format_default_show_columns_combinations_2():
+    from pycobertura.cli import show, ExitCodes
+
+    runner = CliRunner()
+    result = runner.invoke(
+        show,
+        ["tests/dummy.original.xml", "--only-show-columns", '["Filename","Miss"]'],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
+Filename             Miss
+-----------------  ------
+dummy/__init__.py       0
+dummy/dummy.py          2
+TOTAL                   2
+"""
+    )
+    assert result.exit_code == ExitCodes.OK
+
+    result = runner.invoke(
+        show,
+        ["tests/dummy.original.xml", "--only-show-columns", '["Filename","Cover"]'],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
+Filename           Cover
+-----------------  -------
+dummy/__init__.py  0.00%
+dummy/dummy.py     50.00%
+TOTAL              50.00%
+"""
+    )
+
+    assert result.exit_code == ExitCodes.OK
+
+    result = runner.invoke(
+        show,
+        ["tests/dummy.original.xml", "--only-show-columns", '["Cover","Missing"]'],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
+Cover    Missing
+-------  ---------
+0.00%
+50.00%   2, 5
+50.00%
+"""
+    )
+
+    assert result.exit_code == ExitCodes.OK
+
+    result = runner.invoke(
+        show,
+        ["tests/dummy.original.xml", "--only-show-columns", '["Filename","Stmts"]'],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
+Filename             Stmts
+-----------------  -------
+dummy/__init__.py        0
+dummy/dummy.py           4
+TOTAL                    4
+"""
+    )
+
+    assert result.exit_code == ExitCodes.OK
+
+
+def test_show__format_default_show_columns_combinations_3():
+    from pycobertura.cli import show, ExitCodes
+
+    runner = CliRunner()
+    result = runner.invoke(
+        show,
+        [
+            "tests/dummy.original.xml",
+            "--only-show-columns",
+            '["Filename", "Miss", "Missing"]',
+        ],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
+Filename             Miss  Missing
+-----------------  ------  ---------
+dummy/__init__.py       0
+dummy/dummy.py          2  2, 5
+TOTAL                   2
+"""
+    )
+    assert result.exit_code == ExitCodes.OK
+
+    result = runner.invoke(
+        show,
+        [
+            "tests/dummy.original.xml",
+            "--only-show-columns",
+            '["Filename","Miss","Cover"]',
+        ],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
+Filename             Miss  Cover
+-----------------  ------  -------
+dummy/__init__.py       0  0.00%
+dummy/dummy.py          2  50.00%
+TOTAL                   2  50.00%
+"""
+    )
+
+    assert result.exit_code == ExitCodes.OK
+
+    result = runner.invoke(
+        show,
+        [
+            "tests/dummy.original.xml",
+            "--only-show-columns",
+            '["Filename","Cover","Missing"]',
+        ],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
+Filename           Cover    Missing
+-----------------  -------  ---------
+dummy/__init__.py  0.00%
+dummy/dummy.py     50.00%   2, 5
+TOTAL              50.00%
+"""
+    )
+
+    assert result.exit_code == ExitCodes.OK
+
+
+def test_show__format_default_show_columns_combinations_4():
+    from pycobertura.cli import show, ExitCodes
+
+    runner = CliRunner()
+    result = runner.invoke(
+        show,
+        [
+            "tests/dummy.original.xml",
+            "--only-show-columns",
+            '["Filename", "Stmts", "Miss", "Missing"]',
+        ],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
+Filename             Stmts    Miss  Missing
+-----------------  -------  ------  ---------
+dummy/__init__.py        0       0
+dummy/dummy.py           4       2  2, 5
+TOTAL                    4       2
+"""
+    )
+    assert result.exit_code == ExitCodes.OK
+
+    result = runner.invoke(
+        show,
+        [
+            "tests/dummy.original.xml",
+            "--only-show-columns",
+            '["Filename", "Stmts", "Cover", "Missing"]',
+        ],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
+Filename             Stmts  Cover    Missing
+-----------------  -------  -------  ---------
+dummy/__init__.py        0  0.00%
+dummy/dummy.py           4  50.00%   2, 5
+TOTAL                    4  50.00%
+"""
+    )
+    assert result.exit_code == ExitCodes.OK
+
+    result = runner.invoke(
+        show,
+        [
+            "tests/dummy.original.xml",
+            "--only-show-columns",
+            '["Filename", "Stmts", "Miss", "Cover"]',
+        ],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
+Filename             Stmts    Miss  Cover
+-----------------  -------  ------  -------
+dummy/__init__.py        0       0  0.00%
+dummy/dummy.py           4       2  50.00%
+TOTAL                    4       2  50.00%
+"""
+    )
+    assert result.exit_code == ExitCodes.OK
+
+    result = runner.invoke(
+        show,
+        [
+            "tests/dummy.original.xml",
+            "--only-show-columns",
+            '["Stmts", "Miss", "Cover", "Missing"]',
+        ],
+        catch_exceptions=False,
+    )
+    assert (
+        result.output
+        == """\
+  Stmts    Miss  Cover    Missing
+-------  ------  -------  ---------
+      0       0  0.00%
+      4       2  50.00%   2, 5
+      4       2  50.00%
+"""
+    )
+    assert result.exit_code == ExitCodes.OK
+
+
+
 def test_show__format_text():
     from pycobertura.cli import show, ExitCodes
 
