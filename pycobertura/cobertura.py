@@ -2,20 +2,23 @@ import lxml.etree as ET
 import os
 
 from collections import namedtuple
-
 from pycobertura.utils import (
+    LineStatus,
+    LineStatusTuple,
     extrapolate_coverage,
+    get_line_status,
     reconcile_lines,
     hunkify_lines,
     get_filenames_that_do_not_match_regex,
     memoize,
 )
 
+from typing import Dict, List, Tuple
+
 try:
-    basestring
-except NameError:  # pragma: no cover
-    # PY3 basestring
-    basestring = (str, bytes)
+    from typing import Literal
+except ImportError:  # pragma: no cover
+    from typing_extensions import Literal
 
 
 class Line(namedtuple("Line", ["number", "source", "status", "reason"])):
@@ -25,7 +28,8 @@ class Line(namedtuple("Line", ["number", "source", "status", "reason"])):
     The namedtuple has the following attributes:
     `number`: line number in the source code
     `source`: actual source code of line
-    `status`: True (covered), False (uncovered) or None (coverage unchanged)
+    `status`: "hit" (covered), "miss" (uncovered), "partial", or None (coverage
+    unchanged)
     `reason`: If `Line.status` is not `None` the possible values may be
         `"line-edit"`, `"cov-up"` or `"cov-down"`. Otherwise `None`.
     """
@@ -55,14 +59,16 @@ class Cobertura:
         source files referenced in the report. Please check the
         `pycobertura.filesystem` module to learn more about filesystems.
         """
+        errors = []
         for load_func in [
             self._load_from_file,
             self._load_from_string,
         ]:
             try:
-                self.xml = load_func(report)
+                self.xml: ET._Element = load_func(report)
                 break
-            except BaseException:
+            except BaseException as e:
+                errors.append(e)
                 pass
         else:
             if not os.path.exists(report) and filesystem:
@@ -105,32 +111,36 @@ class Cobertura:
         """Return the version number of the coverage report."""
         return self.xml.get("version")
 
-    def line_rate(self, filename=None):
+    def line_rate(self, filename=None, ignore_regex=None):
         """
         Return the global line rate of the coverage report. If the
         `filename` file is given, return the line rate of the file.
         """
 
-        if filename is None:
+        if filename is None and ignore_regex is None:
             return float(self.xml.get("line-rate"))
 
-        elements = self._class_elements_by_file_name[filename]
-        if len(elements) == 1:
-            return float(elements[0].get("line-rate"))
-        else:
-            total = self.total_statements(filename)
-            return float(self.total_hits(filename) / total) if total != 0 else 0
+        if ignore_regex is None:
+            elements = self._class_elements_by_file_name[filename]
+            if len(elements) == 1:
+                return float(elements[0].get("line-rate"))
+        total = self.total_statements(filename, ignore_regex)
+        return (
+            float(self.total_hits(filename, ignore_regex) / total) if total != 0 else 0
+        )
 
     def branch_rate(self, filename=None):
         """
         Return the global branch rate of the coverage report. If the
         `filename` file is given, return the branch rate of the file.
         """
+        branch_rate = None
         if filename is None:
-            return float(self.xml.get("branch-rate"))
+            branch_rate = self.xml.get("branch-rate")
         else:
             classElement = self._class_elements_by_file_name[filename][0]
-            return float(classElement.get("branch-rate"))
+            branch_rate = classElement.get("branch-rate")
+        return None if branch_rate is None else float(branch_rate)
 
     @memoize
     def missed_statements(self, filename):
@@ -142,7 +152,8 @@ class Cobertura:
         return [
             int(line.get("number"))
             for classElement in classElements
-            for line in classElement.xpath("./lines/line[@hits=0]")
+            for line in classElement.xpath("./lines/line")
+            if get_line_status(line) != "hit"
         ]
 
     @memoize
@@ -156,9 +167,10 @@ class Cobertura:
             int(line.get("number"))
             for classElement in classElements
             for line in classElement.xpath("./lines/line[@hits>0]")
+            if get_line_status(line) == "hit"
         ]
 
-    def line_statuses(self, filename):
+    def line_statuses(self, filename: str):
         """
         Return a list of tuples `(lineno, status)` of all the lines found in
         the Cobertura report for the given file `filename` where `lineno` is
@@ -166,18 +178,27 @@ class Cobertura:
         be either `True` (line hit) or `False` (line miss).
         """
         line_elements = self._get_lines_by_filename(filename)
-        return [
-            (int(line.get("number")), line.get("hits") != "0") for line in line_elements
-        ]
+
+        output: List[LineStatusTuple] = []
+        for line in line_elements:
+            lineno = int(line.get("number"))
+            status = get_line_status(line)
+            output.append((lineno, status))
+
+        return output
 
     def missed_lines(self, filename):
         """
-        Return a list of extrapolated uncovered line numbers for the
-        file `filename` according to `Cobertura.line_statuses`.
+        Return a list of extrapolated uncovered or partially uncovered line
+        numbers for the file `filename` according to `Cobertura.line_statuses`.
         """
         statuses = self.line_statuses(filename)
-        statuses = extrapolate_coverage(statuses)
-        return [lno for lno, status in statuses if status is False]
+        extrapolated_statuses = extrapolate_coverage(statuses)
+        return [
+            (lineno, status)
+            for lineno, status in extrapolated_statuses
+            if (status == "miss" or status == "partial")
+        ]
 
     def _raise_MissingFileSystem(self, filename):
         raise self.MissingFileSystem(
@@ -210,7 +231,7 @@ class Cobertura:
 
         return lines
 
-    def total_misses(self, filename=None):
+    def total_misses(self, filename=None, ignore_regex=None):
         """
         Return the total number of uncovered statements for the file
         `filename`. If `filename` is not given, return the total
@@ -219,9 +240,14 @@ class Cobertura:
         if filename is not None:
             return len(self.missed_statements(filename))
 
-        return sum([len(self.missed_statements(filename)) for filename in self.files()])
+        return sum(
+            [
+                len(self.missed_statements(filename))
+                for filename in self.files(ignore_regex)
+            ]
+        )
 
-    def total_hits(self, filename=None):
+    def total_hits(self, filename=None, ignore_regex=None):
         """
         Return the total number of covered statements for the file
         `filename`. If `filename` is not given, return the total
@@ -229,10 +255,14 @@ class Cobertura:
         """
         if filename is not None:
             return len(self.hit_statements(filename))
+        return sum(
+            [
+                len(self.hit_statements(filename))
+                for filename in self.files(ignore_regex)
+            ]
+        )
 
-        return sum([len(self.hit_statements(filename)) for filename in self.files()])
-
-    def total_statements(self, filename=None):
+    def total_statements(self, filename=None, ignore_regex=None):
         """
         Return the total number of statements for the file
         `filename`. If `filename` is not given, return the total
@@ -240,9 +270,11 @@ class Cobertura:
         """
         if filename is not None:
             return len(self._get_lines_by_filename(filename))
-
         return sum(
-            [len(self._get_lines_by_filename(filename)) for filename in self.files()]
+            [
+                len(self._get_lines_by_filename(filename))
+                for filename in self.files(ignore_regex)
+            ]
         )
 
     @memoize
@@ -276,7 +308,7 @@ class Cobertura:
         return filename in self.files()
 
     @memoize
-    def source_lines(self, filename):
+    def source_lines(self, filename: str):
         """
         Return a list for source lines of file `filename`.
         """
@@ -300,8 +332,8 @@ class CoberturaDiff:
     """
 
     def __init__(self, cobertura1, cobertura2):
-        self.cobertura1 = cobertura1
-        self.cobertura2 = cobertura2
+        self.cobertura1: Cobertura = cobertura1
+        self.cobertura2: Cobertura = cobertura2
 
     def has_better_coverage(self):
         """
@@ -323,7 +355,7 @@ class CoberturaDiff:
                 for line in hunk:
                     if line.reason is None:
                         continue  # line untouched
-                    if line.status is False:
+                    if line.status != "hit":
                         return False  # line not covered
         return True
 
@@ -343,14 +375,14 @@ class CoberturaDiff:
 
         total_count = 0.0
         for filename in files:
+            count = [0, 0]
             if self.cobertura1.has_file(filename):
                 method = getattr(self.cobertura1, attr_name)
-                count1 = method(filename)
-            else:
-                count1 = 0.0
-            method = getattr(self.cobertura2, attr_name)
-            count2 = method(filename)
-            total_count += count2 - count1
+                count[0] = method(filename)
+            if self.cobertura2.has_file(filename):
+                method = getattr(self.cobertura2, attr_name)
+                count[1] = method(filename)
+            total_count += count[1] - count[0]
 
         return total_count
 
@@ -368,38 +400,62 @@ class CoberturaDiff:
             return self._diff_attr("line_rate", filename)
         return self.cobertura2.line_rate() - self.cobertura1.line_rate()
 
-    def diff_missed_lines(self, filename):
+    def diff_missed_lines(
+        self, filename: str
+    ) -> List[Tuple[int, Literal["miss", "partial"]]]:
         """
-        Return a list of 2-element tuples `(lineno, True)` for uncovered lines.
+        Return a list of 2-element tuples `(lineno, status)` for uncovered lines.
         The given file `filename` where `lineno` is a missed line number.
         """
         return [
-            line.number for line in self.file_source(filename) if line.status is False
+            (line.number, line.status)
+            for line in self.file_source(filename)
+            if (line.status == "miss" or line.status == "partial")
         ]
 
     def files(self, ignore_regex=None):
         """
-        Return `self.cobertura2.files()`.
+        Return the total of all files we're comparing.
         """
-        return self.cobertura2.files(ignore_regex)
+        f = list(
+            set(
+                self.cobertura2.files(ignore_regex)
+                + self.cobertura1.files(ignore_regex)
+            )
+        )
+        f.sort()
+        return f
 
-    def file_source(self, filename):
+    def file_source(self, filename: str):
         """
         Return a list of namedtuple `Line` for each line of code found in the
         given file `filename`.
 
         """
+        nonexistent = True
         if self.cobertura1.has_file(filename) and self.cobertura1.filesystem.has_file(
             filename
         ):
             lines1 = self.cobertura1.source_lines(filename)
             line_statuses1 = dict(self.cobertura1.line_statuses(filename))
+            nonexistent = False
         else:
             lines1 = []
-            line_statuses1 = {}
+            line_statuses1: Dict[int, LineStatus] = {}
 
-        lines2 = self.cobertura2.source_lines(filename)
-        line_statuses2 = dict(self.cobertura2.line_statuses(filename))
+        if self.cobertura2.has_file(filename) and self.cobertura2.filesystem.has_file(
+            filename
+        ):
+            lines2 = self.cobertura2.source_lines(filename)
+            line_statuses2 = dict(self.cobertura2.line_statuses(filename))
+            nonexistent = False
+        else:
+            lines2 = []
+            line_statuses2 = {}
+
+        if nonexistent:
+            # try to get source lines anyway, to get the exception traceback
+            self.cobertura2.source_lines(filename)
 
         # Build a dict of lineno2 -> lineno1
         lineno_map = reconcile_lines(lines2, lines1)
@@ -424,14 +480,18 @@ class CoberturaDiff:
                 other_lineno = lineno_map[lineno]
                 line_status1 = line_statuses1.get(other_lineno)
                 line_status2 = line_statuses2.get(lineno)
-                if line_status1 is line_status2:
+                if line_status1 == line_status2:
                     status = None  # unchanged
                     reason = None
-                elif line_status1 is True and line_status2 is False:
-                    status = False  # decreased
+                elif (line_status1 == "hit" and line_status2 != "hit") or (
+                    line_status1 == "partial" and line_status2 == "miss"
+                ):
+                    status = line_status2  # decreased
                     reason = "cov-down"
-                elif line_status1 is False and line_status2 is True:
-                    status = True  # increased
+                elif (line_status1 != "hit" and line_status2 == "hit") or (
+                    line_status1 == "miss" and line_status2 == "partial"
+                ):
+                    status = line_status2  # increased
                     reason = "cov-up"
 
             line = Line(lineno, source, status, reason)

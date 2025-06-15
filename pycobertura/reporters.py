@@ -1,6 +1,12 @@
 from jinja2 import Environment, PackageLoader
-from pycobertura.cobertura import CoberturaDiff
-from pycobertura.utils import green, red, stringify
+from pycobertura.cobertura import Cobertura, CoberturaDiff
+from pycobertura.utils import (
+    green,
+    rangify_by_status,
+    red,
+    stringify,
+    calculate_line_rate,
+)
 from pycobertura.templates import filters
 from tabulate import tabulate
 from ruamel import yaml
@@ -19,20 +25,22 @@ env.filters[
 
 headers_with_missing = ["Filename", "Stmts", "Miss", "Cover", "Missing"]
 headers_without_missing = ["Filename", "Stmts", "Miss", "Cover"]
-headers_hideable = headers_without_missing.remove("Filename")
+headers_hideable = headers_without_missing
+headers_hideable.remove("Filename")
 
 
 class Reporter:
     def __init__(self, cobertura, ignore_regex=None, show_columns=[None]):
-        self.cobertura = cobertura
+        self.cobertura: Cobertura = cobertura
         self.ignore_regex = ignore_regex
         self.show_columns = (
             headers_with_missing if None in show_columns else show_columns
         )
 
     @staticmethod
-    def format_line_rate(line_rate):
-        return f"{line_rate:.2%}"
+    def format_line_rates(summary_lines):
+        for i, line_rate in enumerate(summary_lines["Cover"]):
+            summary_lines["Cover"][i] = f"{line_rate:.2%}"
 
     def lines_dict_entry(self, key):
         filenames = self.cobertura.files(ignore_regex=self.ignore_regex)
@@ -61,12 +69,13 @@ class Reporter:
         return rows_func_dict[key] + footer_func_dict[key]
 
     def get_summary_lines(self):
-        lines = {}
+        summary_lines = {}
         for column in self.show_columns:
-            lines[column] = self.lines_dict_entry(column)
-        return lines
+            summary_lines[column] = self.lines_dict_entry(column)
 
-    def per_file_stats(self, file_stats_dict):
+        return summary_lines
+
+    def per_file_stats(self, summary_lines):
         """
         Returns dict with keys `files` and `total` that contain coverage
         statistics per file and overall, respectively.
@@ -90,7 +99,7 @@ class Reporter:
             }
         }
         """
-        file_stats_dict_items = file_stats_dict.items()
+        file_stats_dict_items = summary_lines.items()
         number_of_files = len(self.cobertura.files()) + 1
         file_stats_list = [
             {
@@ -114,10 +123,10 @@ class TextReporter(Reporter):
 
 class CsvReporter(Reporter):
     def generate(self, delimiter):
-        lines = self.get_summary_lines()
+        summary_lines = self.get_summary_lines()
         list_of_lines = [self.show_columns]
         list_of_lines.extend(
-            [[f"{item}" for item in row] for row in zip(*lines.values())]
+            [[f"{item}" for item in row] for row in zip(*summary_lines.values())]
         )
 
         # Explanation here:
@@ -160,18 +169,18 @@ class HtmlReporter(Reporter):
         super(HtmlReporter, self).__init__(*args, **kwargs)
 
     def generate(self):
-        lines = self.get_summary_lines()
+        summary_lines = self.get_summary_lines()
 
+        filenames = summary_lines["Filename"]
         sources = []
         if self.render_file_sources:
-            sources = [
-                (filename, self.cobertura.file_source(filename))
-                for filename in self.cobertura.files()
-            ]
+            for i, filename in enumerate(filenames):
+                if i != len(filenames) - 1:  # exclude TOTAL, not a filename
+                    sources.append((filename, self.cobertura.file_source(filename)))
 
         template = env.get_template("html.jinja2")
-        rows = {k: v[:-1] for k, v in lines.items()}
-        footer = {k: v[-1] for k, v in lines.items()}
+        rows = {k: v[:-1] for k, v in summary_lines.items()}
+        footer = {k: v[-1] for k, v in summary_lines.items()}
 
         return template.render(
             title=self.title,
@@ -211,7 +220,14 @@ class DeltaReporter:
 
     @staticmethod
     def format_missed_lines(missed_lines):
-        return [f"{lno:d}" for lno in missed_lines]
+        output = []
+        if not missed_lines:
+            return output
+
+        for lineno, status in missed_lines:
+            prefix = "~" if status == "partial" else ""
+            output.append(f"{prefix}{lineno:d}")
+        return output
 
     @staticmethod
     def determine_ANSI_color_code_function_of_number(number):
@@ -284,21 +300,18 @@ class DeltaReporter:
 
     def get_summary_lines(self):
         filenames = self.differ.files(ignore_regex=self.ignore_regex)
-        diff_total_stmts = [
-            self.differ.diff_total_statements(filename) for filename in filenames
-        ]
+        diff_total_stmts = []
+        diff_total_miss = []
+        diff_total_cover = []
 
-        diff_total_miss = [
-            self.differ.diff_total_misses(filename) for filename in filenames
-        ]
-
-        diff_total_cover = [
-            self.differ.diff_line_rate(filename) for filename in filenames
-        ]
+        for filename in filenames:
+            diff_total_stmts.append(self.differ.diff_total_statements(filename))
+            diff_total_miss.append(self.differ.diff_total_misses(filename))
+            diff_total_cover.append(self.differ.diff_line_rate(filename))
 
         indexes_of_files_with_changes = [
             i
-            for i in range(len(self.differ.files()))
+            for i in range(len(filenames))
             if any(
                 (
                     diff_total_stmts[i],
@@ -308,11 +321,11 @@ class DeltaReporter:
             )
         ]
 
-        lines = {}
+        summary_lines = {}
 
         for column_name in self.show_columns:
             if column_name != "Missing":
-                lines[column_name] = self.lines_dict_entry(
+                summary_lines[column_name] = self.lines_dict_entry(
                     column_name,
                     indexes_of_files_with_changes,
                     diff_total_stmts,
@@ -321,7 +334,7 @@ class DeltaReporter:
                 )
             else:
                 if self.show_source:
-                    lines["Missing"] = self.lines_dict_entry(
+                    summary_lines["Missing"] = self.lines_dict_entry(
                         "Missing",
                         indexes_of_files_with_changes,
                         diff_total_stmts,
@@ -329,11 +342,11 @@ class DeltaReporter:
                         diff_total_cover,
                     )
 
-        return lines
+        return summary_lines
 
-    def per_file_stats(self, file_stats_dict):
-        file_stats_dict_items = file_stats_dict.items()
-        number_of_files = len(self.differ.files())
+    def per_file_stats(self, summary_lines):
+        file_stats_dict_items = summary_lines.items()
+        number_of_files = len(summary_lines["Filename"])
         file_stats_list = [
             {
                 header_name: header_value[file_index]
@@ -350,23 +363,24 @@ class DeltaReporter:
 
 class TextReporterDelta(DeltaReporter):
     def generate(self):
-        lines = self.get_summary_lines()
+        summary_lines = self.get_summary_lines()
 
         if self.show_source and "Missing" in self.show_columns:
             missed_lines_colored = [
-                self.color_number(line) for line in lines["Missing"]
+                self.color_number([str(m[0]) for m in missing])
+                for missing in summary_lines["Missing"]
             ]
-            lines["Missing"] = missed_lines_colored
-        return tabulate(lines, headers=self.show_columns)
+            summary_lines["Missing"] = missed_lines_colored
+        return tabulate(summary_lines, headers=self.show_columns)
 
 
 class CsvReporterDelta(DeltaReporter):
     def generate(self, delimiter):
-        lines = self.get_summary_lines()
+        summary_lines = self.get_summary_lines()
 
         # lines_values: List of lines dictionary values arranged in
         # tuples of Table row values
-        lines_values = list(zip(*lines.values()))
+        lines_values = list(zip(*summary_lines.values()))
 
         # Stringify every item in Table row values without using the Missing column
         # and store in the list list_of_lines
@@ -379,13 +393,15 @@ class CsvReporterDelta(DeltaReporter):
             # header in every iteration of the tests which would fail them
             list_of_lines[0] = self.show_columns
             # Add to every list inside the list_of_lines the Missing column value
-            for line_index, missing_line in enumerate(lines["Missing"]):
+            for line_index, missing_line in enumerate(summary_lines["Missing"]):
                 # for colors, explanation see here:
                 # https://stackoverflow.com/a/61273717/9698518
+                colored = [
+                    self.color_number(str(lineno_status[0]))
+                    for lineno_status in missing_line
+                ]
                 list_of_lines[line_index + 1] += [
-                    f"{[self.color_number(number) for number in missing_line]}".encode(
-                        "utf-8"
-                    ).decode("unicode_escape")
+                    f"{colored}".encode("utf-8").decode("unicode_escape")
                 ]
 
         # Explanation here:
@@ -397,27 +413,29 @@ class CsvReporterDelta(DeltaReporter):
 
 class MarkdownReporterDelta(DeltaReporter):
     def generate(self):
-        lines = self.get_summary_lines()
+        summary_lines = self.get_summary_lines()
 
         if self.show_source and "Missing" in self.show_columns:
             missed_lines_colored = [
-                self.color_number(line) for line in lines["Missing"]
+                self.color_number([str(m[0]) for m in missing])
+                for missing in summary_lines["Missing"]
             ]
-            lines["Missing"] = missed_lines_colored
-        return tabulate(lines, headers=self.show_columns, tablefmt="github")
+            summary_lines["Missing"] = missed_lines_colored
+        return tabulate(summary_lines, headers=self.show_columns, tablefmt="github")
 
 
 class JsonReporterDelta(DeltaReporter):
     def generate(self):
-        lines = self.get_summary_lines()
+        summary_lines = self.get_summary_lines()
 
         if self.show_source:
             missed_lines_colored = [
-                self.color_number(line) for line in lines["Missing"]
+                self.color_number([str(m[0]) for m in missing])
+                for missing in summary_lines["Missing"]
             ]
-            lines["Missing"] = missed_lines_colored
+            summary_lines["Missing"] = missed_lines_colored
 
-        stats_dict = self.per_file_stats(lines)
+        stats_dict = self.per_file_stats(summary_lines)
 
         json_string = json.dumps(stats_dict, indent=4)
 
@@ -430,15 +448,16 @@ class JsonReporterDelta(DeltaReporter):
 
 class YamlReporterDelta(DeltaReporter):
     def generate(self):
-        lines = self.get_summary_lines()
+        summary_lines = self.get_summary_lines()
 
         if self.show_source:
             missed_lines_colored = [
-                self.color_number(line) for line in lines["Missing"]
+                self.color_number([str(m[0]) for m in missing])
+                for missing in summary_lines["Missing"]
             ]
-            lines["Missing"] = missed_lines_colored
+            summary_lines["Missing"] = missed_lines_colored
 
-        stats_dict = self.per_file_stats(lines)
+        stats_dict = self.per_file_stats(summary_lines)
         # need to write to a buffer as yml packages are using a streaming interface
         buf = io.BytesIO()
         yaml.YAML().dump(stats_dict, buf)
@@ -462,11 +481,11 @@ class HtmlReporterDelta(DeltaReporter):
         super(HtmlReporterDelta, self).__init__(*args, **kwargs)
 
     def generate(self):
-        lines = self.get_summary_lines()
+        summary_lines = self.get_summary_lines()
         template = env.get_template("html-delta.jinja2")
 
-        rows = {k: v[:-1] for k, v in lines.items()}
-        footer = {k: v[-1] for k, v in lines.items()}
+        rows = {k: v[:-1] for k, v in summary_lines.items()}
+        footer = {k: v[-1] for k, v in summary_lines.items()}
 
         render_kwargs = {
             "lines": rows,
@@ -485,3 +504,71 @@ class HtmlReporterDelta(DeltaReporter):
                     )
 
         return template.render(**render_kwargs)
+
+
+class GitHubAnnotationReporter(Reporter):
+    def generate(
+        self,
+        annotation_level: str,
+        annotation_title: str,
+        annotation_message: str,
+    ):
+        file_names = self.cobertura.files(ignore_regex=self.ignore_regex)
+        result_strs = []
+        for file_name in file_names:
+            for range_start, range_end, status in rangify_by_status(
+                self.cobertura.missed_lines(file_name)
+            ):
+                result_strs.append(
+                    self.to_github_annotation_message(
+                        file_name=file_name,
+                        start_line_num=range_start,
+                        end_line_num=range_end,
+                        annotation_level=annotation_level,
+                        annotation_title=annotation_title,
+                        annotation_message=f"{annotation_message} ({status})",
+                    )
+                )
+        result = "\n".join(result_strs)
+        return result
+
+    @staticmethod
+    def to_github_annotation_message(
+        file_name: str,
+        start_line_num: int,
+        end_line_num: int,
+        annotation_level: str,
+        annotation_title: str,
+        annotation_message: str,
+    ):
+        return f"::{annotation_level} file={file_name},line={start_line_num},endLine={end_line_num},title={annotation_title}::{annotation_message}"  # noqa
+
+
+class GitHubAnnotationReporterDelta(DeltaReporter):
+    def generate(
+        self,
+        annotation_level: str,
+        annotation_title: str,
+        annotation_message: str,
+    ):
+        summary_lines = self.get_summary_lines()
+        stats_dict = self.per_file_stats(summary_lines)
+        result_strs = []
+        # import pdb; pdb.set_trace()
+
+        for file_stat in stats_dict["files"]:
+            for range_start, range_end, status in rangify_by_status(
+                file_stat["Missing"]
+            ):
+                result_strs.append(
+                    GitHubAnnotationReporter.to_github_annotation_message(
+                        file_name=file_stat["Filename"],
+                        start_line_num=range_start,
+                        end_line_num=range_end,
+                        annotation_level=annotation_level,
+                        annotation_title=annotation_title,
+                        annotation_message=f"{annotation_message} ({status})",
+                    )
+                )
+        result = "\n".join(result_strs)
+        return result

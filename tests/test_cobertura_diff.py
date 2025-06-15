@@ -16,19 +16,19 @@ def test_diff_class_source():
             Line(2, u'    pass\n', None, None),
             Line(3, u'\n', None, None),
             Line(4, u'def bar():\n', None, None),
-            Line(5, u"    a = 'a'\n", True, 'cov-up'),
-            Line(6, u"    d = 'd'\n", True, 'line-edit')
+            Line(5, u"    a = 'a'\n", "hit", 'cov-up'),
+            Line(6, u"    d = 'd'\n", "hit", 'line-edit')
         ],
         'dummy/dummy2.py': [
             Line(1, u'def baz():\n', None, None),
-            Line(2, u"    c = 'c'\n", True, 'line-edit'),
+            Line(2, u"    c = 'c'\n", "hit", 'line-edit'),
             Line(3, u'\n', None, 'line-edit'),
-            Line(4, u'def bat():\n', True, 'line-edit'),
-            Line(5, u'    pass\n', False, 'cov-down')
+            Line(4, u'def bat():\n', "hit", 'line-edit'),
+            Line(5, u'    pass\n', "miss", 'cov-down')
         ],
         'dummy/dummy3.py': [
-            Line(1, u'def foobar():\n', False, 'line-edit'),
-            Line(2, u'    pass  # This is a very long comment that was purposefully written so we could test how HTML rendering looks like when the boundaries of the page are reached. And here is a non-ascii char: \u015e\n', False, 'line-edit')
+            Line(1, u'def foobar():\n', "miss", 'line-edit'),
+            Line(2, u'    pass  # This is a very long comment that was purposefully written so we could test how HTML rendering looks like when the boundaries of the page are reached. And here is a non-ascii char: \u015e\n', "miss", 'line-edit')
         ],
     }
 
@@ -44,8 +44,16 @@ def test_diff_total_misses():
     cobertura2 = make_cobertura('tests/dummy.source2/coverage.xml')
     differ = CoberturaDiff(cobertura1, cobertura2)
 
-    assert differ.diff_total_misses() == 1
+    assert differ.diff_total_misses() == -4
 
+def test_diff_total_misses_move():
+    from pycobertura.cobertura import CoberturaDiff
+
+    cobertura1 = make_cobertura('tests/dummy.source1/coverage.xml')
+    cobertura2 = make_cobertura('tests/dummy.moved/coverage.xml')
+    differ = CoberturaDiff(cobertura1, cobertura2)
+
+    assert differ.diff_total_misses() == 0
 
 def test_diff_total_misses_by_class_file():
     from pycobertura.cobertura import CoberturaDiff
@@ -102,7 +110,7 @@ def test_diff_same_report_different_source_dirs():
     cobertura2 = make_cobertura('tests/dummy.uncovered.addcode/coverage.xml', source='tests/dummy.uncovered.addcode/dummy/')
     differ = CoberturaDiff(cobertura1, cobertura2)
 
-    assert differ.diff_missed_lines('dummy.py') == [3]
+    assert differ.diff_missed_lines('dummy.py') == [(3, "miss")]
 
 
 def test_diff_total_hits():
@@ -160,3 +168,13 @@ def test_diff__has_not_better_coverage():
     cobertura2 = Cobertura('tests/dummy.zeroexit1/coverage.xml')
     differ = CoberturaDiff(cobertura1, cobertura2)
     assert differ.has_better_coverage() is False
+
+
+def test_diff__mixed_filesystems():
+    from pycobertura.cobertura import Cobertura, CoberturaDiff
+
+    cobertura1 = make_cobertura('tests/dummy.original.xml', source='tests/dummy/dummy.zip')
+    cobertura2 = make_cobertura('tests/dummy.original.xml', source='tests/dummy')
+
+    differ = CoberturaDiff(cobertura1, cobertura2)
+    assert differ.has_all_changes_covered() is True
