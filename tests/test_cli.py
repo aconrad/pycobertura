@@ -36,7 +36,7 @@ def test_show__format_default_show_columns_combinations_1():
     runner = CliRunner()
     result = runner.invoke(
         show,
-        ["tests/dummy.original.xml", "--only-show-columns", '["Filename"]'],
+        ["tests/dummy.original.xml", "--show-columns", "Filename"],
         catch_exceptions=False,
     )
     assert (
@@ -58,7 +58,7 @@ def test_show__format_default_show_columns_combinations_2():
     runner = CliRunner()
     result = runner.invoke(
         show,
-        ["tests/dummy.original.xml", "--only-show-columns", '["Filename","Miss"]'],
+        ["tests/dummy.original.xml", "--show-columns", "Filename,Miss"],
         catch_exceptions=False,
     )
     assert (
@@ -75,7 +75,7 @@ TOTAL                   2
 
     result = runner.invoke(
         show,
-        ["tests/dummy.original.xml", "--only-show-columns", '["Filename","Cover"]'],
+        ["tests/dummy.original.xml", "--show-columns", "Filename,Cover"],
         catch_exceptions=False,
     )
     assert (
@@ -93,7 +93,7 @@ TOTAL              50.00%
 
     result = runner.invoke(
         show,
-        ["tests/dummy.original.xml", "--only-show-columns", '["Cover","Missing"]'],
+        ["tests/dummy.original.xml", "--show-columns", "Cover,Missing"],
         catch_exceptions=False,
     )
     assert (
@@ -111,7 +111,7 @@ Cover    Missing
 
     result = runner.invoke(
         show,
-        ["tests/dummy.original.xml", "--only-show-columns", '["Filename","Stmts"]'],
+        ["tests/dummy.original.xml", "--show-columns", "Filename,Stmts"],
         catch_exceptions=False,
     )
     assert (
@@ -136,8 +136,8 @@ def test_show__format_default_show_columns_combinations_3():
         show,
         [
             "tests/dummy.original.xml",
-            "--only-show-columns",
-            '["Filename", "Miss", "Missing"]',
+            "--show-columns",
+            "Filename,Miss,Missing",
         ],
         catch_exceptions=False,
     )
@@ -157,8 +157,8 @@ TOTAL                   2
         show,
         [
             "tests/dummy.original.xml",
-            "--only-show-columns",
-            '["Filename","Miss","Cover"]',
+            "--show-columns",
+            "Filename,Miss,Cover",
         ],
         catch_exceptions=False,
     )
@@ -179,8 +179,8 @@ TOTAL                   2  50.00%
         show,
         [
             "tests/dummy.original.xml",
-            "--only-show-columns",
-            '["Filename","Cover","Missing"]',
+            "--show-columns",
+            "Filename,Cover,Missing",
         ],
         catch_exceptions=False,
     )
@@ -206,8 +206,8 @@ def test_show__format_default_show_columns_combinations_4():
         show,
         [
             "tests/dummy.original.xml",
-            "--only-show-columns",
-            '["Filename", "Stmts", "Miss", "Missing"]',
+            "--show-columns",
+            "Filename,Stmts,Miss,Missing",
         ],
         catch_exceptions=False,
     )
@@ -227,8 +227,8 @@ TOTAL                    4       2
         show,
         [
             "tests/dummy.original.xml",
-            "--only-show-columns",
-            '["Filename", "Stmts", "Cover", "Missing"]',
+            "--show-columns",
+            "Filename,Stmts,Cover,Missing",
         ],
         catch_exceptions=False,
     )
@@ -248,8 +248,8 @@ TOTAL                    4  50.00%
         show,
         [
             "tests/dummy.original.xml",
-            "--only-show-columns",
-            '["Filename", "Stmts", "Miss", "Cover"]',
+            "--show-columns",
+            "Filename,Stmts,Miss,Cover",
         ],
         catch_exceptions=False,
     )
@@ -269,8 +269,8 @@ TOTAL                    4       2  50.00%
         show,
         [
             "tests/dummy.original.xml",
-            "--only-show-columns",
-            '["Stmts", "Miss", "Cover", "Missing"]',
+            "--show-columns",
+            "Stmts,Miss,Cover,Missing",
         ],
         catch_exceptions=False,
     )
