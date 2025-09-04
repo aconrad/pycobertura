@@ -83,54 +83,69 @@ class GitFileSystem(FileSystem):
         self.prefix = self.repository.replace(self.repository_root, "").lstrip("/")
 
     def real_filename(self, filename):
-        prefix = "{}/".format(self.prefix) if self.prefix else ""
-        return "{ref}:{prefix}{filename}".format(
-            prefix=prefix, ref=self.ref, filename=filename
-        )
+        """
+        Constructs the Git path for a given filename.
+        This method should NOT resolve symlinks on the local disk.
+        """
+        prefix = f"{self.prefix}/" if self.prefix else ""
+        return f"{self.ref}:{prefix}{filename}"
 
     def has_file(self, filename):
-        command = "git --no-pager show {}".format(self.real_filename(filename))
-        return_code = subprocess.call(
+        """
+        Check for a file's existence in the specified commit's tree.
+        """
+        git_path = f"{self.prefix}/{filename}" if self.prefix else filename
+        command = ["git", "ls-tree", "-r", "--name-only", self.ref, "--", git_path]
+        return subprocess.call(
             command,
-            cwd=self.repository,
-            shell=True,
+            cwd=self.repository_root,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
-        )
-        return not bool(return_code)
+        ) == 0
 
     def _get_root_path(self, repository_folder):
-        command = "git rev-parse --show-toplevel"
-        command_tokens = shlex.split(command)
+        command = ["git", "rev-parse", "--show-toplevel"]
         try:
-            output = subprocess.check_output(command_tokens, cwd=repository_folder)
-        except (OSError, subprocess.CalledProcessError):
-            raise ValueError(
-                "The folder {} is not "
-                "a valid git repository.".format(repository_folder)
-            )
-
+            output = subprocess.check_output(command, cwd=repository_folder, stderr=subprocess.DEVNULL)
+        except subprocess.CalledProcessError:
+            raise ValueError(f"The folder {repository_folder} is not a valid git repository.")
         return output.decode("utf-8").rstrip()
 
     @contextmanager
     def open(self, filename):
         """
-        Yield a file-like object for file `filename`.
-
-        This function is a context manager.
+        Yield a file-like object for the given filename, following symlinks if necessary.
         """
-        filename = self.real_filename(filename)
-
-        command = "git --no-pager show {}".format(filename)
-        command_tokens = shlex.split(command)
+        git_path = f"{self.prefix}/{filename}" if self.prefix else filename
+        command = ["git", "cat-file", "--batch", "--follow-symlinks"]
+        input_data = f"{self.ref}:{git_path}\n".encode()
 
         try:
-            output = subprocess.check_output(command_tokens, cwd=self.repository)
-        except (OSError, subprocess.CalledProcessError):
-            raise self.FileNotFound(filename)
+            process = subprocess.Popen(
+                command,
+                cwd=self.repository_root,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            output, error = process.communicate(input=input_data)
+            return_code = process.wait()
 
-        output = output.decode("utf-8").rstrip()
-        yield io.StringIO(output)
+            if return_code != 0:
+                raise subprocess.CalledProcessError(return_code, command, output=output, stderr=error)
+
+            # Parse the batch output to get content
+            lines = output.split(b'\n', 1)
+            # The first line contains object info. If the path doesn't exist, it might contain "missing" or "filtered".
+            first_line = lines[0].decode()
+            if "missing" in first_line or "filtered" in first_line:
+                raise self.FileNotFound(f"File not found in git: {git_path}@{self.ref}")
+
+            content = lines[1]
+            yield io.StringIO(content.decode("utf-8"))
+
+        except (OSError, subprocess.CalledProcessError) as e:
+            raise self.FileNotFound(f"Could not open file in git: {git_path}@{self.ref}") from e
 
 
 def filesystem_factory(source, source_prefix=None, ref=None):
