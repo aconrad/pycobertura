@@ -3,7 +3,6 @@ import os
 import io
 import zipfile
 import subprocess
-import shlex
 
 from contextlib import contextmanager
 
@@ -95,19 +94,25 @@ class GitFileSystem(FileSystem):
         Check for a file's existence in the specified commit's tree.
         """
         git_path = f"{self.prefix}/{filename}" if self.prefix else filename
-        command = ["git", "ls-tree", "-r", "--name-only", self.ref, "--", git_path]
-        return subprocess.call(
+        command = ["git", "cat-file", "--batch-check", "--follow-symlinks", "-Z"]
+        input_data = f"{self.ref}:{git_path}".encode() + b'\x00'
+
+        process = subprocess.Popen(
             command,
             cwd=self.repository_root,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        ) == 0
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        output, error = process.communicate(input=input_data)
+        assert error == b''
+        return not output.endswith(b'missing\x00')
 
     def _get_root_path(self, repository_folder):
         command = ["git", "rev-parse", "--show-toplevel"]
         try:
-            output = subprocess.check_output(command, cwd=repository_folder, stderr=subprocess.DEVNULL)
-        except subprocess.CalledProcessError:
+            output = subprocess.check_output(command, cwd=repository_folder)
+        except (OSError, subprocess.CalledProcessError):
             raise ValueError(f"The folder {repository_folder} is not a valid git repository.")
         return output.decode("utf-8").rstrip()
 
@@ -117,8 +122,8 @@ class GitFileSystem(FileSystem):
         Yield a file-like object for the given filename, following symlinks if necessary.
         """
         git_path = f"{self.prefix}/{filename}" if self.prefix else filename
-        command = ["git", "cat-file", "--batch", "--follow-symlinks"]
-        input_data = f"{self.ref}:{git_path}\n".encode()
+        command = ["git", "cat-file", "--batch", "--follow-symlinks", "-Z"]
+        input_data = f"{self.ref}:{git_path}".encode() + b'\x00'
 
         try:
             process = subprocess.Popen(
@@ -128,24 +133,17 @@ class GitFileSystem(FileSystem):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
             )
-            output, error = process.communicate(input=input_data)
+            output, _ = process.communicate(input=input_data)
             return_code = process.wait()
 
-            if return_code != 0:
-                raise subprocess.CalledProcessError(return_code, command, output=output, stderr=error)
-
-            # Parse the batch output to get content
+            if return_code != 0 or output.endswith(b'missing\x00'):
+                raise self.FileNotFound(self.real_filename(filename))
             lines = output.split(b'\n', 1)
-            # The first line contains object info. If the path doesn't exist, it might contain "missing" or "filtered".
-            first_line = lines[0].decode()
-            if "missing" in first_line or "filtered" in first_line:
-                raise self.FileNotFound(f"File not found in git: {git_path}@{self.ref}")
-
             content = lines[1]
             yield io.StringIO(content.decode("utf-8"))
 
-        except (OSError, subprocess.CalledProcessError) as e:
-            raise self.FileNotFound(f"Could not open file in git: {git_path}@{self.ref}") from e
+        except (OSError, subprocess.CalledProcessError):
+            raise self.FileNotFound(self.real_filename(filename))
 
 
 def filesystem_factory(source, source_prefix=None, ref=None):
