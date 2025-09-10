@@ -104,6 +104,8 @@ class GitFileSystem(FileSystem):
             stderr=subprocess.PIPE,
         )
         output, error = process.communicate(input=input_data)
+        print(output)
+        print(error)
         return not output.endswith(b'missing\x00')
 
     def _get_root_path(self, repository_folder):
@@ -131,7 +133,9 @@ class GitFileSystem(FileSystem):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
             )
-            output, _ = process.communicate(input=input_data)
+            output, error = process.communicate(input=input_data)
+            print(output)
+            print(error)
             return_code = process.wait()
 
             if return_code != 0 or output.endswith(b'missing\x00'):
