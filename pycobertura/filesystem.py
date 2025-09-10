@@ -93,9 +93,8 @@ class GitFileSystem(FileSystem):
         """
         Check for a file's existence in the specified commit's tree.
         """
-        git_path = f"{self.prefix}/{filename}" if self.prefix else filename
         command = ["git", "cat-file", "--batch-check", "--follow-symlinks", "-Z"]
-        input_data = f"{self.ref}:{git_path}".encode() + b'\x00'
+        input_data = self.real_filename(filename).encode() + b'\x00'
 
         process = subprocess.Popen(
             command,
@@ -120,9 +119,9 @@ class GitFileSystem(FileSystem):
         """
         Yield a file-like object for the given filename, following symlinks if necessary.
         """
-        git_path = f"{self.prefix}/{filename}" if self.prefix else filename
         command = ["git", "cat-file", "--batch", "--follow-symlinks", "-Z"]
-        input_data = f"{self.ref}:{git_path}".encode() + b'\x00'
+        real_filename = self.real_filename(filename)
+        input_data = real_filename.encode() + b'\x00'
 
         try:
             process = subprocess.Popen(
@@ -136,13 +135,13 @@ class GitFileSystem(FileSystem):
             return_code = process.wait()
 
             if return_code != 0 or output.endswith(b'missing\x00'):
-                raise self.FileNotFound(self.real_filename(filename))
+                raise self.FileNotFound(real_filename)
             lines = output.split(b'\n', 1)
             content = lines[1]
             yield io.StringIO(content.decode("utf-8"))
 
         except (OSError, subprocess.CalledProcessError):
-            raise self.FileNotFound(self.real_filename(filename))
+            raise self.FileNotFound(real_filename)
 
 
 def filesystem_factory(source, source_prefix=None, ref=None):
