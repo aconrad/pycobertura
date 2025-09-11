@@ -104,9 +104,7 @@ class GitFileSystem(FileSystem):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        output, error = process.communicate(input=input_data)
-        print(output)
-        print(error)
+        output, _ = process.communicate(input=input_data)
         return not output.endswith(b'missing\n')
 
     def _get_root_path(self, repository_folder):
@@ -134,9 +132,7 @@ class GitFileSystem(FileSystem):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
             )
-            output, error = process.communicate(input=input_data)
-            print(output)
-            print(error)
+            output, _ = process.communicate(input=input_data)
             return_code = process.wait()
 
             if return_code != 0 or output.endswith(b'missing\n'):
