@@ -143,7 +143,7 @@ def test_filesystem_git():
         git_filename = fs.real_filename(filename)
         assert git_filename == expected_git_filename
 
-        expected_command = ["git", "cat-file", "--batch", "--follow-symlinks", "-Z"]
+        expected_command = ["git", "cat-file", "--batch", "--follow-symlinks"]
         subprocess_mock.Popen.assert_called_with(expected_command, cwd=repo_root, stdin=subprocess_mock.PIPE,
                                                  stdout=subprocess_mock.PIPE, stderr=subprocess_mock.PIPE)
 

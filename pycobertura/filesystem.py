@@ -93,8 +93,9 @@ class GitFileSystem(FileSystem):
         """
         Check for a file's existence in the specified commit's tree.
         """
-        command = ["git", "cat-file", "--batch-check", "--follow-symlinks", "-Z"]
-        input_data = self.real_filename(filename).encode() + b'\x00'
+        command = ["git", "cat-file", "--batch-check", "--follow-symlinks"]
+        real_filename = self.real_filename(filename)
+        input_data = f"{real_filename}\n".encode()
 
         process = subprocess.Popen(
             command,
@@ -106,7 +107,7 @@ class GitFileSystem(FileSystem):
         output, error = process.communicate(input=input_data)
         print(output)
         print(error)
-        return not output.endswith(b'missing\x00')
+        return not output.endswith(b'missing\n')
 
     def _get_root_path(self, repository_folder):
         command = ["git", "rev-parse", "--show-toplevel"]
@@ -121,9 +122,9 @@ class GitFileSystem(FileSystem):
         """
         Yield a file-like object for the given filename, following symlinks if necessary.
         """
-        command = ["git", "cat-file", "--batch", "--follow-symlinks", "-Z"]
+        command = ["git", "cat-file", "--batch", "--follow-symlinks"]
         real_filename = self.real_filename(filename)
-        input_data = real_filename.encode() + b'\x00'
+        input_data = f"{real_filename}\n".encode()
 
         try:
             process = subprocess.Popen(
@@ -138,7 +139,7 @@ class GitFileSystem(FileSystem):
             print(error)
             return_code = process.wait()
 
-            if return_code != 0 or output.endswith(b'missing\x00'):
+            if return_code != 0 or output.endswith(b'missing\n'):
                 raise self.FileNotFound(real_filename)
             lines = output.split(b'\n', 1)
             content = lines[1]
