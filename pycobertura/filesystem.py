@@ -138,6 +138,8 @@ class GitFileSystem(FileSystem):
             if return_code != 0 or output.endswith(b'missing\n'):
                 raise self.FileNotFound(real_filename)
             lines = output.split(b'\n', 1)
+            if len(lines) < 2:
+                raise self.FileNotFound(real_filename)
             content = lines[1]
             yield io.StringIO(content.decode("utf-8"))
 
