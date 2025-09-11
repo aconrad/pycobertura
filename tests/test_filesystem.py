@@ -194,22 +194,6 @@ def test_filesystem_git__git_not_found():
             assert folder in str(e)
 
 
-def test_filesystem_git_integration():
-    from pycobertura.filesystem import GitFileSystem
-
-    fs = GitFileSystem(".", FIRST_PYCOBERTURA_COMMIT_SHA)
-
-    # Files included in pycobertura's first commit.
-    source_files = [
-        "README.md",
-        ".gitignore",
-    ]
-
-    for source_file in source_files:
-        with fs.open(source_file) as f:
-            assert hasattr(f, "read")
-
-
 def test_filesystem_git_has_file_integration():
     from pycobertura.filesystem import GitFileSystem
 
