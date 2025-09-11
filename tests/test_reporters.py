@@ -528,7 +528,7 @@ def test_html_report_delta():
     html_output = report_delta.generate()
     assert '.red {color: red}' in html_output
     assert '.green {color: green}' in html_output
-    assert '.yellow {color: yellow}' in html_output
+    assert '.yellow {color: #FFD700}' in html_output
     assert "normalize.css" in html_output
     assert "Skeleton V2.0" in html_output
 
