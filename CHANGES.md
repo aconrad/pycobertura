@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+* Improve `GitFileSystem` to support symbolic links by using `git cat-file
+  --batch --follow-symlinks`.
+* Use a slightly darker yellow to highlight partially covered lines.
+
 * Add support for Python 3.12 and 3.13.
 
 ## 4.0.0 (2025-04-13)
