@@ -4,7 +4,8 @@
 
 * Improve `GitFileSystem` to support symbolic links by using `git cat-file
   --batch --follow-symlinks`.
-* Use a slightly darker yellow to highlight partially covered lines.
+* Use a slightly darker yellow in the HTML report for the numbers of
+  partially covered lines, for readability.
 
 * Add support for Python 3.12 and 3.13.
 
