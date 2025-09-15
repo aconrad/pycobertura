@@ -105,14 +105,16 @@ class GitFileSystem(FileSystem):
             stderr=subprocess.PIPE,
         )
         output, _ = process.communicate(input=input_data)
-        return not output.endswith(b'missing\n')
+        return not output.endswith(b"missing\n")
 
     def _get_root_path(self, repository_folder):
         command = ["git", "rev-parse", "--show-toplevel"]
         try:
             output = subprocess.check_output(command, cwd=repository_folder)
         except (OSError, subprocess.CalledProcessError):
-            raise ValueError(f"The folder {repository_folder} is not a valid git repository.")
+            raise ValueError(
+                f"The folder {repository_folder} is not a valid git repository."
+            )
         return output.decode("utf-8").rstrip()
 
     @contextmanager
@@ -135,9 +137,9 @@ class GitFileSystem(FileSystem):
             output, _ = process.communicate(input=input_data)
             return_code = process.wait()
 
-            if return_code != 0 or output.endswith(b'missing\n'):
+            if return_code != 0 or output.endswith(b"missing\n"):
                 raise self.FileNotFound(real_filename)
-            lines = output.split(b'\n', 1)
+            lines = output.split(b"\n", 1)
             if len(lines) < 2:
                 raise self.FileNotFound(real_filename)
             content = lines[1]
