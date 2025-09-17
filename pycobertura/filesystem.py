@@ -80,6 +80,8 @@ class GitFileSystem(FileSystem):
         # the report may have been collected in a subfolder of the repository
         # root. Each file path shall thus be completed by the prefix.
         self.prefix = self.repository.replace(self.repository_root, "").lstrip("/")
+        # Cache submodule paths and commit SHAs for the provided ref
+        self._submodules = self._discover_submodules()
 
     def real_filename(self, filename):
         """
@@ -93,6 +95,22 @@ class GitFileSystem(FileSystem):
         """
         Check for a file's existence in the specified commit's tree.
         """
+        # If the file is within a submodule, query the submodule repository
+        submodule_ctx = self._resolve_submodule_ctx(filename)
+        if submodule_ctx is not None:
+            submodule_root, sub_commit, rel_path = submodule_ctx
+            command = ["git", "cat-file", "--batch-check", "--follow-symlinks"]
+            input_data = f"{sub_commit}:{rel_path}\n".encode()
+            process = subprocess.Popen(
+                command,
+                cwd=submodule_root,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            output, _ = process.communicate(input=input_data)
+            return not output.endswith(b"missing\n")
+
         command = ["git", "cat-file", "--batch-check", "--follow-symlinks"]
         real_filename = self.real_filename(filename)
         input_data = f"{real_filename}\n".encode()
@@ -122,6 +140,34 @@ class GitFileSystem(FileSystem):
         """
         Yield a file-like object for the given filename, following symlinks if necessary.
         """
+        # If the file is within a submodule, read from the submodule repository at the pinned commit
+        submodule_ctx = self._resolve_submodule_ctx(filename)
+        if submodule_ctx is not None:
+            submodule_root, sub_commit, rel_path = submodule_ctx
+            command = ["git", "cat-file", "--batch", "--follow-symlinks"]
+            input_data = f"{sub_commit}:{rel_path}\n".encode()
+            try:
+                process = subprocess.Popen(
+                    command,
+                    cwd=submodule_root,
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                )
+                output, _ = process.communicate(input=input_data)
+                return_code = process.wait()
+
+                if return_code != 0 or output.endswith(b"missing\n"):
+                    raise self.FileNotFound(f"{sub_commit}:{rel_path}")
+                lines = output.split(b"\n", 1)
+                if len(lines) < 2:
+                    raise self.FileNotFound(f"{sub_commit}:{rel_path}")
+                content = lines[1]
+                yield io.StringIO(content.decode("utf-8"))
+                return
+            except (OSError, subprocess.CalledProcessError):
+                raise self.FileNotFound(f"{sub_commit}:{rel_path}")
+
         command = ["git", "cat-file", "--batch", "--follow-symlinks"]
         real_filename = self.real_filename(filename)
         input_data = f"{real_filename}\n".encode()
@@ -147,6 +193,63 @@ class GitFileSystem(FileSystem):
 
         except (OSError, subprocess.CalledProcessError):
             raise self.FileNotFound(real_filename)
+
+    def _discover_submodules(self):
+        """
+        Discover submodule paths and SHAs for the given ref by inspecting the tree.
+        Returns a mapping of submodule path -> commit SHA.
+        """
+        try:
+            output = subprocess.check_output(
+                [
+                    "git",
+                    "ls-tree",
+                    "-r",
+                    "--full-tree",
+                    self.ref,
+                ],
+                cwd=self.repository_root,
+            )
+        except (OSError, subprocess.CalledProcessError):
+            return {}
+
+        submodules = {}
+        for line in output.decode("utf-8", errors="replace").splitlines():
+            # Expected format: "160000 commit <sha>\t<path>"
+            try:
+                meta, path = line.split("\t", 1)
+            except ValueError:
+                continue
+            parts = meta.split()
+            if len(parts) < 3:
+                continue
+            mode, obj_type, sha = parts[0], parts[1], parts[2]
+            if mode == "160000" and obj_type == "commit":
+                submodules[path] = sha
+        return submodules
+
+    def _resolve_submodule_ctx(self, filename):
+        """
+        If the path points into a submodule, return a tuple of
+        (submodule_root_abs_path, submodule_commit_sha, relative_path_inside_submodule).
+        Otherwise, return None.
+        """
+        # Find the longest matching submodule path that prefixes the filename
+        matching = [p for p in self._submodules.keys() if filename == p or filename.startswith(p + "/")]
+        if not matching:
+            return None
+        # Use the longest (deepest) match in case of nested submodules
+        sub_path = max(matching, key=len)
+        sub_sha = self._submodules.get(sub_path)
+        if not sub_sha:
+            return None
+
+        rel_path = filename.removeprefix(sub_path).lstrip("/")
+        submodule_root = os.path.join(self.repository_root, sub_path)
+        if not os.path.isdir(submodule_root):
+            # Submodule not checked out; we cannot read without local checkout of objects
+            return None
+        return (submodule_root, sub_sha, rel_path)
 
 
 def filesystem_factory(source, source_prefix=None, ref=None):
