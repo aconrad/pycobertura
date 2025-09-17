@@ -83,6 +83,53 @@ class GitFileSystem(FileSystem):
         # Cache submodule paths and commit SHAs for the provided ref
         self._submodules = self._discover_submodules()
 
+    def _git_cat_file_check(self, repo_root, spec):
+        """
+        Call `git cat-file --batch-check --follow-symlinks` and return existence as bool.
+        """
+        args = ["git", "cat-file", "--follow-symlinks", "--batch-check"]
+        input_data = f"{spec}\n".encode()
+        try:
+            process = subprocess.Popen(
+                args,
+                cwd=repo_root,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            output, _ = process.communicate(input=input_data)
+            return_code = process.wait()
+        except (OSError, subprocess.CalledProcessError):
+            return False
+        return return_code == 0 and not output.endswith(b"missing\n")
+
+    def _git_cat_file_read(self, repo_root, spec):
+        """
+        Call `git cat-file --batch --follow-symlinks` and return blob content as bytes.
+        Raises FileNotFound if the object is missing or on error.
+        """
+        args = ["git", "cat-file", "--follow-symlinks", "--batch"]
+        input_data = f"{spec}\n".encode()
+        try:
+            process = subprocess.Popen(
+                args,
+                cwd=repo_root,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            output, _ = process.communicate(input=input_data)
+            return_code = process.wait()
+        except (OSError, subprocess.CalledProcessError):
+            raise self.FileNotFound(spec)
+
+        if return_code != 0 or output.endswith(b"missing\n"):
+            raise self.FileNotFound(spec)
+        lines = output.split(b"\n", 1)
+        if len(lines) < 2:
+            raise self.FileNotFound(spec)
+        return lines[1]
+
     def real_filename(self, filename):
         """
         Constructs the Git path for a given filename.
@@ -99,31 +146,10 @@ class GitFileSystem(FileSystem):
         submodule_ctx = self._resolve_submodule_ctx(filename)
         if submodule_ctx is not None:
             submodule_root, sub_commit, rel_path = submodule_ctx
-            command = ["git", "cat-file", "--batch-check", "--follow-symlinks"]
-            input_data = f"{sub_commit}:{rel_path}\n".encode()
-            process = subprocess.Popen(
-                command,
-                cwd=submodule_root,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            output, _ = process.communicate(input=input_data)
-            return not output.endswith(b"missing\n")
+            return self._git_cat_file_check(submodule_root, f"{sub_commit}:{rel_path}")
 
-        command = ["git", "cat-file", "--batch-check", "--follow-symlinks"]
         real_filename = self.real_filename(filename)
-        input_data = f"{real_filename}\n".encode()
-
-        process = subprocess.Popen(
-            command,
-            cwd=self.repository_root,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        output, _ = process.communicate(input=input_data)
-        return not output.endswith(b"missing\n")
+        return self._git_cat_file_check(self.repository_root, real_filename)
 
     def _get_root_path(self, repository_folder):
         command = ["git", "rev-parse", "--show-toplevel"]
@@ -144,55 +170,13 @@ class GitFileSystem(FileSystem):
         submodule_ctx = self._resolve_submodule_ctx(filename)
         if submodule_ctx is not None:
             submodule_root, sub_commit, rel_path = submodule_ctx
-            command = ["git", "cat-file", "--batch", "--follow-symlinks"]
-            input_data = f"{sub_commit}:{rel_path}\n".encode()
-            try:
-                process = subprocess.Popen(
-                    command,
-                    cwd=submodule_root,
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                )
-                output, _ = process.communicate(input=input_data)
-                return_code = process.wait()
-
-                if return_code != 0 or output.endswith(b"missing\n"):
-                    raise self.FileNotFound(f"{sub_commit}:{rel_path}")
-                lines = output.split(b"\n", 1)
-                if len(lines) < 2:
-                    raise self.FileNotFound(f"{sub_commit}:{rel_path}")
-                content = lines[1]
-                yield io.StringIO(content.decode("utf-8"))
-                return
-            except (OSError, subprocess.CalledProcessError):
-                raise self.FileNotFound(f"{sub_commit}:{rel_path}")
-
-        command = ["git", "cat-file", "--batch", "--follow-symlinks"]
-        real_filename = self.real_filename(filename)
-        input_data = f"{real_filename}\n".encode()
-
-        try:
-            process = subprocess.Popen(
-                command,
-                cwd=self.repository_root,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            output, _ = process.communicate(input=input_data)
-            return_code = process.wait()
-
-            if return_code != 0 or output.endswith(b"missing\n"):
-                raise self.FileNotFound(real_filename)
-            lines = output.split(b"\n", 1)
-            if len(lines) < 2:
-                raise self.FileNotFound(real_filename)
-            content = lines[1]
+            content = self._git_cat_file_read(submodule_root, f"{sub_commit}:{rel_path}")
             yield io.StringIO(content.decode("utf-8"))
+            return
 
-        except (OSError, subprocess.CalledProcessError):
-            raise self.FileNotFound(real_filename)
+        real_filename = self.real_filename(filename)
+        content = self._git_cat_file_read(self.repository_root, real_filename)
+        yield io.StringIO(content.decode("utf-8"))
 
     def _discover_submodules(self):
         """
