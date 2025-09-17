@@ -87,7 +87,7 @@ class GitFileSystem(FileSystem):
         """
         Call `git cat-file --batch-check --follow-symlinks` and return existence as bool.
         """
-        args = ["git", "cat-file", "--follow-symlinks", "--batch-check"]
+        args = ["git", "cat-file", "--batch-check", "--follow-symlinks"]
         input_data = f"{spec}\n".encode()
         try:
             process = subprocess.Popen(
@@ -108,7 +108,7 @@ class GitFileSystem(FileSystem):
         Call `git cat-file --batch --follow-symlinks` and return blob content as bytes.
         Raises FileNotFound if the object is missing or on error.
         """
-        args = ["git", "cat-file", "--follow-symlinks", "--batch"]
+        args = ["git", "cat-file", "--batch", "--follow-symlinks"]
         input_data = f"{spec}\n".encode()
         try:
             process = subprocess.Popen(
