@@ -170,7 +170,9 @@ class GitFileSystem(FileSystem):
         submodule_ctx = self._resolve_submodule_ctx(filename)
         if submodule_ctx is not None:
             submodule_root, sub_commit, rel_path = submodule_ctx
-            content = self._git_cat_file_read(submodule_root, f"{sub_commit}:{rel_path}")
+            content = self._git_cat_file_read(
+                submodule_root, f"{sub_commit}:{rel_path}"
+            )
             yield io.StringIO(content.decode("utf-8"))
             return
 
@@ -219,7 +221,11 @@ class GitFileSystem(FileSystem):
         Otherwise, return None.
         """
         # Find the longest matching submodule path that prefixes the filename
-        matching = [p for p in self._submodules.keys() if filename == p or filename.startswith(p + "/")]
+        matching = [
+            p
+            for p in self._submodules.keys()
+            if filename == p or filename.startswith(p + "/")
+        ]
         if not matching:
             return None
         # Use the longest (deepest) match in case of nested submodules
