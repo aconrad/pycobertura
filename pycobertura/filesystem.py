@@ -85,7 +85,8 @@ class GitFileSystem(FileSystem):
 
     def _git_cat_file_check(self, repo_root, spec):
         """
-        Call `git cat-file --batch-check --follow-symlinks` and return existence as bool.
+        Call `git cat-file --batch-check --follow-symlinks`
+        and return existence as bool.
         """
         args = ["git", "cat-file", "--batch-check", "--follow-symlinks"]
         input_data = f"{spec}\n".encode()
@@ -164,9 +165,11 @@ class GitFileSystem(FileSystem):
     @contextmanager
     def open(self, filename):
         """
-        Yield a file-like object for the given filename, following symlinks if necessary.
+        Yield a file-like object for the given filename,
+        following symlinks if necessary.
         """
-        # If the file is within a submodule, read from the submodule repository at the pinned commit
+        # If the file is within a submodule,
+        # read from the submodule repository at the pinned commit
         submodule_ctx = self._resolve_submodule_ctx(filename)
         if submodule_ctx is not None:
             submodule_root, sub_commit, rel_path = submodule_ctx
@@ -237,7 +240,8 @@ class GitFileSystem(FileSystem):
         rel_path = filename.removeprefix(sub_path).lstrip("/")
         submodule_root = os.path.join(self.repository_root, sub_path)
         if not os.path.isdir(submodule_root):
-            # Submodule not checked out; we cannot read without local checkout of objects
+            # Submodule not checked out;
+            # we cannot read without local checkout of objects
             return None
         return (submodule_root, sub_sha, rel_path)
 
