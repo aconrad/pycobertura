@@ -167,6 +167,8 @@ class GitFileSystem(FileSystem):
         """
         Yield a file-like object for the given filename,
         following symlinks if necessary.
+
+        This function is a context manager.
         """
         # If the file is within a submodule,
         # read from the submodule repository at the pinned commit
