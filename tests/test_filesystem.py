@@ -1,5 +1,6 @@
 import subprocess
 from unittest.mock import patch, MagicMock
+import pytest
 
 
 FIRST_PYCOBERTURA_COMMIT_SHA = "d1fe88da6b18340762b24bb1f89067a3439c4041"
@@ -121,21 +122,30 @@ def test_filesystem_git():
     import pycobertura.filesystem as fsm
 
     branch, folder, filename = "master", "tests/dummy", "test-file"
+    repo_root = "/tmp/repo"
 
     with patch.object(fsm, "subprocess") as subprocess_mock:
-        subprocess_mock.check_output = MagicMock(return_value=b"<file-content>")
+        # Mock for _get_root_path
+        subprocess_mock.check_output.return_value = repo_root.encode('utf-8')
+
+        # Mock for open
+        mock_process = MagicMock()
+        mock_process.communicate.return_value = ('some_hash blob 12\n<file-content>'.encode(), b'')
+        mock_process.wait.return_value = 0
+        subprocess_mock.Popen.return_value = mock_process
 
         fs = fsm.GitFileSystem(folder, branch)
 
         with fs.open(filename) as f:
             assert hasattr(f, 'read')
 
-        expected_git_filename = "master:tests/dummy/test-file"
+        expected_git_filename = f"{branch}:{folder}/{filename}"
         git_filename = fs.real_filename(filename)
         assert git_filename == expected_git_filename
 
-        expected_command = ["git", "--no-pager", "show", git_filename]
-        subprocess_mock.check_output.assert_called_with(expected_command, cwd=folder)
+        expected_command = ["git", "cat-file", "--batch", "--follow-symlinks"]
+        subprocess_mock.Popen.assert_called_with(expected_command, cwd=repo_root, stdin=subprocess_mock.PIPE,
+                                                 stdout=subprocess_mock.PIPE, stderr=subprocess_mock.PIPE)
 
 
 def test_filesystem_git_integration():
@@ -184,22 +194,6 @@ def test_filesystem_git__git_not_found():
             assert folder in str(e)
 
 
-def test_filesystem_git_integration():
-    from pycobertura.filesystem import GitFileSystem
-
-    fs = GitFileSystem(".", FIRST_PYCOBERTURA_COMMIT_SHA)
-
-    # Files included in pycobertura's first commit.
-    source_files = [
-        "README.md",
-        ".gitignore",
-    ]
-
-    for source_file in source_files:
-        with fs.open(source_file) as f:
-            assert hasattr(f, "read")
-
-
 def test_filesystem_git_has_file_integration():
     from pycobertura.filesystem import GitFileSystem
 
@@ -222,11 +216,11 @@ def test_filesystem_git_integration__not_found():
 
     dummy_source_file = "CHANGES.md"
 
-    try:
+    with pytest.raises(GitFileSystem.FileNotFound) as excinfo:
         with fs.open(dummy_source_file) as f:
             pass
-    except GitFileSystem.FileNotFound as fnf:
-        assert fnf.path == fs.real_filename(dummy_source_file)
+
+    assert excinfo.value.path == fs.real_filename(dummy_source_file)
 
 
 def test_filesystem_git_has_file_integration__not_found():
