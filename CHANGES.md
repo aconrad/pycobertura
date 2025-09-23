@@ -2,11 +2,14 @@
 
 ## Unreleased
 
+## 4.1.0 (2025-04-13)
+
 * Improve `GitFileSystem` to support symbolic links by using `git cat-file
-  --batch --follow-symlinks`.
-* Improve `GitFileSystem` to support source files located in submodules.
+  --batch --follow-symlinks`. Thanks @JokeWaumans
+* Improve `GitFileSystem` to support source files located in submodules. Thanks
+  @JokeWaumans
 * Use a slightly darker yellow in the HTML report for the numbers of
-  partially covered lines, for readability.
+  partially covered lines, for readability. Thanks @JokeWaumans
 
 * Add support for Python 3.12 and 3.13.
 
