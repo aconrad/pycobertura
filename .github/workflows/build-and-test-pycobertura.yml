@@ -31,6 +31,21 @@ jobs:
       - name: Test with tox
         run: tox
 
+      - name: Download coverage artifact from master (${{ matrix.python-version }})
+        # Only run on PRs targeting master
+        if: github.event_name == 'pull_request' && github.base_ref == 'master'
+        uses: actions/download-artifact@v4
+        with:
+          # Construct the specific artifact name using the target commit SHA
+          name: cobertura-coverage-${{ github.event.pull_request.base.sha }}-${{ matrix.python-version }}
+          # Specify the workflow, branch, and commit to find the artifact from the correct run
+          workflow: ${{ github.workflow }} # Assumes this workflow generated the artifact
+          branch: master
+          commit: ${{ github.event.pull_request.base.sha }}
+          # Specify where to download the artifact (optional, defaults to current dir)
+          path: base-coverage/
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Upload coverage artifact
         if: ${{ github.event_name == 'push' }}
         uses: actions/upload-artifact@v4
