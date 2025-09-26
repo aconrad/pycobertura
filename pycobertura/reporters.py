@@ -20,24 +20,22 @@ env.filters["line_reason"] = filters.line_reason_icon
 env.filters["is_not_equal_to_dash"] = filters.is_not_equal_to_dash
 env.filters["misses_color"] = filters.misses_color
 
-headers_with_missing = ["Filename", "Stmts", "Miss", "Cover", "Missing"]
-headers_without_missing = ["Filename", "Stmts", "Miss", "Cover"]
-
 
 class Reporter:
-    def __init__(self, cobertura, ignore_regex=None):
+    def __init__(self, cobertura, ignore_regex=None, show_columns=None):
         self.cobertura: Cobertura = cobertura
         self.ignore_regex = ignore_regex
+        self.show_columns = show_columns
 
-    @staticmethod
-    def format_line_rates(summary_lines):
-        for i, line_rate in enumerate(summary_lines["Cover"]):
-            summary_lines["Cover"][i] = f"{line_rate:.2%}"
+    def format_line_rates(self, summary_lines):
+        if (not self.show_columns or "Cover" in self.show_columns):
+            for i, line_rate in enumerate(summary_lines["Cover"]):
+                summary_lines["Cover"][i] = f"{line_rate:.2%}"
 
-    @staticmethod
-    def format_missing_lines(summary_lines):
-        for i, missing_lines in enumerate(summary_lines["Missing"]):
-            summary_lines["Missing"][i] = stringify(missing_lines)
+    def format_missing_lines(self, summary_lines):
+        if (not self.show_columns or "Missing" in self.show_columns):
+            for i, missing_lines in enumerate(summary_lines["Missing"]):
+                summary_lines["Missing"][i] = stringify(missing_lines)
 
     def get_summary_lines(self):
         filenames = self.cobertura.files(ignore_regex=self.ignore_regex)
@@ -72,6 +70,9 @@ class Reporter:
         summary_lines["Miss"].append(total_misses)
         summary_lines["Cover"].append(total_rate)
         summary_lines["Missing"].append([])
+
+        if self.show_columns:
+            summary_lines = {k:v for k, v in summary_lines.items() if k in self.show_columns}
 
         return summary_lines
 
@@ -120,25 +121,28 @@ class TextReporter(Reporter):
         summary_lines = self.get_summary_lines()
         self.format_line_rates(summary_lines)
         self.format_missing_lines(summary_lines)
-        return tabulate(summary_lines, headers=headers_with_missing)
+        headers = list(summary_lines.keys())
+        return tabulate(summary_lines, headers=headers)
+
 
 
 class CsvReporter(Reporter):
     def generate(self, delimiter):
         summary_lines = self.get_summary_lines()
+        headers = list(summary_lines.keys())
+        values = list(summary_lines.values())
+
         self.format_line_rates(summary_lines)
         self.format_missing_lines(summary_lines)
 
-        list_of_lines = [headers_with_missing]
-        list_of_lines.extend(
-            [[f"{item}" for item in row] for row in zip(*summary_lines.values())]
-        )
+        list_of_lines = [headers]
+        # Transpose the columns into rows
+        rows = list(zip(*values))
+        list_of_lines.extend(rows)
 
-        # Explanation here:
-        # https://stackoverflow.com/a/55889036/9698518
         delimiter = delimiter.encode().decode("unicode_escape")
 
-        return "\n".join([delimiter.join(line) for line in list_of_lines])
+        return "\n".join([delimiter.join(map(str, line)) for line in list_of_lines])
 
 
 class MarkdownReporter(Reporter):
@@ -146,7 +150,7 @@ class MarkdownReporter(Reporter):
         summary_lines = self.get_summary_lines()
         self.format_line_rates(summary_lines)
         self.format_missing_lines(summary_lines)
-        return tabulate(summary_lines, headers=headers_with_missing, tablefmt="github")
+        return tabulate(summary_lines, headers=list(summary_lines.keys()), tablefmt="github")
 
 
 class JsonReporter(Reporter):
@@ -210,6 +214,7 @@ class DeltaReporter:
         cobertura1,
         cobertura2,
         ignore_regex=None,
+        show_columns = None,
         show_source=True,
         *args,
         **kwargs,
@@ -218,6 +223,7 @@ class DeltaReporter:
         self.show_source = show_source
         self.color = kwargs.pop("color", False)
         self.ignore_regex = ignore_regex
+        self.show_columns = show_columns
 
     def format_line_rate(self, line_rate):
         return f"{line_rate:+.2%}" if line_rate else "+100.00%"
@@ -319,6 +325,10 @@ class DeltaReporter:
                 diff_total_missing[i] for i in indexes_of_files_with_changes
             ]
             summary_lines["Missing"].append("")  # for total line
+            
+            
+        if self.show_columns:
+            summary_lines = {k:v for k, v in summary_lines.items() if k in self.show_columns}
 
         return summary_lines
 
@@ -342,37 +352,31 @@ class DeltaReporter:
 class TextReporterDelta(DeltaReporter):
     def generate(self):
         summary_lines = self.get_summary_lines()
-        headers = headers_without_missing
+        headers = list(summary_lines.keys())
 
-        if self.show_source:
+        if self.show_source and "Missing" in headers:
             missed_lines_colored = [
                 self.color_number([str(m[0]) for m in missing])
                 for missing in summary_lines["Missing"]
             ]
 
             summary_lines["Missing"] = missed_lines_colored
-            headers = headers_with_missing
         return tabulate(summary_lines, headers=headers)
 
 
 class CsvReporterDelta(DeltaReporter):
     def generate(self, delimiter):
         summary_lines = self.get_summary_lines()
-
-        # lines_values: List of lines dictionary values arranged in
-        # tuples of Table row values
-        lines_values = list(zip(*summary_lines.values()))
+        headers = list(summary_lines.keys())
+        values = list(summary_lines.values())
 
         # Stringify every item in Table row values without using the Missing column
         # and store in the list list_of_lines
-        list_of_lines = [headers_without_missing]
-        list_of_lines.extend([[f"{item}" for item in row[:-1]] for row in lines_values])
+        list_of_lines = [headers]
+        rows = list(zip(*values))
+        list_of_lines.extend(rows)
 
-        if self.show_source:
-            # Add the Missing header to list_of_lines first inner list
-            # This is a direct assignment to avoid appending an additional "Missing"
-            # header in every iteration of the tests which would fail them
-            list_of_lines[0] = headers_with_missing
+        if self.show_source and "Missing" in list_of_lines:
             # Add to every list inside the list_of_lines the Missing column value
             for line_index, missing_line in enumerate(summary_lines["Missing"]):
                 # for colors, explanation see here:
@@ -389,21 +393,20 @@ class CsvReporterDelta(DeltaReporter):
         # https://stackoverflow.com/a/55889036/9698518
         delimiter = delimiter.encode().decode("unicode_escape")
 
-        return "\n".join([delimiter.join(line) for line in list_of_lines])
+        return "\n".join([delimiter.join(map(str, line)) for line in list_of_lines])
 
 
 class MarkdownReporterDelta(DeltaReporter):
     def generate(self):
         summary_lines = self.get_summary_lines()
-        headers = headers_without_missing
+        headers = list(summary_lines.keys())
 
-        if self.show_source:
+        if self.show_source and "Missing" in headers:
             missed_lines_colored = [
                 self.color_number([str(m[0]) for m in missing])
                 for missing in summary_lines["Missing"]
             ]
             summary_lines["Missing"] = missed_lines_colored
-            headers = headers_with_missing
         return tabulate(summary_lines, headers=headers, tablefmt="github")
 
 
@@ -411,7 +414,7 @@ class JsonReporterDelta(DeltaReporter):
     def generate(self):
         summary_lines = self.get_summary_lines()
 
-        if self.show_source:
+        if self.show_source and "Missing" in summary_lines.keys():
             missed_lines_colored = [
                 self.color_number([str(m[0]) for m in missing])
                 for missing in summary_lines["Missing"]
@@ -433,7 +436,7 @@ class YamlReporterDelta(DeltaReporter):
     def generate(self):
         summary_lines = self.get_summary_lines()
 
-        if self.show_source:
+        if self.show_source and "Missing" in summary_lines.keys():
             missed_lines_colored = [
                 self.color_number([str(m[0]) for m in missing])
                 for missing in summary_lines["Missing"]

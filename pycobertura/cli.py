@@ -116,6 +116,12 @@ def get_exit_code(differ: CoberturaDiff, source):
     "the --source is a zip archive and the files were zipped under "
     "a directory prefix that is not part of the source.",
 )
+@click.option(
+    '-cols',
+    '--show-columns', 
+    help='String in format item1,item2,item3',
+    multiple=True
+)
 def show(
     cobertura_file,
     ignore_regex,
@@ -127,6 +133,7 @@ def show(
     annotation_level,
     annotation_title,
     annotation_message,
+    show_columns,
 ):
     """show coverage summary of a Cobertura report"""
 
@@ -138,7 +145,7 @@ def show(
         filesystem=filesystem_factory(source, source_prefix=source_prefix),
     )
     Reporter = reporters[format]
-    reporter = Reporter(cobertura, ignore_regex)
+    reporter = Reporter(cobertura, ignore_regex, show_columns)
 
     if format == "csv":
         report = reporter.generate(delimiter)
@@ -271,6 +278,12 @@ directories (or zip archives). If the source is not available at all, pass
     type=str,
     help="annotation message for github annotation format",
 )
+@click.option(
+    '-cols',
+    '--show-columns', 
+    help='String in format item1,item2,item3',
+    multiple=True
+)
 def diff(
     cobertura_file1,
     cobertura_file2,
@@ -287,6 +300,7 @@ def diff(
     annotation_level,
     annotation_title,
     annotation_message,
+    show_columns
 ):
     """compare coverage of two Cobertura reports"""
     # Assume that the source is located in the same directory as the provided
@@ -304,7 +318,7 @@ def diff(
     cobertura2 = Cobertura(cobertura_file2, filesystem=filesystem2)
 
     Reporter = delta_reporters[format]
-    reporter_args = [cobertura1, cobertura2, ignore_regex]
+    reporter_args = [cobertura1, cobertura2, ignore_regex, show_columns]
     reporter_kwargs = {"show_source": source}
 
     isatty = True if output is None else output.isatty()

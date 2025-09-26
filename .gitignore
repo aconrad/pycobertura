@@ -22,6 +22,7 @@ var/
 .installed.cfg
 *.egg
 .eggs
+.venv
 
 # Installer logs
 pip-log.txt
@@ -32,6 +33,7 @@ htmlcov/
 .tox/
 .coverage
 .cache
+.history
 nosetests.xml
 coverage.xml
 junit.xml
