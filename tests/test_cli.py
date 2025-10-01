@@ -1,5 +1,6 @@
 import json
 import os
+from pycobertura.cli import ExitCodes
 import pytest
 from click.testing import CliRunner
 
@@ -12,6 +13,37 @@ def test_exit_codes():
     assert ExitCodes.EXCEPTION == 1
     assert ExitCodes.COVERAGE_WORSENED == 2
     assert ExitCodes.NOT_ALL_CHANGES_COVERED == 3
+    assert ExitCodes.LINE_RATE_BELOW_THRESHOLD == 4
+
+
+@pytest.mark.parametrize("fail_under, exit_code", ((0.1, ExitCodes.OK), (100, ExitCodes.LINE_RATE_BELOW_THRESHOLD)))
+def test_show__fail_under__exit_status(fail_under, exit_code):
+    from pycobertura.cli import show
+
+    runner = CliRunner()
+    result = runner.invoke(show, [
+        'tests/dummy.with-dummy2-better-and-worse.xml',  # has covered AND uncovered lines
+        f'--fail-under={fail_under}',
+    ], catch_exceptions=False)
+    assert result.exit_code == exit_code
+
+
+@pytest.mark.parametrize('fail_under', (-1, 0, 0.0, 100.1, 101))
+def test_show__fail_under__invalid_value(fail_under):
+    from pycobertura.cli import show
+
+    runner = CliRunner()
+    result = runner.invoke(
+        show,
+        ['tests/dummp.original.xml', f'--fail-under={fail_under}'],
+        catch_exceptions=False,
+    )
+    assert result.output == f"""\
+Usage: show [OPTIONS] COBERTURA_FILE
+Try 'show --help' for help.
+
+Error: Invalid value for '--fail-under': {fail_under:.1f} is not in the range 0<x<=100.
+"""
 
 
 def test_show__format_default():
