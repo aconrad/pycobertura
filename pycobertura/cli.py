@@ -39,7 +39,7 @@ class ExitCodes:
     EXCEPTION = 1
     COVERAGE_WORSENED = 2
     NOT_ALL_CHANGES_COVERED = 3
-    LINE_RATE_BELOW_THRESHOLD = 4
+    TOTAL_MISSES_ABOVE_THRESHOLD = 4
 
 
 def get_exit_code(differ: CoberturaDiff, source):
@@ -123,10 +123,11 @@ def get_exit_code(differ: CoberturaDiff, source):
     help="Sort the summary so files with the most uncovered lines appear first.",
 )
 @click.option(
-    "--fail-under",
+    "--fail-threshold",
     metavar="<threshold>",
-    type=click.FloatRange(0, 100, min_open=True),
-    help="Return a non-zero code if the line rate falls below the threshold.",
+    type=click.IntRange(min=1),
+    help="Return a non-zero code if the total number of uncovered statements "
+    "falls above the threshold.",
 )
 def show(
     cobertura_file,
@@ -140,7 +141,7 @@ def show(
     annotation_level,
     annotation_title,
     annotation_message,
-    fail_under,
+    fail_threshold,
 ):
     """show coverage summary of a Cobertura report"""
 
@@ -173,10 +174,9 @@ def show(
     isatty = True if output is None else output.isatty()
     click.echo(report, file=output, nl=isatty)
 
-    if fail_under is not None:
-        line_rate = 100 * cobertura.line_rate()
-        if line_rate < fail_under:
-            raise SystemExit(ExitCodes.LINE_RATE_BELOW_THRESHOLD)
+    if fail_threshold is not None:
+        if cobertura.total_misses() > fail_threshold:
+            raise SystemExit(ExitCodes.TOTAL_MISSES_ABOVE_THRESHOLD)
 
 
 delta_reporters = {

@@ -219,10 +219,10 @@ $ pycobertura show --format github-annotation tests/cobertura.xml
 ::notice file=dummy/dummy4.py,line=1,endLine=6,title=pycobertura::not covered
 ```
 
-The following shows how to return a non-zero exit code when the line rate falls below the specified threshold.
+The following shows how to return a non-zero exit code when the total number of uncovered lines falls above the specified threshold.
 
 ```shell
-$ pycobertura show --fail-under=80 cobertura.xml
+$ pycobertura show --fail-threshold=123 cobertura.xml
 ```
 
 If you run it in GitHub Actions/Apps, the above log generates check annotations.
