@@ -127,7 +127,7 @@ def get_exit_code(differ: CoberturaDiff, source):
     metavar="<threshold>",
     type=click.IntRange(min=1),
     help="Return a non-zero code if the total number of uncovered statements "
-    "falls above the threshold.",
+    "exceeds the threshold.",
 )
 def show(
     cobertura_file,
