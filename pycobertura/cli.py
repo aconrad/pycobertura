@@ -39,6 +39,7 @@ class ExitCodes:
     EXCEPTION = 1
     COVERAGE_WORSENED = 2
     NOT_ALL_CHANGES_COVERED = 3
+    TOTAL_MISSES_ABOVE_THRESHOLD = 4
 
 
 def get_exit_code(differ: CoberturaDiff, source):
@@ -116,6 +117,13 @@ def get_exit_code(differ: CoberturaDiff, source):
     "the --source is a zip archive and the files were zipped under "
     "a directory prefix that is not part of the source.",
 )
+@click.option(
+    "--fail-threshold",
+    metavar="<threshold>",
+    type=click.IntRange(min=1),
+    help="Return a non-zero code if the total number of uncovered statements "
+    "exceeds the threshold.",
+)
 def show(
     cobertura_file,
     ignore_regex,
@@ -127,6 +135,7 @@ def show(
     annotation_level,
     annotation_title,
     annotation_message,
+    fail_threshold,
 ):
     """show coverage summary of a Cobertura report"""
 
@@ -156,6 +165,10 @@ def show(
 
     isatty = True if output is None else output.isatty()
     click.echo(report, file=output, nl=isatty)
+
+    if fail_threshold is not None:
+        if cobertura.total_misses() > fail_threshold:
+            raise SystemExit(ExitCodes.TOTAL_MISSES_ABOVE_THRESHOLD)
 
 
 delta_reporters = {
