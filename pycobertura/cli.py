@@ -154,7 +154,7 @@ def show(
     )
     Reporter = reporters[format]
     reporter_kwargs = {}
-    reporter_kwargs["sort_by_uncovered_lines"] = sort_by_uncovered_lines 
+    reporter_kwargs["sort_by_uncovered_lines"] = sort_by_uncovered_lines
     reporter = Reporter(cobertura, ignore_regex, **reporter_kwargs)
 
     if format == "csv":
