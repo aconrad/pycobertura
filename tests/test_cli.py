@@ -34,7 +34,7 @@ def test_show__fail_threshold__invalid_value(fail_threshold):
     runner = CliRunner()
     result = runner.invoke(
         show,
-        ['tests/dummp.original.xml', f'--fail-threshold={fail_threshold}'],
+        ['tests/dummy.original.xml', f'--fail-threshold={fail_threshold}'],
         catch_exceptions=False,
     )
     assert result.output == f"""\
@@ -52,7 +52,7 @@ def test_show__fail_threshold__invalid_type(fail_threshold):
     runner = CliRunner()
     result = runner.invoke(
         show,
-        ['tests/dummp.original.xml', f'--fail-threshold={fail_threshold}'],
+        ['tests/dummy.original.xml', f'--fail-threshold={fail_threshold}'],
         catch_exceptions=False,
     )
     assert result.output == f"""\
