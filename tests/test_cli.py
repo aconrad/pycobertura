@@ -135,6 +135,27 @@ def test_show__format_html():
     assert result.exit_code == ExitCodes.OK
 
 
+def test_show__format_html__sorted_by_uncovered_lines():
+    from pycobertura.cli import show, ExitCodes
+
+    runner = CliRunner()
+    result = runner.invoke(
+        show,
+        [
+            'tests/dummy.original.xml',
+            '--format',
+            'html',
+            '--sort-html-by-uncovered-lines',
+        ],
+        catch_exceptions=False,
+    )
+    tbody = result.output[
+        result.output.index("<tbody>") : result.output.index("</tbody>")
+    ]
+    assert tbody.index("dummy/dummy.py") < tbody.index("dummy/__init__.py")
+    assert result.exit_code == ExitCodes.OK
+
+
 def test_show__format_json():
     from pycobertura.cli import show, ExitCodes
 

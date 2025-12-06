@@ -177,10 +177,41 @@ class HtmlReporter(Reporter):
         self.no_file_sources_message = kwargs.pop(
             "no_file_sources_message", "Rendering of source files was disabled."
         )
+        self.sort_by_uncovered_lines = kwargs.pop(
+            "sort_by_uncovered_lines", False
+        )
         super(HtmlReporter, self).__init__(*args, **kwargs)
+
+    def _sort_summary_lines(self, summary_lines):
+        """
+        Returns a copy of summary_lines with files sorted by uncovered lines
+        (Miss) descending; TOTAL row remains last.
+        """
+        sorted_summary = {key: [] for key in summary_lines}
+        files_count = len(summary_lines["Filename"]) - 1
+        sorted_indexes = sorted(
+            range(files_count),
+            key=lambda index: (
+                -summary_lines["Miss"][index],
+                summary_lines["Filename"][index],
+            ),
+        )
+
+        for index in sorted_indexes:
+            for key in sorted_summary:
+                sorted_summary[key].append(summary_lines[key][index])
+
+        # keep TOTAL row untouched at the end
+        for key in sorted_summary:
+            sorted_summary[key].append(summary_lines[key][-1])
+
+        return sorted_summary
 
     def generate(self):
         summary_lines = self.get_summary_lines()
+        if self.sort_by_uncovered_lines:
+            summary_lines = self._sort_summary_lines(summary_lines)
+
         self.format_line_rates(summary_lines)
         self.format_missing_lines(summary_lines)
 

@@ -125,6 +125,13 @@ whether lines were covered (green) or not (red).
 pycobertura show --format html --output coverage.html coverage.xml
 ```
 
+To focus on the riskiest files first, the HTML summary can be sorted by the
+number of uncovered lines:
+
+```shell
+pycobertura show --format html --sort-html-by-uncovered-lines --output coverage.html coverage.xml
+```
+
 ![Example output of html formatted pycobertura show command](http://i.imgur.com/BYnXmAp.png)
 
 The following shows how to generate a JSON version of another coverage file.
