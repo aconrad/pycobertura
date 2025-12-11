@@ -25,9 +25,15 @@ headers_without_missing = ["Filename", "Stmts", "Miss", "Cover"]
 
 
 class Reporter:
-    def __init__(self, cobertura, ignore_regex=None):
+    def __init__(
+        self,
+        cobertura,
+        ignore_regex=None,
+        sort_by_uncovered_lines=False,
+    ):
         self.cobertura: Cobertura = cobertura
         self.ignore_regex = ignore_regex
+        self.sort_by_uncovered_lines = sort_by_uncovered_lines
 
     @staticmethod
     def format_line_rates(summary_lines):
@@ -38,6 +44,32 @@ class Reporter:
     def format_missing_lines(summary_lines):
         for i, missing_lines in enumerate(summary_lines["Missing"]):
             summary_lines["Missing"][i] = stringify(missing_lines)
+
+    def _maybe_sort_summary_lines(self, summary_lines):
+        if not self.sort_by_uncovered_lines:
+            return summary_lines
+        return self._sort_summary_lines(summary_lines)
+
+    @staticmethod
+    def _sort_summary_lines(summary_lines):
+        sorted_summary = {key: [] for key in summary_lines}
+        files_count = len(summary_lines["Filename"]) - 1
+        sorted_indexes = sorted(
+            range(files_count),
+            key=lambda index: (
+                -summary_lines["Miss"][index],
+                summary_lines["Filename"][index],
+            ),
+        )
+
+        for index in sorted_indexes:
+            for key in sorted_summary:
+                sorted_summary[key].append(summary_lines[key][index])
+
+        for key in sorted_summary:
+            sorted_summary[key].append(summary_lines[key][-1])
+
+        return sorted_summary
 
     def get_summary_lines(self):
         filenames = self.cobertura.files(ignore_regex=self.ignore_regex)
@@ -73,7 +105,7 @@ class Reporter:
         summary_lines["Cover"].append(total_rate)
         summary_lines["Missing"].append([])
 
-        return summary_lines
+        return self._maybe_sort_summary_lines(summary_lines)
 
     def per_file_stats(self, summary_lines):
         """
@@ -177,40 +209,10 @@ class HtmlReporter(Reporter):
         self.no_file_sources_message = kwargs.pop(
             "no_file_sources_message", "Rendering of source files was disabled."
         )
-        self.sort_by_uncovered_lines = kwargs.pop(
-            "sort_by_uncovered_lines", False
-        )
         super(HtmlReporter, self).__init__(*args, **kwargs)
-
-    def _sort_summary_lines(self, summary_lines):
-        """
-        Returns a copy of summary_lines with files sorted by uncovered lines
-        (Miss) descending; TOTAL row remains last.
-        """
-        sorted_summary = {key: [] for key in summary_lines}
-        files_count = len(summary_lines["Filename"]) - 1
-        sorted_indexes = sorted(
-            range(files_count),
-            key=lambda index: (
-                -summary_lines["Miss"][index],
-                summary_lines["Filename"][index],
-            ),
-        )
-
-        for index in sorted_indexes:
-            for key in sorted_summary:
-                sorted_summary[key].append(summary_lines[key][index])
-
-        # keep TOTAL row untouched at the end
-        for key in sorted_summary:
-            sorted_summary[key].append(summary_lines[key][-1])
-
-        return sorted_summary
 
     def generate(self):
         summary_lines = self.get_summary_lines()
-        if self.sort_by_uncovered_lines:
-            summary_lines = self._sort_summary_lines(summary_lines)
 
         self.format_line_rates(summary_lines)
         self.format_missing_lines(summary_lines)

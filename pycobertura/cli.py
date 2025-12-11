@@ -117,9 +117,9 @@ def get_exit_code(differ: CoberturaDiff, source):
     "a directory prefix that is not part of the source.",
 )
 @click.option(
-    "--sort-html-by-uncovered-lines/--no-sort-html-by-uncovered-lines",
+    "--sort-by-uncovered-lines/--no-sort-by-uncovered-lines",
     default=False,
-    help="Sort HTML output so files with the most uncovered lines appear first.",
+    help="Sort the summary so files with the most uncovered lines appear first.",
 )
 def show(
     cobertura_file,
@@ -129,7 +129,7 @@ def show(
     output,
     source,
     source_prefix,
-    sort_html_by_uncovered_lines,
+    sort_by_uncovered_lines,
     annotation_level,
     annotation_title,
     annotation_message,
@@ -145,8 +145,7 @@ def show(
     )
     Reporter = reporters[format]
     reporter_kwargs = {}
-    if format == "html":
-        reporter_kwargs["sort_by_uncovered_lines"] = sort_html_by_uncovered_lines
+    reporter_kwargs["sort_by_uncovered_lines"] = sort_by_uncovered_lines
 
     reporter = Reporter(cobertura, ignore_regex, **reporter_kwargs)
 
