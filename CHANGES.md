@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+* Add `--sort-by-uncovered-lines` to sort output, so the file with the most missing lines is at the
+  top. Thanks @guettli
+
 ## 4.1.0 (2025-04-13)
 
 * Improve `GitFileSystem` to support symbolic links by using `git cat-file

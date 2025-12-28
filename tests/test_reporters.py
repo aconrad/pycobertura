@@ -432,6 +432,71 @@ def test_html_report__no_source_files_message():
 </html>"""
 
 
+def test_html_report__sorted_by_uncovered_lines():
+    from pycobertura.reporters import HtmlReporter
+
+    cobertura = make_cobertura('tests/dummy.original.xml')
+    report = HtmlReporter(
+        cobertura,
+        render_file_sources=False,
+        sort_by_uncovered_lines=True,
+    )
+    html_output = report.generate()
+
+    assert "normalize.css" in html_output
+    assert "Skeleton V2.0" in html_output
+
+    assert remove_style_tag(html_output) == """\
+<html>
+  <head>
+    <title>pycobertura report</title>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <div class="container">
+      <h1>pycobertura report</h1>
+      <table class="u-full-width">
+        <thead>
+          <tr>
+            <th>Filename</th>
+            <th>Stmts</th>
+            <th>Miss</th>
+            <th>Cover</th>
+            <th>Missing</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>dummy/dummy.py</td>
+            <td>4</td>
+            <td>2</td>
+            <td>50.00%</td>
+            <td>2, 5</td>
+          </tr>
+          <tr>
+            <td>dummy/__init__.py</td>
+            <td>0</td>
+            <td>0</td>
+            <td>100.00%</td>
+            <td></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>TOTAL</td>
+            <td>4</td>
+            <td>2</td>
+            <td>50.00%</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+<p>Rendering of source files was disabled.</p>
+    </div>
+  </body>
+</html>"""
+
+
 def test_text_report_delta__no_source():
     from pycobertura.reporters import TextReporterDelta
 

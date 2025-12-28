@@ -60,3 +60,6 @@ docs/_build/
 
 # Mac OS
 .DS_Store
+
+.venv
+.envrc

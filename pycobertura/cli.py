@@ -116,6 +116,11 @@ def get_exit_code(differ: CoberturaDiff, source):
     "the --source is a zip archive and the files were zipped under "
     "a directory prefix that is not part of the source.",
 )
+@click.option(
+    "--sort-by-uncovered-lines/--no-sort-by-uncovered-lines",
+    default=False,
+    help="Sort the summary so files with the most uncovered lines appear first.",
+)
 def show(
     cobertura_file,
     ignore_regex,
@@ -124,6 +129,7 @@ def show(
     output,
     source,
     source_prefix,
+    sort_by_uncovered_lines,
     annotation_level,
     annotation_title,
     annotation_message,
@@ -138,7 +144,10 @@ def show(
         filesystem=filesystem_factory(source, source_prefix=source_prefix),
     )
     Reporter = reporters[format]
-    reporter = Reporter(cobertura, ignore_regex)
+    reporter_kwargs = {}
+    reporter_kwargs["sort_by_uncovered_lines"] = sort_by_uncovered_lines
+
+    reporter = Reporter(cobertura, ignore_regex, **reporter_kwargs)
 
     if format == "csv":
         report = reporter.generate(delimiter)

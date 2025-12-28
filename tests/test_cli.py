@@ -1,3 +1,4 @@
+import json
 import os
 import pytest
 from click.testing import CliRunner
@@ -132,6 +133,47 @@ def test_show__format_html():
     ], catch_exceptions=False)
     assert result.output.startswith('<html>')
     assert result.output.endswith('</html>\n')
+    assert result.exit_code == ExitCodes.OK
+
+
+def test_show__format_html__sorted_by_uncovered_lines():
+    from pycobertura.cli import show, ExitCodes
+
+    runner = CliRunner()
+    result = runner.invoke(
+        show,
+        [
+            'tests/dummy.original.xml',
+            '--format',
+            'html',
+            '--sort-by-uncovered-lines',
+        ],
+        catch_exceptions=False,
+    )
+    tbody = result.output[
+        result.output.index("<tbody>") : result.output.index("</tbody>")
+    ]
+    assert tbody.index("dummy/dummy.py") < tbody.index("dummy/__init__.py")
+    assert result.exit_code == ExitCodes.OK
+
+
+def test_show__format_json__sorted_by_uncovered_lines():
+    from pycobertura.cli import show, ExitCodes
+
+    runner = CliRunner()
+    result = runner.invoke(
+        show,
+        [
+            'tests/dummy.original.xml',
+            '--format',
+            'json',
+            '--sort-by-uncovered-lines',
+        ],
+        catch_exceptions=False,
+    )
+    payload = json.loads(result.output)
+
+    assert payload["files"][0]["Filename"] == "dummy/dummy.py"
     assert result.exit_code == ExitCodes.OK
 
 
