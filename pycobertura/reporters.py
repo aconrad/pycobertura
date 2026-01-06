@@ -132,7 +132,9 @@ class Reporter:
         }
         """
         file_stats_dict_items = summary_lines.items()
-        number_of_files = len(self.cobertura.files()) + 1
+        # Use length from summary_lines instead of self.cobertura.files()
+        # to account for files filtered by ignore_regex
+        number_of_files = len(summary_lines["Filename"])
         file_stats_list = [
             {
                 header_name: header_value[file_index]
