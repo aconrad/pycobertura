@@ -1061,3 +1061,147 @@ def test_diff__line_status():
         'tests/dummy.linestatus/test2.xml',
     ], catch_exceptions=False)
     assert True
+
+
+def test_show__format_json__with_ignore_regex():
+    """Test JSON format with ignore-regex to verify files are properly filtered."""
+    from pycobertura.cli import show, ExitCodes
+
+    runner = CliRunner()
+    result = runner.invoke(
+        show,
+        ['tests/cobertura.xml', '--format', 'json', '--ignore-regex', '^search/.*'],
+        catch_exceptions=False
+    )
+
+    # Verify it succeeds
+    assert result.exit_code == ExitCodes.OK
+
+    # Verify JSON is valid
+    payload = json.loads(result.output)
+
+    # Verify structure
+    assert 'files' in payload
+    assert 'total' in payload
+
+    # Verify search/ files are excluded
+    filenames = [f['Filename'] for f in payload['files']]
+    search_files = [f for f in filenames if f.startswith('search/')]
+    assert len(search_files) == 0, "search/ files should be filtered out"
+
+    # Verify Main.java is still present
+    assert 'Main.java' in filenames
+
+    # Verify total coverage reflects only Main.java (not search files)
+    assert payload['total']['Filename'] == 'TOTAL'
+    assert payload['total']['Stmts'] == 15
+    assert payload['total']['Miss'] == 0
+    assert payload['total']['Cover'] == '100.00%'
+
+
+def test_show__format_yaml__with_ignore_regex():
+    """Test YAML format with ignore-regex to verify files are properly filtered."""
+    from pycobertura.cli import show, ExitCodes
+
+    runner = CliRunner()
+    result = runner.invoke(
+        show,
+        ['tests/cobertura.xml', '--format', 'yaml', '--ignore-regex', '^search/.*'],
+        catch_exceptions=False
+    )
+
+    # Verify it succeeds
+    assert result.exit_code == ExitCodes.OK
+
+    # Verify YAML output structure
+    assert 'files:' in result.output
+    assert 'total:' in result.output
+
+    # Verify search/ files are excluded
+    assert 'search/' not in result.output, "search/ files should be filtered out"
+
+    # Verify Main.java is still present
+    assert 'Main.java' in result.output
+
+    # Verify total coverage reflects filtered files
+    assert 'Filename: TOTAL' in result.output
+    assert 'Stmts: 15' in result.output
+    assert 'Miss: 0' in result.output
+    assert 'Cover: 100.00%' in result.output
+
+
+def test_diff__format_json__with_ignore_regex():
+    """Test diff JSON format with ignore-regex to verify files are properly filtered."""
+    from pycobertura.cli import diff, ExitCodes
+
+    runner = CliRunner()
+    result = runner.invoke(
+        diff,
+        [
+            'tests/dummy.source1/coverage.xml',
+            'tests/dummy.source2/coverage.xml',
+            '--format', 'json',
+            '--no-color',
+            '--ignore-regex', '^dummy/dummy3.*',
+        ],
+        catch_exceptions=False
+    )
+
+    # Verify it exits with COVERAGE_WORSENED (exit code 2)
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
+
+    # Verify JSON is valid
+    payload = json.loads(result.output)
+
+    # Verify structure
+    assert 'files' in payload
+    assert 'total' in payload
+
+    # Verify dummy/dummy3.py is excluded (it would normally appear in diff)
+    filenames = [f['Filename'] for f in payload['files']]
+    dummy3_files = [f for f in filenames if 'dummy3' in f]
+    assert len(dummy3_files) == 0, "dummy3 files should be filtered out"
+
+    # Verify other files are still present
+    assert 'dummy/dummy.py' in filenames
+    assert 'dummy/dummy2.py' in filenames
+    assert 'dummy/dummy4.py' in filenames
+
+    # Verify total reflects filtered results
+    assert payload['total']['Filename'] == 'TOTAL'
+
+
+def test_diff__format_yaml__with_ignore_regex():
+    """Test diff YAML format with ignore-regex to verify files are properly filtered."""
+    from pycobertura.cli import diff, ExitCodes
+
+    runner = CliRunner()
+    result = runner.invoke(
+        diff,
+        [
+            'tests/dummy.source1/coverage.xml',
+            'tests/dummy.source2/coverage.xml',
+            '--format', 'yaml',
+            '--no-color',
+            '--ignore-regex', '^dummy/dummy3.*',
+        ],
+        catch_exceptions=False
+    )
+
+    # Verify it exits with COVERAGE_WORSENED (exit code 2)
+    assert result.exit_code == ExitCodes.COVERAGE_WORSENED
+
+    # Verify YAML output structure
+    assert 'files:' in result.output
+    assert 'total:' in result.output
+
+    # Verify dummy/dummy3.py is excluded
+    assert 'dummy3' not in result.output, "dummy3 files should be filtered out"
+
+    # Verify other files are still present
+    assert 'dummy/dummy.py' in result.output
+    assert 'dummy/dummy2.py' in result.output
+    assert 'dummy/dummy4.py' in result.output
+
+    # Verify total is present
+    assert 'Filename: TOTAL' in result.output
