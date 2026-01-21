@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage line-rate="0.75" branch-rate="0.60" lines-covered="750" lines-valid="1000" branches-covered="60" branches-valid="100">
+    <packages>
+        <package name="com.example.package1">
+            <classes>
+                <class name="ExampleClass1">
+                    <methods>
+                        <method name="method1">
+                            <lines>
+                                <line number="20" hits="8"/>
+                                <line number="25" hits="12"/>
+                            </lines>
+                        </method>
+                    </methods>
+                </class>
+                <class name="ExampleClass2">
+                    <methods>
+                        <method name="method2">
+                            <lines>
+                                <line number="10" hits="5"/>
+                                <line number="15" hits="10"/>
+                            </lines>
+                        </method>
+                    </methods>
+                </class>
+            </classes>
+        </package>
+    </packages>
+</coverage>
