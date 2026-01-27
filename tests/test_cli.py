@@ -1,5 +1,6 @@
 import json
 import os
+from pycobertura.cli import ExitCodes
 import pytest
 from click.testing import CliRunner
 
@@ -12,6 +13,55 @@ def test_exit_codes():
     assert ExitCodes.EXCEPTION == 1
     assert ExitCodes.COVERAGE_WORSENED == 2
     assert ExitCodes.NOT_ALL_CHANGES_COVERED == 3
+    assert ExitCodes.TOTAL_MISSES_ABOVE_THRESHOLD == 4
+
+
+@pytest.mark.parametrize("fail_threshold, exit_code", ((1000, ExitCodes.OK), (1, ExitCodes.TOTAL_MISSES_ABOVE_THRESHOLD)))
+def test_show__fail_threshold__exit_status(fail_threshold, exit_code):
+    from pycobertura.cli import show
+
+    runner = CliRunner()
+    result = runner.invoke(show, [
+        'tests/dummy.original.xml',
+        f'--fail-threshold={fail_threshold}',
+    ], catch_exceptions=False)
+    assert result.exit_code == exit_code
+
+
+@pytest.mark.parametrize('fail_threshold', (-1, 0))
+def test_show__fail_threshold__invalid_value(fail_threshold):
+    from pycobertura.cli import show
+
+    runner = CliRunner()
+    result = runner.invoke(
+        show,
+        ['tests/dummy.original.xml', f'--fail-threshold={fail_threshold}'],
+        catch_exceptions=False,
+    )
+    assert result.output == f"""\
+Usage: show [OPTIONS] COBERTURA_FILE
+Try 'show --help' for help.
+
+Error: Invalid value for '--fail-threshold': {fail_threshold} is not in the range x>=1.
+"""
+
+
+@pytest.mark.parametrize('fail_threshold', (42.0, True, False, None))
+def test_show__fail_threshold__invalid_type(fail_threshold):
+    from pycobertura.cli import show
+
+    runner = CliRunner()
+    result = runner.invoke(
+        show,
+        ['tests/dummy.original.xml', f'--fail-threshold={fail_threshold}'],
+        catch_exceptions=False,
+    )
+    assert result.output == f"""\
+Usage: show [OPTIONS] COBERTURA_FILE
+Try 'show --help' for help.
+
+Error: Invalid value for '--fail-threshold': '{fail_threshold}' is not a valid integer range.
+"""
 
 
 def test_show__format_default():
