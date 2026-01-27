@@ -5,6 +5,7 @@
 * Add `--sort-by-uncovered-lines` to sort output, so the file with the most missing lines is at the
   top. Thanks @guettli
 * Fix: JSON and YAML output when using `--ignore-regex` in `show` command. Thanks @OidaTiftla
+* Add `--fail-threshold` to return a non-zero exit code when the total number of uncovered lines exceeds the specified threshold
 
 ## 4.1.0 (2025-04-13)
 

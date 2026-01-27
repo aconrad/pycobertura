@@ -190,8 +190,7 @@ delta_reporters = {
 }
 
 
-@pycobertura.command(
-    help="""\
+@pycobertura.command(help="""\
 The diff command compares and shows the changes between two Cobertura reports.
 
 NOTE: Reporting missing lines or showing the source code with the diff command
@@ -202,8 +201,7 @@ location. If the source is not accessible from the report's location, the
 options `--source1` and `--source2` are necessary to point to the source code
 directories (or zip archives). If the source is not available at all, pass
 `--no-source` but missing lines and source code will not be reported.
-"""
-)
+""")
 @click.argument("cobertura_file1")
 @click.argument("cobertura_file2")
 @click.option(
