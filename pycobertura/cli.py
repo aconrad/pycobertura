@@ -39,6 +39,7 @@ class ExitCodes:
     EXCEPTION = 1
     COVERAGE_WORSENED = 2
     NOT_ALL_CHANGES_COVERED = 3
+    TOTAL_MISSES_ABOVE_THRESHOLD = 4
 
 
 def get_exit_code(differ: CoberturaDiff, source):
@@ -121,6 +122,13 @@ def get_exit_code(differ: CoberturaDiff, source):
     default=False,
     help="Sort the summary so files with the most uncovered lines appear first.",
 )
+@click.option(
+    "--fail-threshold",
+    metavar="<threshold>",
+    type=click.IntRange(min=1),
+    help="Return a non-zero code if the total number of uncovered statements "
+    "exceeds the threshold.",
+)
 def show(
     cobertura_file,
     ignore_regex,
@@ -133,6 +141,7 @@ def show(
     annotation_level,
     annotation_title,
     annotation_message,
+    fail_threshold,
 ):
     """show coverage summary of a Cobertura report"""
 
@@ -146,7 +155,6 @@ def show(
     Reporter = reporters[format]
     reporter_kwargs = {}
     reporter_kwargs["sort_by_uncovered_lines"] = sort_by_uncovered_lines
-
     reporter = Reporter(cobertura, ignore_regex, **reporter_kwargs)
 
     if format == "csv":
@@ -166,6 +174,10 @@ def show(
     isatty = True if output is None else output.isatty()
     click.echo(report, file=output, nl=isatty)
 
+    if fail_threshold is not None:
+        if cobertura.total_misses() > fail_threshold:
+            raise SystemExit(ExitCodes.TOTAL_MISSES_ABOVE_THRESHOLD)
+
 
 delta_reporters = {
     "text": TextReporterDelta,
@@ -178,8 +190,7 @@ delta_reporters = {
 }
 
 
-@pycobertura.command(
-    help="""\
+@pycobertura.command(help="""\
 The diff command compares and shows the changes between two Cobertura reports.
 
 NOTE: Reporting missing lines or showing the source code with the diff command
@@ -190,8 +201,7 @@ location. If the source is not accessible from the report's location, the
 options `--source1` and `--source2` are necessary to point to the source code
 directories (or zip archives). If the source is not available at all, pass
 `--no-source` but missing lines and source code will not be reported.
-"""
-)
+""")
 @click.argument("cobertura_file1")
 @click.argument("cobertura_file2")
 @click.option(

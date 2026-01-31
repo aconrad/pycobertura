@@ -13,7 +13,6 @@ from ruamel import yaml
 import json
 import io
 
-
 env = Environment(loader=PackageLoader("pycobertura", "templates"))
 env.filters["line_status"] = filters.line_status
 env.filters["line_reason"] = filters.line_reason_icon
