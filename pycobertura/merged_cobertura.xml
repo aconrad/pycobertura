@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<coverage><package name="com.example.package1"><class name="ExampleClass1"><method name="method1"><lines><line number="20" hits="8" /><line number="25" hits="12" /></lines></method></class><class name="ExampleClass2"><method name="method2"><lines><line number="10" hits="8" /><line number="15" hits="18" /></lines></method></class><class name="ExampleClass3"><method name="method3"><lines><line number="30" hits="6" /><line number="35" hits="10" /></lines></method></class></package></coverage>
